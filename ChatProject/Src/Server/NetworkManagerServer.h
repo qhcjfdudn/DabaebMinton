@@ -3,13 +3,15 @@
 class NetworkManagerServer
 {
 public:
-	static NetworkManagerServer* GetInstance();
+
+	static NetworkManagerServer& GetInstance();
 	
 	void Init();
 
 private:
-	NetworkManagerServer() {}
+	NetworkManagerServer();
+	~NetworkManagerServer();
 
 	//SOCKET mServerSocket;
-	//WSADATA wsa;
+	WSADATA wsa;
 };
