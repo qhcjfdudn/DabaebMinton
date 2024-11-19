@@ -56,13 +56,12 @@ void NetworkManagerServer::ReceivePackets() {
 	char packet[1000];
 	auto& engine = Engine::GetInstance();
 	
-	for (auto it = clientSockets.begin(); it != clientSockets.end();) {
+	for (auto it = clientSockets.begin(); it != clientSockets.end(); it++) {
 		memset(packet, 0, sizeof(packet));
 		if (recv(*it, packet, sizeof(packet), 0) == SOCKET_ERROR) {
 			cout << "recv error: " << WSAGetLastError() << endl;
 			if (WSAGetLastError() == 10054) {
-				closesocket(*it);
-				it = clientSockets.erase(it);
+				clientSocketItersToErase.push_back(it);
 			}
 			continue;
 		}
@@ -71,8 +70,10 @@ void NetworkManagerServer::ReceivePackets() {
 		// 임시 종료 조건
 		if (strcmp(packet, "quit") == 0)
 			engine.isRunning = false;
+	}
 
-		it++;
+	if (clientSocketItersToErase.size() > 0) {
+		closeSockets();
 	}
 }
 void NetworkManagerServer::SendPackets() {
@@ -85,6 +86,22 @@ void NetworkManagerServer::SendPackets() {
 	//		cout << "send error: " << WSAGetLastError() << endl;
 	//	}
 	//}
+
+	if (clientSocketItersToErase.size() > 0) {
+		closeSockets();
+	}
+}
+
+void NetworkManagerServer::closeSockets() {
+	for (auto clientSocketIter : clientSocketItersToErase) {
+		if (closesocket(*clientSocketIter) == SOCKET_ERROR) {
+			cout << "closesocket error: " << WSAGetLastError() << endl;
+		}
+
+		clientSockets.erase(clientSocketIter);
+	}
+
+	clientSocketItersToErase.clear();
 }
 
 NetworkManagerServer::NetworkManagerServer()
