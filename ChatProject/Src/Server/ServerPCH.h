@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <queue>
+#include <thread>
+#include <list>
 
 #include <WinSock2.h>
 
