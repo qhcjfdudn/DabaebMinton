@@ -53,26 +53,35 @@ void NetworkManagerServer::Init() {
 }
 
 void NetworkManagerServer::InitIOCP() {
-	SOCKET s = WSASocket(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
+	// Overlapped IO 위한 listen socket 생성
+	SOCKET listenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
 	
 	sockaddr_in s_in = {};
 	s_in.sin_family = AF_INET;
 	s_in.sin_addr.S_un.S_addr = INADDR_ANY;
 	s_in.sin_port = htons(50000);
 
-	if (bind(s, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in)) == SOCKET_ERROR) {
+	if (bind(listenSocket, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in)) == SOCKET_ERROR) {
 		cout << "bind error: " << WSAGetLastError() << endl;
 		return;
 	}
 
-	if (listen(s, 10) == SOCKET_ERROR) {
+	if (listen(listenSocket, 10) == SOCKET_ERROR) {
 		cout << "listen error: " << WSAGetLastError() << endl;
 		return;
 	}
 
+	// IOCP 생성
 	mh_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, 0, m_threadCount);
 
-
+	// IOCP에 listen socket 추가
+	if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(listenSocket),
+		mh_iocp, reinterpret_cast<ULONG_PTR>(nullptr), 0) == nullptr) {
+		cout << "Add IOCP error: " << GetLastError() << endl;
+		//cout << "Add IOCP error: " << WSAGetLastError() << endl;
+		return;
+	}
+	
 
 }
 
