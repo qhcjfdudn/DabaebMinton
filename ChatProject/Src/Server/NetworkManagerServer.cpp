@@ -52,7 +52,7 @@ void NetworkManagerServer::Init() {
 		});
 }
 
-void NetworkManagerServer::Init2() {
+void NetworkManagerServer::InitIOCP() {
 	SOCKET s = WSASocket(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
 	
 	sockaddr_in s_in = {};

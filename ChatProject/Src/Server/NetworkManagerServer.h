@@ -6,7 +6,7 @@ public:
 
 	static NetworkManagerServer& GetInstance();
 	void Init();
-	void Init2();
+	void InitIOCP();
 
 	void ReceivePackets();
 	void SendPackets();
