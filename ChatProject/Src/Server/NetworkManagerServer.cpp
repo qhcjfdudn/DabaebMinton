@@ -82,6 +82,7 @@ void NetworkManagerServer::InitIOCP() {
 		return;
 	}
 	
+	// accept. WSAIoctl()? AcceptEx()?
 
 }
 
