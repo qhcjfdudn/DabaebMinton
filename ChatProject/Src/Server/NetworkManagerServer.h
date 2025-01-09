@@ -18,6 +18,8 @@ public:
 	std::list<SOCKET> m_clientSockets;
 	std::vector<std::list<SOCKET>::iterator> m_clientSocketItersToErase;
 
+	LPFN_ACCEPTEX m_AcceptEx;
+
 private:
 	NetworkManagerServer();
 	~NetworkManagerServer();
@@ -25,4 +27,5 @@ private:
 	WSADATA m_wsa;
 	HANDLE mh_iocp;
 	int m_threadCount;
+	OVERLAPPED m_readOverlappedStruct;
 };

@@ -8,6 +8,7 @@
 #include <list>
 
 #include <WinSock2.h>
+#include <mswsock.h>
 
 using std::shared_ptr;
 using std::unique_ptr;

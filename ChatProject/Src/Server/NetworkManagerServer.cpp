@@ -82,7 +82,42 @@ void NetworkManagerServer::InitIOCP() {
 		return;
 	}
 	
-	// accept. WSAIoctl()? AcceptEx()?
+	// WSAIoctl로부터 AcceptEx 함수 포인터 할당
+	GUID guidAcceptEx = WSAID_ACCEPTEX;
+	//LPFN_ACCEPTEX AcceptEx = nullptr;
+	DWORD dwBytes;
+
+	if (WSAIoctl(listenSocket,				// 소켓 API라 필요한 것 같은데... 아직 필요를 모르겠음.
+		SIO_GET_EXTENSION_FUNCTION_POINTER,	// AcceptEx 함수 포인터를 얻기 위한 제어 코드
+		&guidAcceptEx,						// 얻고자 하는 함수 이름의 지정된 값(WSAID_ACCEPTEX) 사용.
+		sizeof(guidAcceptEx),
+		&m_AcceptEx,						// 요청에 대한 출력 버퍼. AcceptEx 함수 포인터 출력.
+		sizeof(m_AcceptEx),
+		&dwBytes,							// 출력버퍼로 출력된 개수. <- 애매
+		nullptr,							// lpOverlapped: WSAOVERLAPPED 구조체 포인터. 지금 불필요.
+		nullptr) == SOCKET_ERROR) {			// lpCompletionRoutine: 작업 완료 후 호출할 루틴 전달 가능. // 지금 불필요.
+
+		cout << "WSAIoctl error: " << WSAGetLastError() << endl;
+		}
+
+	if (m_AcceptEx == nullptr) {
+		cout << "Getting AcceptEx ptr failed." << endl;
+	}
+
+	// AcceptEx 호출
+	SOCKET clientCandidateSocket = WSASocket(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
+	char lpOutputBuf[1024];
+
+	bool ret = m_AcceptEx(listenSocket,	// listenSocket
+		clientCandidateSocket,			// Accept가 이루어지면 client socket으로 변한다.
+		lpOutputBuf,					// 첫 번째 데이터 블록, 서버 로컬주소, 클라 원격 주소 수신 버퍼
+		0,								// 수신에 사용할 데이터 바이트 수. 0이면 데이터는 받지 않고 accept만 하겠다는 의미.
+		sizeof(sockaddr_in) + 16,		// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
+		sizeof(sockaddr_in) + 16,		// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
+		&dwBytes,						// 받은 바이트 수. 불필요.
+		&m_readOverlappedStruct);		// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
+	// 에러가 없다면 ret은 TRUE이다.
+	
 
 }
 
