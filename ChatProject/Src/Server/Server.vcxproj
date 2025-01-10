@@ -111,6 +111,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -137,6 +138,7 @@
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="IOCPEvent.cpp" />
     <ClCompile Include="NetworkManagerServer.cpp" />
     <ClCompile Include="ServerMain.cpp" />
     <ClCompile Include="ServerPCH.cpp">
@@ -147,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="IOCPEvent.h" />
     <ClInclude Include="NetworkManagerServer.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="WorldServer.h" />
