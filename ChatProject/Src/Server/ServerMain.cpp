@@ -8,14 +8,16 @@ int main() {
 	auto& engine = Engine::GetInstance();
 	
 	auto& networkInstance = NetworkManagerServer::GetInstance();
-	networkInstance.Init();
+	//networkInstance.Init();
+	networkInstance.InitIOCP();
 
 	auto& worldInstance = WorldServer::GetInstance();
 
 	cout << "engine start" << endl;
 	while (engine.isRunning) {
 
-		networkInstance.ReceivePackets();
+		//networkInstance.ReceivePackets();
+		networkInstance.ReceivePacketsIOCP();
 		worldInstance.Update();
 		networkInstance.SendPackets();
 

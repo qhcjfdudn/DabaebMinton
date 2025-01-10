@@ -1,15 +1,20 @@
 #pragma once
 
+#include "IOCPEvent.h"
+
 class NetworkManagerServer
 {
 public:
 
 	static NetworkManagerServer& GetInstance();
-	void Init();
-	void InitIOCP();
 
+	void Init();
 	void ReceivePackets();
 	void SendPackets();
+
+	void InitIOCP();
+	void ReceivePacketsIOCP();
+	bool GetCompletionStatus();
 
 	void closeSockets();
 
@@ -20,6 +25,8 @@ public:
 
 	LPFN_ACCEPTEX m_AcceptEx;
 
+	static const int MAX_IOCP_EVENT_COUNT = 1000;
+
 private:
 	NetworkManagerServer();
 	~NetworkManagerServer();
@@ -28,4 +35,7 @@ private:
 	HANDLE mh_iocp;
 	int m_threadCount;
 	OVERLAPPED m_readOverlappedStruct;
+
+	IOCPEvent iocpEvent;
+	DWORD timeoutMs = 100;
 };

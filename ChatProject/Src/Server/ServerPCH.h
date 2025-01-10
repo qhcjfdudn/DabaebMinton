@@ -11,6 +11,8 @@
 #include <mswsock.h>
 
 using std::shared_ptr;
+using std::make_shared;
+
 using std::unique_ptr;
 using std::cout;
 using std::endl;
