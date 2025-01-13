@@ -95,7 +95,13 @@ void NetworkManagerServer::SendPackets() {
 
 void NetworkManagerServer::InitIOCP() {
 	// Overlapped IO 위한 listen socket 생성
-	SOCKET listenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
+	SOCKET listenSocket = WSASocket(
+		AF_INET, 
+		SOCK_STREAM, 
+		0, 
+		nullptr, 
+		0, 
+		WSA_FLAG_OVERLAPPED);
 	
 	cout << "listenSocket 생성 완료" << endl;
 		 
@@ -119,7 +125,11 @@ void NetworkManagerServer::InitIOCP() {
 	cout << "listen 완료" << endl;
 
 	// IOCP 생성
-	mh_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, nullptr, reinterpret_cast<ULONG_PTR>(nullptr), m_threadCount);
+	mh_iocp = CreateIoCompletionPort(
+		INVALID_HANDLE_VALUE, 
+		nullptr, 
+		reinterpret_cast<ULONG_PTR>(nullptr), 
+		m_threadCount);
 
 	cout << "IOCP 생성 완료" << endl;
 
@@ -162,7 +172,13 @@ void NetworkManagerServer::InitIOCP() {
 
 	if (m_AcceptEx != nullptr) {
 		// AcceptEx 호출
-		SOCKET clientCandidateSocket = WSASocket(AF_INET, SOCK_STREAM, 0, nullptr, 0, WSA_FLAG_OVERLAPPED);
+		SOCKET clientCandidateSocket = WSASocket(
+			AF_INET, 
+			SOCK_STREAM, 
+			0, 
+			nullptr, 
+			0, 
+			WSA_FLAG_OVERLAPPED);
 		char lpOutputBuf[1024];
 
 		bool ret = m_AcceptEx(listenSocket,	// listenSocket
@@ -206,7 +222,7 @@ bool NetworkManagerServer::GetCompletionStatus() {
 		MAX_IOCP_EVENT_COUNT,				// 최대 event 개수
 		(ULONG*)&iocpEvent.m_eventCount,	// 수신한 event 개수를 받을 변수
 		timeoutMs,							// 다시 분석 필요
-		FALSE);								// ???
+		FALSE);								// fAlertable: ?????
 
 	if (ret == false)	// 실패 시
 	{
