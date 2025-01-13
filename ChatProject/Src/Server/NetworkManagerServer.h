@@ -19,12 +19,12 @@ public:
 
 	void closeSockets();
 
-	std::thread* m_acceptSocketThread;
+	std::thread* m_acceptSocketThread = nullptr;
 
 	std::list<SOCKET> m_clientSockets;
 	std::vector<std::list<SOCKET>::iterator> m_clientSocketItersToErase;
 
-	LPFN_ACCEPTEX m_AcceptEx;
+	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 
 	static const int MAX_IOCP_EVENT_COUNT = 1000;
 
@@ -33,15 +33,15 @@ private:
 	~NetworkManagerServer();
 
 	WSADATA m_wsa;
-	HANDLE mh_iocp;
-	int m_threadCount;
+	HANDLE mh_iocp = nullptr;
+	int m_threadCount = 1;
 
-	SOCKET m_listenSocket;
-	SOCKET m_clientCandidateSocket;
-	char m_lpOutputBuf[1024];
-	DWORD m_dwBytes;
-	OVERLAPPED m_readOverlappedStruct;
+	SOCKET m_listenSocket{};
+	SOCKET m_clientCandidateSocket{};
+	char m_lpOutputBuf[1024] = { 0, };
+	DWORD m_dwBytes{};
+	OVERLAPPED m_readOverlappedStruct{};
 
-	IOCPEvent m_iocpEvent;
-	DWORD m_timeoutMs;
+	IOCPEvent m_iocpEvent{};
+	DWORD m_timeoutMs{ 100 };
 };

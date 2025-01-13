@@ -285,23 +285,6 @@ void NetworkManagerServer::closeSockets()
 
 NetworkManagerServer::NetworkManagerServer()
 {
-	m_acceptSocketThread = nullptr;
-	
-	mh_iocp = nullptr;
-	m_threadCount = 1;
-	
-	m_AcceptEx = nullptr;
-	m_listenSocket = {};
-	m_clientCandidateSocket = {};
-	memset(&m_lpOutputBuf, 0, sizeof(m_lpOutputBuf));
-	m_dwBytes = {};
-
-	m_readOverlappedStruct = {};
-	
-	memset(&m_iocpEvent, 0, sizeof(m_iocpEvent));
-	m_timeoutMs = 100;
-
-
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
 	{
 		cout << "WSAStartup failed" << endl;
