@@ -3,11 +3,9 @@
 class IOCPEvent
 {
 public:
-	IOCPEvent(int max_event_count);
+	static const int MAX_EVENT_COUNT = 1000;
 
-	const int MAX_EVENT_COUNT;
-
-	unique_ptr<OVERLAPPED_ENTRY[]> m_events;
+	OVERLAPPED_ENTRY m_events[MAX_EVENT_COUNT];
 	int m_eventCount = 0;
 };
 

@@ -198,9 +198,11 @@ void NetworkManagerServer::ReceivePacketsIOCP() {
 }
 
 bool NetworkManagerServer::GetCompletionStatus() {
+	cout << "GetCompletionStatus() 호출" << endl;
+
 	bool ret = GetQueuedCompletionStatusEx(
 		mh_iocp,							// IOCP 객체
-		iocpEvent.m_events.get(),			// 처리가 완료된 event를 수신하는 배열
+		iocpEvent.m_events,					// 처리가 완료된 event를 수신하는 배열
 		MAX_IOCP_EVENT_COUNT,				// 최대 event 개수
 		(ULONG*)&iocpEvent.m_eventCount,	// 수신한 event 개수를 받을 변수
 		timeoutMs,							// 다시 분석 필요
@@ -208,12 +210,19 @@ bool NetworkManagerServer::GetCompletionStatus() {
 
 	if (ret == false)	// 실패 시
 	{
+		int errorCode = WSAGetLastError();
+		
+		if (errorCode == WSA_WAIT_TIMEOUT)	// timeoutMs 동안 event가 발생하지 않았다.
+											// 별도 처리할 내용 없음
+		{}
+		else
+		{
+			cout << "GetQueuedCompletionStatusEx 실패" << endl;
+			cout << errorCode << endl;
+		}
+		
 		iocpEvent.m_eventCount = 0;			// 실패 시 수동으로 변경 필요 코드
-		cout << "GetQueuedCompletionStatusEx 실패" << endl;
-		cout << WSAGetLastError() << endl;
 	}
-
-	cout << "비동기 테스트" << endl;
 
 	return ret;
 }
@@ -232,8 +241,8 @@ void NetworkManagerServer::closeSockets() {
 
 NetworkManagerServer::NetworkManagerServer()
 	: m_acceptSocketThread(nullptr), mh_iocp(nullptr), m_threadCount(1),
-	m_AcceptEx(nullptr), m_readOverlappedStruct(),
-	iocpEvent(1000)
+	m_AcceptEx(nullptr), m_readOverlappedStruct({}),
+	iocpEvent()
 {
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0) {
 		cout << "WSAStartup failed" << endl;
