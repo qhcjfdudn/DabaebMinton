@@ -13,6 +13,7 @@ public:
 	void SendPackets();
 
 	void InitIOCP();
+	void AcceptEx();
 	void ReceivePacketsIOCP();
 	bool GetCompletionStatus();
 
@@ -34,8 +35,13 @@ private:
 	WSADATA m_wsa;
 	HANDLE mh_iocp;
 	int m_threadCount;
+
+	SOCKET m_listenSocket;
+	SOCKET m_clientCandidateSocket;
+	char m_lpOutputBuf[1024];
+	DWORD m_dwBytes;
 	OVERLAPPED m_readOverlappedStruct;
 
-	IOCPEvent iocpEvent;
-	DWORD timeoutMs = 100;
+	IOCPEvent m_iocpEvent;
+	DWORD m_timeoutMs = 100;
 };
