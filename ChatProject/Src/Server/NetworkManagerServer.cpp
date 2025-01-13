@@ -215,7 +215,8 @@ void NetworkManagerServer::AcceptEx()
 	}
 }
 
-void NetworkManagerServer::ReceivePacketsIOCP() {
+void NetworkManagerServer::ReceivePacketsIOCP()
+{
 	GetCompletionStatus();
 
 	// 받은 이벤트 각각을 처리합니다.
@@ -236,8 +237,9 @@ void NetworkManagerServer::ReceivePacketsIOCP() {
 	}
 }
 
-bool NetworkManagerServer::GetCompletionStatus() {
-	cout << "GetCompletionStatus() 호출" << endl;
+bool NetworkManagerServer::GetCompletionStatus()
+{
+	//cout << "GetCompletionStatus() 호출" << endl;
 
 	bool ret = GetQueuedCompletionStatusEx(
 		mh_iocp,							// IOCP 객체
@@ -266,9 +268,12 @@ bool NetworkManagerServer::GetCompletionStatus() {
 	return ret;
 }
 
-void NetworkManagerServer::closeSockets() {
-	for (auto clientSocketIter : m_clientSocketItersToErase) {
-		if (closesocket(*clientSocketIter) == SOCKET_ERROR) {
+void NetworkManagerServer::closeSockets()
+{
+	for (auto clientSocketIter : m_clientSocketItersToErase)
+	{
+		if (closesocket(*clientSocketIter) == SOCKET_ERROR)
+		{
 			cout << "closesocket error: " << WSAGetLastError() << endl;
 		}
 
@@ -279,11 +284,26 @@ void NetworkManagerServer::closeSockets() {
 }
 
 NetworkManagerServer::NetworkManagerServer()
-	: m_acceptSocketThread(nullptr), mh_iocp(nullptr), m_threadCount(1),
-	m_AcceptEx(nullptr), m_readOverlappedStruct({}),
-	m_iocpEvent()
 {
-	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0) {
+	m_acceptSocketThread = nullptr;
+	
+	mh_iocp = nullptr;
+	m_threadCount = 1;
+	
+	m_AcceptEx = nullptr;
+	m_listenSocket = {};
+	m_clientCandidateSocket = {};
+	memset(&m_lpOutputBuf, 0, sizeof(m_lpOutputBuf));
+	m_dwBytes = {};
+
+	m_readOverlappedStruct = {};
+	
+	memset(&m_iocpEvent, 0, sizeof(m_iocpEvent));
+	m_timeoutMs = 100;
+
+
+	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
+	{
 		cout << "WSAStartup failed" << endl;
 		
 		return;
@@ -292,8 +312,10 @@ NetworkManagerServer::NetworkManagerServer()
 	cout << m_clientSockets.size() << endl;
 }
 NetworkManagerServer::~NetworkManagerServer() {
-	for (const auto& clientSocket : m_clientSockets) {
-		if (closesocket(clientSocket) == SOCKET_ERROR) {
+	for (const auto& clientSocket : m_clientSockets)
+	{
+		if (closesocket(clientSocket) == SOCKET_ERROR)
+		{
 			cout << "closesocket error: " << WSAGetLastError() << endl;
 		}
 	}

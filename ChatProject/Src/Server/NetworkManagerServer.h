@@ -43,5 +43,5 @@ private:
 	OVERLAPPED m_readOverlappedStruct;
 
 	IOCPEvent m_iocpEvent;
-	DWORD m_timeoutMs = 100;
+	DWORD m_timeoutMs;
 };
