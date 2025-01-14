@@ -29,6 +29,8 @@ public:
 
 	static const int MAX_IOCP_EVENT_COUNT = 1000;
 
+	std::unordered_map<ULONG_PTR, shared_ptr<Socket>> m_clientsMap;
+
 private:
 	NetworkManagerServer();
 	~NetworkManagerServer();

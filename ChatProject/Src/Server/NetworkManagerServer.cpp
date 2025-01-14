@@ -226,44 +226,38 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			// m_clientCandidateSocket 변수는 새로운 clientSocket의 주소를 가지고 있을 것이다.
 			// // ac, 104, ... 이런 값으로 출력.
 			// 어쨌든 연결될 때마다 다른 값이다.
-			Socket clientSocket;
-			clientSocket.m_socket = m_clientCandidateSocket.m_socket;
+			shared_ptr<Socket> clientSocket = make_shared<Socket>();
+			clientSocket->m_socket = m_clientCandidateSocket.m_socket;
 
 			// 신규 client를 IOCP에 추가
-			// 
+			const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(&clientSocket);
 			if (CreateIoCompletionPort(
-				reinterpret_cast<HANDLE>(clientSocket.m_socket),
+				reinterpret_cast<HANDLE>(clientSocket->m_socket),
 				mh_iocp,
-				reinterpret_cast<ULONG_PTR>(&clientSocket.m_socket),
+				completionKey,
 				0) == nullptr) {
 				cout << "Add IOCP error: " << WSAGetLastError() << endl;
 				return;
 			}
 
+			// 이후 completionKey로 clientSocket 참조 위해 map에 저장해둔다.
+			m_clientsMap.insert({ completionKey, clientSocket });
+				
 			// 다시 listenSocket을 accept로 변경
 			// listenSocket.AcceptEx() 형태로 쓰는 게 좋을 것 같다. 추후 리팩터링 진행.
 			AcceptEx();
 
 			// 연결한 clientSocket을 recv로 전환
-			WSABUF b;
-			b.buf = clientSocket.m_receiveBuffer;
-			b.len = clientSocket.MAX_RECEIVE_LENGTH;
+			clientSocket->Recv();
 
-			// overlapped I/O가 진행되는 동안 여기 값이 채워집니다.
-			clientSocket.m_readFlags = 0;
-
-			WSARecv(
-				clientSocket.m_socket, 
-				&b, 
-				1, 
-				NULL, 
-				&clientSocket.m_readFlags,
-				&m_readOverlappedStruct, 
-				NULL);
 		}
 		else // clientSocket
 		{
-			cout << "WSARecv() 성공!" << endl;
+			auto clientSocket = m_clientsMap[readEvent.lpCompletionKey];
+			// 수신 내용 출력
+			cout << clientSocket->m_receiveBuffer << endl;
+
+			clientSocket->Recv();
 		}
 	}
 }

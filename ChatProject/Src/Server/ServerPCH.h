@@ -6,6 +6,7 @@
 #include <queue>
 #include <thread>
 #include <list>
+#include <unordered_map>
 
 #include <WinSock2.h>
 #include <mswsock.h>
