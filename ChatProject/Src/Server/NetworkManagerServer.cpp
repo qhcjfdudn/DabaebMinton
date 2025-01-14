@@ -188,7 +188,9 @@ void NetworkManagerServer::AcceptEx()
 	bool acceptExStatus = m_AcceptEx(
 		m_listenSocket,				// listenSocket
 		m_clientCandidateSocket,	// Accept가 이루어지면 client socket으로 변한다.
-		m_lpOutputBuf,				// 첫 번째 데이터 블록, 서버 로컬주소, 클라 원격 주소 수신 버퍼
+		m_lpOutputBuf,				// 첫 번째 데이터 블록, 서버 로컬주소, 클라 원격 주소 수신 버퍼.
+									// 이 변수와 아래 3개의 바이트 수 정보 변수는 GetAcceptExSockaddrs() 함수의 인자로
+									// 로컬/원격 sockaddr 정보를 파싱할 때에 사용될 수 있다.
 		0,							// 수신에 사용할 데이터 바이트 수. 0이면 데이터는 받지 않고 accept만 하겠다는 의미.
 		sizeof(sockaddr_in) + 16,	// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
 		sizeof(sockaddr_in) + 16,	// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
@@ -215,7 +217,7 @@ void NetworkManagerServer::AcceptEx()
 	}
 }
 
-void NetworkManagerServer::ReceivePacketsIOCP()
+void NetworkManagerServer::ProcessIOCPEvent()
 {
 	GetCompletionStatus();
 
@@ -228,11 +230,43 @@ void NetworkManagerServer::ReceivePacketsIOCP()
 			cout << "listen Socket!!!" << endl;
 
 			// m_clientCandidateSocket로부터 신규 client socket을 iocp에 추가
-			
+			// listenSocket과 동일한 context로 clientSocket을 최적화
+			setsockopt(
+				m_clientCandidateSocket,
+				SOL_SOCKET,
+				SO_UPDATE_ACCEPT_CONTEXT,
+				reinterpret_cast<const char*>(&m_listenSocket),
+				sizeof(m_listenSocket));
 
+			// SOCKET 타입은 UINT_PTR일 뿐이다. 아래와 같이 값을 대입하고
+			// 이후에 m_clientCandidateSocket을 다시 listen에 사용하더라도
+			// m_clientCandidateSocket 변수는 새로운 clientSocket의 주소를 가지고 있을 것이다.
+			// // ac, 104, ... 이런 값으로 출력.
+			// 어쨌든 연결될 때마다 다른 값이다.
+			SOCKET clientSocket = m_clientCandidateSocket;
 
-			// 다시 listenSocket을 accept
+			// 신규 client를 IOCP에 추가
+			// 
+			if (CreateIoCompletionPort(
+				reinterpret_cast<HANDLE>(clientSocket),
+				mh_iocp,
+				reinterpret_cast<ULONG_PTR>(&clientSocket),
+				0) == nullptr) {
+				cout << "Add IOCP error: " << WSAGetLastError() << endl;
+				return;
+			}
+
+			// 다시 listenSocket을 accept로 변경
+			// listenSocket.AcceptEx() 형태로 쓰는 게 좋을 것 같다. 추후 리팩터링 진행.
 			AcceptEx();
+
+			// 연결한 clientSocket을 recv로 전환
+
+
+		}
+		else // clientSocket
+		{
+
 		}
 	}
 }

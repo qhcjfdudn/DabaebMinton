@@ -14,7 +14,7 @@ public:
 
 	void InitIOCP();
 	void AcceptEx();
-	void ReceivePacketsIOCP();
+	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
 
 	void closeSockets();

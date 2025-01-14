@@ -17,7 +17,7 @@ int main() {
 	while (engine.isRunning) {
 
 		//networkInstance.ReceivePackets();
-		networkInstance.ReceivePacketsIOCP();
+		networkInstance.ProcessIOCPEvent();
 		worldInstance.Update();
 		networkInstance.SendPackets();
 
