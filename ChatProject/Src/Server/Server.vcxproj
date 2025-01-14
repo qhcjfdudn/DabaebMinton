@@ -144,6 +144,7 @@
     <ClCompile Include="ServerPCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Socket.cpp" />
     <ClCompile Include="WorldServer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,6 +153,7 @@
     <ClInclude Include="IOCPEvent.h" />
     <ClInclude Include="NetworkManagerServer.h" />
     <ClInclude Include="ServerPCH.h" />
+    <ClInclude Include="Socket.h" />
     <ClInclude Include="WorldServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
