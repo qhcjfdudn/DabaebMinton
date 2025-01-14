@@ -95,29 +95,18 @@ void NetworkManagerServer::SendPackets() {
 
 void NetworkManagerServer::InitIOCP() {
 	// Overlapped IO 위한 listen socket 생성
-	m_listenSocket = WSASocket(
-		AF_INET, 
-		SOCK_STREAM, 
-		0, 
-		nullptr, 
-		0, 
-		WSA_FLAG_OVERLAPPED);
+	m_listenSocket.m_socket = Socket::CreateWSASocket();
 	
 	cout << "listenSocket 생성 완료" << endl;
-		 
-	sockaddr_in s_in = {};
-	s_in.sin_family = AF_INET;
-	s_in.sin_addr.S_un.S_addr = INADDR_ANY;
-	s_in.sin_port = htons(50000);
 
-	if (bind(m_listenSocket, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in)) == SOCKET_ERROR) {
+	if (m_listenSocket.BindServer(50000) == SOCKET_ERROR) {
 		cout << "bind error: " << WSAGetLastError() << endl;
 		return;
 	}
 
 	cout << "bind 완료" << endl;
 
-	if (listen(m_listenSocket, 10) == SOCKET_ERROR) {
+	if (listen(m_listenSocket.m_socket, 10) == SOCKET_ERROR) {
 		cout << "listen error: " << WSAGetLastError() << endl;
 		return;
 	}
@@ -135,7 +124,7 @@ void NetworkManagerServer::InitIOCP() {
 
 	// IOCP에 listen socket 추가
 	if (CreateIoCompletionPort(
-		reinterpret_cast<HANDLE>(m_listenSocket),
+		reinterpret_cast<HANDLE>(m_listenSocket.m_socket),
 		mh_iocp, 
 		reinterpret_cast<ULONG_PTR>(nullptr), 
 		0) == nullptr) {
@@ -151,7 +140,7 @@ void NetworkManagerServer::InitIOCP() {
 	DWORD dwBytes;
 
 	if (WSAIoctl(
-		m_listenSocket,						// 소켓 API라 필요한 arg인 것 같은데... 아직 왜 필요한지 모르겠음.
+		m_listenSocket.m_socket,						// 소켓 API라 필요한 arg인 것 같은데... 아직 왜 필요한지 모르겠음.
 		SIO_GET_EXTENSION_FUNCTION_POINTER,	// AcceptEx 함수 포인터를 얻기 위한 제어 코드
 		&guidAcceptEx,						// 얻고자 하는 함수 이름의 지정된 값(WSAID_ACCEPTEX) 사용.
 		sizeof(guidAcceptEx),
@@ -177,25 +166,19 @@ void NetworkManagerServer::InitIOCP() {
 
 void NetworkManagerServer::AcceptEx()
 {
-	m_clientCandidateSocket = WSASocket(
-		AF_INET,
-		SOCK_STREAM,
-		0,
-		nullptr,
-		0,
-		WSA_FLAG_OVERLAPPED);
+	m_clientCandidateSocket.m_socket = Socket::CreateWSASocket();
 
 	bool acceptExStatus = m_AcceptEx(
-		m_listenSocket,				// listenSocket
-		m_clientCandidateSocket,	// Accept가 이루어지면 client socket으로 변한다.
-		m_lpOutputBuf,				// 첫 번째 데이터 블록, 서버 로컬주소, 클라 원격 주소 수신 버퍼.
-									// 이 변수와 아래 3개의 바이트 수 정보 변수는 GetAcceptExSockaddrs() 함수의 인자로
-									// 로컬/원격 sockaddr 정보를 파싱할 때에 사용될 수 있다.
-		0,							// 수신에 사용할 데이터 바이트 수. 0이면 데이터는 받지 않고 accept만 하겠다는 의미.
-		sizeof(sockaddr_in) + 16,	// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
-		sizeof(sockaddr_in) + 16,	// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
-		&m_dwBytes,					// 받은 바이트 수. 불필요.
-		&m_readOverlappedStruct);	// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
+		m_listenSocket.m_socket,			// listenSocket
+		m_clientCandidateSocket.m_socket,	// Accept가 이루어지면 client socket으로 변한다.
+		m_lpOutputBuf,						// 첫 번째 데이터 블록, 서버 로컬주소, 클라 원격 주소 수신 버퍼.
+											// 이 변수와 아래 3개의 바이트 수 정보 변수는 GetAcceptExSockaddrs() 함수의 인자로
+											// 로컬/원격 sockaddr 정보를 파싱할 때에 사용될 수 있다.
+		0,									// 수신에 사용할 데이터 바이트 수. 0이면 데이터는 받지 않고 accept만 하겠다는 의미.
+		sizeof(sockaddr_in) + 16,			// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
+		sizeof(sockaddr_in) + 16,			// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
+		&m_dwBytes,							// 받은 바이트 수. 불필요.
+		&m_readOverlappedStruct);			// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
 	// 에러가 없다면 ret은 TRUE이다.
 
 	if (acceptExStatus == false)
@@ -232,7 +215,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			// m_clientCandidateSocket로부터 신규 client socket을 iocp에 추가
 			// listenSocket과 동일한 context로 clientSocket을 최적화
 			setsockopt(
-				m_clientCandidateSocket,
+				m_clientCandidateSocket.m_socket,
 				SOL_SOCKET,
 				SO_UPDATE_ACCEPT_CONTEXT,
 				reinterpret_cast<const char*>(&m_listenSocket),
@@ -243,14 +226,15 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			// m_clientCandidateSocket 변수는 새로운 clientSocket의 주소를 가지고 있을 것이다.
 			// // ac, 104, ... 이런 값으로 출력.
 			// 어쨌든 연결될 때마다 다른 값이다.
-			SOCKET clientSocket = m_clientCandidateSocket;
+			Socket clientSocket;
+			clientSocket.m_socket = m_clientCandidateSocket.m_socket;
 
 			// 신규 client를 IOCP에 추가
 			// 
 			if (CreateIoCompletionPort(
-				reinterpret_cast<HANDLE>(clientSocket),
+				reinterpret_cast<HANDLE>(clientSocket.m_socket),
 				mh_iocp,
-				reinterpret_cast<ULONG_PTR>(&clientSocket),
+				reinterpret_cast<ULONG_PTR>(&clientSocket.m_socket),
 				0) == nullptr) {
 				cout << "Add IOCP error: " << WSAGetLastError() << endl;
 				return;
@@ -261,12 +245,25 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			AcceptEx();
 
 			// 연결한 clientSocket을 recv로 전환
+			WSABUF b;
+			b.buf = clientSocket.m_receiveBuffer;
+			b.len = clientSocket.MAX_RECEIVE_LENGTH;
 
+			// overlapped I/O가 진행되는 동안 여기 값이 채워집니다.
+			clientSocket.m_readFlags = 0;
 
+			WSARecv(
+				clientSocket.m_socket, 
+				&b, 
+				1, 
+				NULL, 
+				&clientSocket.m_readFlags,
+				&m_readOverlappedStruct, 
+				NULL);
 		}
 		else // clientSocket
 		{
-
+			cout << "WSARecv() 성공!" << endl;
 		}
 	}
 }

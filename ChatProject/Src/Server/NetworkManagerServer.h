@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IOCPEvent.h"
+#include "Socket.h"
 
 class NetworkManagerServer
 {
@@ -36,12 +37,13 @@ private:
 	HANDLE mh_iocp = nullptr;
 	int m_threadCount = 1;
 
-	SOCKET m_listenSocket{};
-	SOCKET m_clientCandidateSocket{};
 	char m_lpOutputBuf[1024] = { 0, };
 	DWORD m_dwBytes{};
 	OVERLAPPED m_readOverlappedStruct{};
 
 	IOCPEvent m_iocpEvent{};
 	DWORD m_timeoutMs{ 100 };
+
+	Socket m_listenSocket{};
+	Socket m_clientCandidateSocket{};
 };
