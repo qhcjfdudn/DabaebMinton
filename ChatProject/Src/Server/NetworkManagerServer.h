@@ -43,7 +43,6 @@ private:
 
 	char m_lpOutputBuf[1024] = { 0, };
 	DWORD m_dwBytes{};
-	OVERLAPPED m_readOverlappedStruct{};
 
 	IOCPEvent m_iocpEvent{};
 	DWORD m_timeoutMs{ 100 };

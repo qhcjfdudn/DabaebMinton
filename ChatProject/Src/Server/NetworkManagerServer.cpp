@@ -140,7 +140,7 @@ void NetworkManagerServer::InitIOCP() {
 	DWORD dwBytes;
 
 	if (WSAIoctl(
-		m_listenSocket.m_socket,						// 소켓 API라 필요한 arg인 것 같은데... 아직 왜 필요한지 모르겠음.
+		m_listenSocket.m_socket,			// 소켓 API라 필요한 arg인 것 같은데... 아직 왜 필요한지 모르겠음.
 		SIO_GET_EXTENSION_FUNCTION_POINTER,	// AcceptEx 함수 포인터를 얻기 위한 제어 코드
 		&guidAcceptEx,						// 얻고자 하는 함수 이름의 지정된 값(WSAID_ACCEPTEX) 사용.
 		sizeof(guidAcceptEx),
@@ -168,16 +168,16 @@ void NetworkManagerServer::AcceptEx()
 	m_clientCandidateSocket.m_socket = Socket::CreateWSASocket();
 
 	bool acceptExStatus = m_AcceptEx(
-		m_listenSocket.m_socket,			// listenSocket
-		m_clientCandidateSocket.m_socket,	// Accept가 이루어지면 client socket으로 변한다.
-		m_lpOutputBuf,						// 첫 번째 데이터 블록, 서버 로컬주소, 클라 원격 주소 수신 버퍼.
-											// 이 변수와 아래 3개의 바이트 수 정보 변수는 GetAcceptExSockaddrs() 함수의 인자로
-											// 로컬/원격 sockaddr 정보를 파싱할 때에 사용될 수 있다.
-		0,									// 수신에 사용할 데이터 바이트 수. 0이면 데이터는 받지 않고 accept만 하겠다는 의미.
-		sizeof(sockaddr_in) + 16,			// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
-		sizeof(sockaddr_in) + 16,			// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
-		&m_dwBytes,							// 받은 바이트 수. 불필요.
-		&m_readOverlappedStruct);			// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
+		m_listenSocket.m_socket,					// listenSocket
+		m_clientCandidateSocket.m_socket,			// Accept가 이루어지면 client socket으로 변한다.
+		m_lpOutputBuf,								// 첫 번째 데이터 블록, 서버 로컬주소, 클라 원격 주소 수신 버퍼.
+													// 이 변수와 아래 3개의 바이트 수 정보 변수는 GetAcceptExSockaddrs() 함수의 인자로
+													// 로컬/원격 sockaddr 정보를 파싱할 때에 사용될 수 있다.
+		0,											// 수신에 사용할 데이터 바이트 수. 0이면 데이터는 받지 않고 accept만 하겠다는 의미.
+		sizeof(sockaddr_in) + 16,					// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
+		sizeof(sockaddr_in) + 16,					// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
+		&m_dwBytes,									// 받은 바이트 수. 불필요.
+		&m_listenSocket.m_readOverlappedStruct);	// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
 	// 에러가 없다면 ret은 TRUE이다.
 
 	if (acceptExStatus == false)
@@ -260,10 +260,11 @@ void NetworkManagerServer::ProcessIOCPEvent()
 				continue;
 
 			// 수신 내용 출력
-			p_clientSocket->m_receiveBuffer[readEvent.dwNumberOfBytesTransferred] = 0;
+			size_t sendBytes = readEvent.dwNumberOfBytesTransferred;
+
+			p_clientSocket->m_receiveBuffer[sendBytes] = 0;
 			cout << p_clientSocket->m_receiveBuffer << endl;
 
-			size_t sendBytes = readEvent.dwNumberOfBytesTransferred;
 			p_clientSocket->SetSendBuffer(
 				p_clientSocket->m_receiveBuffer,
 				sendBytes);
