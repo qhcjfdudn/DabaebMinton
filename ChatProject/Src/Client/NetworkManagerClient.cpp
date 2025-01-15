@@ -45,15 +45,15 @@ void NetworkManagerClient::Init() {
 
 		if (strcmp(msg, "quit") == 0)
 			break;
+
+		memset(msg, 0, sizeof(msg));
+		if (recv(s, msg, sizeof(msg), 0) == SOCKET_ERROR) {
+			cout << "recv error: " << WSAGetLastError() << endl;
+		}
+
+		cout << msg << endl;
+
 	}
-
-	//memset(msg, 0, sizeof(msg));
-	//if (recv(s, msg, sizeof(msg), 0) == SOCKET_ERROR) {
-	//	cout << "recv error: " << WSAGetLastError() << endl;
-	//}
-
-	//cout << msg << endl;
-
 	if (closesocket(s) == SOCKET_ERROR) {
 		cout << "closesocket error: " << WSAGetLastError() << endl;
 		return;
