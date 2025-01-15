@@ -18,6 +18,7 @@ public:
 	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
 	int Recv(Socket& clientSocket);
+	int Send(Socket& clientSocket, size_t len);
 
 	void closeSockets();
 

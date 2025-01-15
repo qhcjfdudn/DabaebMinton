@@ -20,3 +20,8 @@ int Socket::BindServer(unsigned int port) {
 
 	return bind(m_socket, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in));
 }
+
+void Socket::SetSendBuffer(const char* str, size_t len)
+{
+	memcpy(m_sendBuffer, str, len);
+}

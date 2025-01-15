@@ -253,19 +253,26 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		}
 		else // clientSocket
 		{
-			shared_ptr<Socket> clientSocket = m_clientsMap[readEvent.lpCompletionKey];
+			shared_ptr<Socket> p_clientSocket = m_clientsMap[readEvent.lpCompletionKey];
+
+			// event가 WSASend의 완료에 의해 발생했다면, 무시하자.
+			if (readEvent.lpOverlapped == &p_clientSocket->m_sendOverlappedStruct)
+				continue;
 
 			// 수신 내용 출력
-			clientSocket->m_receiveBuffer[readEvent.dwNumberOfBytesTransferred] = 0;
-			cout << clientSocket->m_receiveBuffer << endl;
+			p_clientSocket->m_receiveBuffer[readEvent.dwNumberOfBytesTransferred] = 0;
+			cout << p_clientSocket->m_receiveBuffer << endl;
+
+			size_t sendBytes = readEvent.dwNumberOfBytesTransferred;
+			p_clientSocket->SetSendBuffer(
+				p_clientSocket->m_receiveBuffer,
+				sendBytes);
 
 			// Send 구현
-			{
-
-			}
+			Send(*p_clientSocket, sendBytes);
 
 			// 다시 수신 대기
-			Recv(*clientSocket);
+			Recv(*p_clientSocket);
 
 		}
 	}
@@ -311,12 +318,29 @@ int NetworkManagerServer::Recv(Socket& clientSocket)
 
 	int retCode = WSARecv(
 		clientSocket.m_socket,
-		&b,													// lpBuffers.
-		1,													// dwBufferCount. lpBuffers 배열의 구조체 개수.
-		reinterpret_cast<LPDWORD>(&numberOfBytesReceived),	// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
+		&b,										// lpBuffers.
+		1,										// dwBufferCount. lpBuffers 배열의 구조체 개수.
+		&numberOfBytesReceived,					// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
 		&clientSocket.m_readFlags,
 		&clientSocket.m_readOverlappedStruct,
-		NULL);												// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
+		NULL);									// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
+
+	return retCode;
+}
+int NetworkManagerServer::Send(Socket& clientSocket, size_t len)
+{
+	WSABUF b;
+	b.buf = clientSocket.m_sendBuffer;
+	b.len = static_cast<ULONG>(len);
+
+	int retCode = WSASend(
+		clientSocket.m_socket,
+		&b,
+		1,
+		&clientSocket.m_numberOfBytesSent,
+		clientSocket.m_sendFlags,
+		&clientSocket.m_sendOverlappedStruct,
+		NULL);
 
 	return retCode;
 }
