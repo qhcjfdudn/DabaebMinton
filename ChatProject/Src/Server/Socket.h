@@ -7,8 +7,9 @@ public:
 	static SOCKET CreateWSASocket();
 	
 	char m_receiveBuffer[MAX_RECEIVE_LENGTH + 1] = { 0, };
-	OVERLAPPED m_readOverlappedStruct{};
+	DWORD m_numberOfBytesReceived{};
 	DWORD m_readFlags{};
+	OVERLAPPED m_readOverlappedStruct{};
 
 	SOCKET m_socket{};
 

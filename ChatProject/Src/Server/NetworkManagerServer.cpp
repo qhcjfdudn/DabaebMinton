@@ -200,6 +200,35 @@ void NetworkManagerServer::AcceptEx()
 	}
 }
 
+bool NetworkManagerServer::GetCompletionStatus()
+{
+	bool ret = GetQueuedCompletionStatusEx(
+		mh_iocp,							// IOCP 객체
+		m_iocpEvent.m_events,					// 처리가 완료된 event를 수신하는 배열
+		MAX_IOCP_EVENT_COUNT,				// 최대 event 개수
+		(ULONG*)&m_iocpEvent.m_eventCount,	// 수신한 event 개수를 받을 변수
+		m_timeoutMs,							// 다시 분석 필요
+		FALSE);								// fAlertable: ?????
+
+	if (ret == false)	// 실패 시
+	{
+		int errorCode = WSAGetLastError();
+		
+		if (errorCode == WSA_WAIT_TIMEOUT)	// timeoutMs 동안 event가 발생하지 않았다.
+											// 별도 처리할 내용 없음
+		{}
+		else
+		{
+			cout << "GetQueuedCompletionStatusEx 실패" << endl;
+			cout << errorCode << endl;
+		}
+		
+		m_iocpEvent.m_eventCount = 0;			// 실패 시 수동으로 변경 필요 코드
+	}
+
+	return ret;
+}
+
 void NetworkManagerServer::ProcessIOCPEvent()
 {
 	GetCompletionStatus();
@@ -230,7 +259,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			clientSocket->m_socket = m_clientCandidateSocket.m_socket;
 
 			// 신규 client를 IOCP에 추가
-			const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(&clientSocket);
+			const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(clientSocket.get());
 			if (CreateIoCompletionPort(
 				reinterpret_cast<HANDLE>(clientSocket->m_socket),
 				mh_iocp,
@@ -241,10 +270,13 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			}
 
 			// 이후 completionKey로 clientSocket 참조 위해 map에 저장해둔다.
+			cout << "completionKey: " << completionKey << endl;
+
 			m_clientsMap.insert({ completionKey, clientSocket });
 				
 			// 다시 listenSocket을 accept로 변경
 			// listenSocket.AcceptEx() 형태로 쓰는 게 좋을 것 같다. 추후 리팩터링 진행.
+			m_clientCandidateSocket.m_socket = Socket::CreateWSASocket();
 			AcceptEx();
 
 			// 연결한 clientSocket을 recv로 전환
@@ -253,44 +285,15 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		}
 		else // clientSocket
 		{
-			auto clientSocket = m_clientsMap[readEvent.lpCompletionKey];
+			shared_ptr<Socket> clientSocket = m_clientsMap[readEvent.lpCompletionKey];
+
 			// 수신 내용 출력
+			clientSocket->m_receiveBuffer[readEvent.dwNumberOfBytesTransferred] = 0;
 			cout << clientSocket->m_receiveBuffer << endl;
 
 			clientSocket->Recv();
 		}
 	}
-}
-
-bool NetworkManagerServer::GetCompletionStatus()
-{
-	//cout << "GetCompletionStatus() 호출" << endl;
-
-	bool ret = GetQueuedCompletionStatusEx(
-		mh_iocp,							// IOCP 객체
-		m_iocpEvent.m_events,					// 처리가 완료된 event를 수신하는 배열
-		MAX_IOCP_EVENT_COUNT,				// 최대 event 개수
-		(ULONG*)&m_iocpEvent.m_eventCount,	// 수신한 event 개수를 받을 변수
-		m_timeoutMs,							// 다시 분석 필요
-		FALSE);								// fAlertable: ?????
-
-	if (ret == false)	// 실패 시
-	{
-		int errorCode = WSAGetLastError();
-		
-		if (errorCode == WSA_WAIT_TIMEOUT)	// timeoutMs 동안 event가 발생하지 않았다.
-											// 별도 처리할 내용 없음
-		{}
-		else
-		{
-			cout << "GetQueuedCompletionStatusEx 실패" << endl;
-			cout << errorCode << endl;
-		}
-		
-		m_iocpEvent.m_eventCount = 0;			// 실패 시 수동으로 변경 필요 코드
-	}
-
-	return ret;
 }
 
 void NetworkManagerServer::closeSockets()

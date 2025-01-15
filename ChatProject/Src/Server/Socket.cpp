@@ -32,12 +32,12 @@ int Socket::Recv()
 
 	int retCode = WSARecv(
 		m_socket,
-		&b,
-		1,
-		NULL,
+		&b,														// lpBuffers.
+		1,														// dwBufferCount. lpBuffers 배열의 구조체 개수.
+		reinterpret_cast<LPDWORD>(&m_numberOfBytesReceived),	// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
 		&m_readFlags,
 		&m_readOverlappedStruct,
-		NULL);
+		NULL);													// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
 
 	return retCode;
 }
