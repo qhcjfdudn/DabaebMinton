@@ -163,7 +163,6 @@ void NetworkManagerServer::InitIOCP() {
 
 	AcceptEx();
 }
-
 void NetworkManagerServer::AcceptEx()
 {
 	m_clientCandidateSocket.m_socket = Socket::CreateWSASocket();
@@ -199,36 +198,6 @@ void NetworkManagerServer::AcceptEx()
 		cout << "m_AcceptEx 함수 수행 완료" << endl;
 	}
 }
-
-bool NetworkManagerServer::GetCompletionStatus()
-{
-	bool ret = GetQueuedCompletionStatusEx(
-		mh_iocp,							// IOCP 객체
-		m_iocpEvent.m_events,					// 처리가 완료된 event를 수신하는 배열
-		MAX_IOCP_EVENT_COUNT,				// 최대 event 개수
-		(ULONG*)&m_iocpEvent.m_eventCount,	// 수신한 event 개수를 받을 변수
-		m_timeoutMs,							// 다시 분석 필요
-		FALSE);								// fAlertable: ?????
-
-	if (ret == false)	// 실패 시
-	{
-		int errorCode = WSAGetLastError();
-		
-		if (errorCode == WSA_WAIT_TIMEOUT)	// timeoutMs 동안 event가 발생하지 않았다.
-											// 별도 처리할 내용 없음
-		{}
-		else
-		{
-			cout << "GetQueuedCompletionStatusEx 실패" << endl;
-			cout << errorCode << endl;
-		}
-		
-		m_iocpEvent.m_eventCount = 0;			// 실패 시 수동으로 변경 필요 코드
-	}
-
-	return ret;
-}
-
 void NetworkManagerServer::ProcessIOCPEvent()
 {
 	GetCompletionStatus();
@@ -237,7 +206,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 	for (int i = 0; i < m_iocpEvent.m_eventCount; i++)
 	{
 		auto& readEvent = m_iocpEvent.m_events[i];
-		if (readEvent.lpCompletionKey == 0) // listenSocket
+		if (readEvent.lpCompletionKey == 0) // listenSocket. AcceptEx에 의해 신규 client 접속
 		{
 			cout << "listen Socket!!!" << endl;
 
@@ -280,8 +249,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			AcceptEx();
 
 			// 연결한 clientSocket을 recv로 전환
-			clientSocket->Recv();
-
+			Recv(*clientSocket);
 		}
 		else // clientSocket
 		{
@@ -291,10 +259,68 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			clientSocket->m_receiveBuffer[readEvent.dwNumberOfBytesTransferred] = 0;
 			cout << clientSocket->m_receiveBuffer << endl;
 
-			clientSocket->Recv();
+			// Send 구현
+			{
+
+			}
+
+			// 다시 수신 대기
+			Recv(*clientSocket);
+
 		}
 	}
 }
+bool NetworkManagerServer::GetCompletionStatus()
+{
+	bool ret = GetQueuedCompletionStatusEx(
+		mh_iocp,							// IOCP 객체
+		m_iocpEvent.m_events,					// 처리가 완료된 event를 수신하는 배열
+		MAX_IOCP_EVENT_COUNT,				// 최대 event 개수
+		(ULONG*)&m_iocpEvent.m_eventCount,	// 수신한 event 개수를 받을 변수
+		m_timeoutMs,							// 다시 분석 필요
+		FALSE);								// fAlertable: ?????
+
+	if (ret == false)	// 실패 시
+	{
+		int errorCode = WSAGetLastError();
+		
+		if (errorCode == WSA_WAIT_TIMEOUT)	// timeoutMs 동안 event가 발생하지 않았다.
+											// 별도 처리할 내용 없음
+		{}
+		else
+		{
+			cout << "GetQueuedCompletionStatusEx 실패" << endl;
+			cout << errorCode << endl;
+		}
+		
+		m_iocpEvent.m_eventCount = 0;			// 실패 시 수동으로 변경 필요 코드
+	}
+
+	return ret;
+}
+int NetworkManagerServer::Recv(Socket& clientSocket)
+{
+	WSABUF b;
+	b.buf = clientSocket.m_receiveBuffer;
+	b.len = clientSocket.MAX_RECEIVE_LENGTH;
+
+	DWORD& numberOfBytesReceived = clientSocket.m_numberOfBytesReceived;
+	
+	// overlapped I/O가 진행되는 동안 여기 값이 채워집니다.
+	clientSocket.m_readFlags = 0;
+
+	int retCode = WSARecv(
+		clientSocket.m_socket,
+		&b,													// lpBuffers.
+		1,													// dwBufferCount. lpBuffers 배열의 구조체 개수.
+		reinterpret_cast<LPDWORD>(&numberOfBytesReceived),	// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
+		&clientSocket.m_readFlags,
+		&clientSocket.m_readOverlappedStruct,
+		NULL);												// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
+
+	return retCode;
+}
+
 
 void NetworkManagerServer::closeSockets()
 {

@@ -14,5 +14,4 @@ public:
 	SOCKET m_socket{};
 
 	int BindServer(unsigned int port);
-	int Recv();
 };

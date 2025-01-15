@@ -17,6 +17,7 @@ public:
 	void AcceptEx();
 	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
+	int Recv(Socket& clientSocket);
 
 	void closeSockets();
 

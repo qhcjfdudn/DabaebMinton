@@ -20,24 +20,3 @@ int Socket::BindServer(unsigned int port) {
 
 	return bind(m_socket, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in));
 }
-
-int Socket::Recv()
-{
-	WSABUF b;
-	b.buf = m_receiveBuffer;
-	b.len = MAX_RECEIVE_LENGTH;
-
-	// overlapped I/O가 진행되는 동안 여기 값이 채워집니다.
-	m_readFlags = 0;
-
-	int retCode = WSARecv(
-		m_socket,
-		&b,														// lpBuffers.
-		1,														// dwBufferCount. lpBuffers 배열의 구조체 개수.
-		reinterpret_cast<LPDWORD>(&m_numberOfBytesReceived),	// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
-		&m_readFlags,
-		&m_readOverlappedStruct,
-		NULL);													// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
-
-	return retCode;
-}
