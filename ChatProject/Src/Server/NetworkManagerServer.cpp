@@ -299,11 +299,11 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 	AcceptEx();
 
 	// 연결한 clientSocket을 recv로 전환
-	Recv(*clientSocket);
+	Recv(clientSocket);
 
 	return true;
 }
-HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket>& clientSocket, const ULONG_PTR completionKey)
+HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket> clientSocket, const ULONG_PTR completionKey)
 {
 	return CreateIoCompletionPort(
 		reinterpret_cast<HANDLE>(clientSocket->m_socket),
@@ -324,26 +324,26 @@ void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSo
 	//Send(*p_clientSocket, sendBytes);
 
 	// 다시 수신 대기
-	Recv(*p_clientSocket);
+	Recv(p_clientSocket);
 }
-int NetworkManagerServer::Recv(Socket& clientSocket)
+int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 {
 	WSABUF b;
-	b.buf = clientSocket.m_receiveBuffer;
-	b.len = clientSocket.MAX_RECEIVE_LENGTH;
+	b.buf = clientSocket->m_receiveBuffer;
+	b.len = clientSocket->MAX_RECEIVE_LENGTH;
 
-	DWORD& numberOfBytesReceived = clientSocket.m_numberOfBytesReceived;
+	DWORD& numberOfBytesReceived = clientSocket->m_numberOfBytesReceived;
 	
 	// overlapped I/O가 진행되는 동안 여기 값이 채워집니다.
-	clientSocket.m_readFlags = 0;
+	clientSocket->m_readFlags = 0;
 
 	int retCode = WSARecv(
-		clientSocket.m_socket,
+		clientSocket->m_socket,
 		&b,										// lpBuffers.
 		1,										// dwBufferCount. lpBuffers 배열의 구조체 개수.
 		&numberOfBytesReceived,					// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
-		&clientSocket.m_readFlags,
-		&clientSocket.m_readOverlappedStruct,
+		&clientSocket->m_readFlags,
+		&clientSocket->m_readOverlappedStruct,
 		NULL);									// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
 
 	return retCode;
