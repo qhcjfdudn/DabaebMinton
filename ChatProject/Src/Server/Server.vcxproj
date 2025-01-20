@@ -140,6 +140,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="IOCPEvent.cpp" />
     <ClCompile Include="NetworkManagerServer.cpp" />
+    <ClCompile Include="PacketQueue.cpp" />
     <ClCompile Include="ServerMain.cpp" />
     <ClCompile Include="ServerPCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -152,6 +153,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="IOCPEvent.h" />
     <ClInclude Include="NetworkManagerServer.h" />
+    <ClInclude Include="PacketQueue.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="WorldServer.h" />
