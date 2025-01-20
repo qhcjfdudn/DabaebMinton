@@ -141,6 +141,7 @@
     <ClCompile Include="IOCPEvent.cpp" />
     <ClCompile Include="NetworkManagerServer.cpp" />
     <ClCompile Include="ReceiveQueue.cpp" />
+    <ClCompile Include="SendQueue.cpp" />
     <ClCompile Include="ServerMain.cpp" />
     <ClCompile Include="ServerPCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -154,6 +155,7 @@
     <ClInclude Include="IOCPEvent.h" />
     <ClInclude Include="NetworkManagerServer.h" />
     <ClInclude Include="ReceiveQueue.h" />
+    <ClInclude Include="SendQueue.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="WorldServer.h" />
