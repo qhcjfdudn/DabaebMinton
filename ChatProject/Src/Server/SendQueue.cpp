@@ -9,12 +9,13 @@ SendQueue& SendQueue::GetInstance()
 
 void SendQueue::Push(const string& str)
 {
+	cout << "str: " << str << endl;
 	_bufferQueue.push(str);
 }
 
 string SendQueue::Front()
 {
-	string& ret = _bufferQueue.front();
+	string ret = _bufferQueue.front();
 	_bufferQueue.pop();
 
 	return ret;

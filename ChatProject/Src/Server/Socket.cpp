@@ -24,4 +24,5 @@ int Socket::BindServer(unsigned int port) {
 void Socket::SetSendBuffer(const char* str, size_t len)
 {
 	memcpy(m_sendBuffer, str, len);
+	m_sendBuffer[len] = 0;
 }

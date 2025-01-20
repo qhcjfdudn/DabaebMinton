@@ -219,7 +219,9 @@ void NetworkManagerServer::ProcessIOCPEvent()
 
 			// event가 WSASend의 완료에 의해 발생했다면, 무시하자.
 			if (readEvent.lpOverlapped == &p_clientSocket->m_sendOverlappedStruct)
+			{
 				continue;
+			}
 
 			size_t sendBytes = readEvent.dwNumberOfBytesTransferred;
 			
@@ -227,7 +229,6 @@ void NetworkManagerServer::ProcessIOCPEvent()
 
 			// 수신 내용 출력
 			p_clientSocket->m_receiveBuffer[sendBytes] = 0;
-			cout << p_clientSocket->m_receiveBuffer << endl;
 
 			ReceivePacketsIOCP(p_clientSocket);
 		}
@@ -314,8 +315,8 @@ HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket> clientSocket,
 }
 void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket)
 {
-	auto& packetQueue = ReceiveQueue::GetInstance();
-	packetQueue.Push(p_clientSocket->m_receiveBuffer);
+	auto& receiveQueue = ReceiveQueue::GetInstance();
+	receiveQueue.Push(p_clientSocket->m_receiveBuffer);
 
 	//p_clientSocket->SetSendBuffer(
 	//	p_clientSocket->m_receiveBuffer,

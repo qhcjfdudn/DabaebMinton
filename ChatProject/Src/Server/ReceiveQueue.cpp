@@ -14,7 +14,7 @@ void ReceiveQueue::Push(const string& str)
 
 string ReceiveQueue::Front()
 {
-	string& ret = _bufferQueue.front();
+	string ret = _bufferQueue.front();
 	_bufferQueue.pop();
 
 	return ret;
