@@ -6,7 +6,6 @@
 class NetworkManagerServer
 {
 public:
-
 	static NetworkManagerServer& GetInstance();
 
 	void Init();
@@ -17,6 +16,9 @@ public:
 	void AcceptEx();
 	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
+	bool ProcessAcceptedClientSocketIOCP();
+	HANDLE AddSocketIOCP(std::shared_ptr<Socket>& clientSocket, const ULONG_PTR completionKey);
+	void ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket);
 	int Recv(Socket& clientSocket);
 	int Send(Socket& clientSocket, size_t len);
 

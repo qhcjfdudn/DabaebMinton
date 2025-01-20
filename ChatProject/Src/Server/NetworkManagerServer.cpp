@@ -2,6 +2,7 @@
 #include "NetworkManagerServer.h"
 
 #include "Engine.h"
+#include "PacketQueue.h"
 
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
@@ -208,48 +209,8 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		auto& readEvent = m_iocpEvent.m_events[i];
 		if (readEvent.lpCompletionKey == 0) // listenSocket. AcceptEx에 의해 신규 client 접속
 		{
-			cout << "listen Socket!!!" << endl;
-
-			// m_clientCandidateSocket로부터 신규 client socket을 iocp에 추가
-			// listenSocket과 동일한 context로 clientSocket을 최적화
-			setsockopt(
-				m_clientCandidateSocket.m_socket,
-				SOL_SOCKET,
-				SO_UPDATE_ACCEPT_CONTEXT,
-				reinterpret_cast<const char*>(&m_listenSocket),
-				sizeof(m_listenSocket));
-
-			// SOCKET 타입은 UINT_PTR일 뿐이다. 아래와 같이 값을 대입하고
-			// 이후에 m_clientCandidateSocket을 다시 listen에 사용하더라도
-			// m_clientCandidateSocket 변수는 새로운 clientSocket의 주소를 가지고 있을 것이다.
-			// // ac, 104, ... 이런 값으로 출력.
-			// 어쨌든 연결될 때마다 다른 값이다.
-			shared_ptr<Socket> clientSocket = make_shared<Socket>();
-			clientSocket->m_socket = m_clientCandidateSocket.m_socket;
-
-			// 신규 client를 IOCP에 추가
-			const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(clientSocket.get());
-			if (CreateIoCompletionPort(
-				reinterpret_cast<HANDLE>(clientSocket->m_socket),
-				mh_iocp,
-				completionKey,
-				0) == nullptr) {
-				cout << "Add IOCP error: " << WSAGetLastError() << endl;
+			if (ProcessAcceptedClientSocketIOCP() == false)
 				return;
-			}
-
-			// 이후 completionKey로 clientSocket 참조 위해 map에 저장해둔다.
-			cout << "completionKey: " << completionKey << endl;
-
-			m_clientsMap.insert({ completionKey, clientSocket });
-				
-			// 다시 listenSocket을 accept로 변경
-			// listenSocket.AcceptEx() 형태로 쓰는 게 좋을 것 같다. 추후 리팩터링 진행.
-			m_clientCandidateSocket.m_socket = Socket::CreateWSASocket();
-			AcceptEx();
-
-			// 연결한 clientSocket을 recv로 전환
-			Recv(*clientSocket);
 		}
 		else // clientSocket
 		{
@@ -259,22 +220,15 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			if (readEvent.lpOverlapped == &p_clientSocket->m_sendOverlappedStruct)
 				continue;
 
-			// 수신 내용 출력
 			size_t sendBytes = readEvent.dwNumberOfBytesTransferred;
+			
+			// sendBytes == 0일 때 clientSocket 제거 로직 필요
 
+			// 수신 내용 출력
 			p_clientSocket->m_receiveBuffer[sendBytes] = 0;
 			cout << p_clientSocket->m_receiveBuffer << endl;
 
-			p_clientSocket->SetSendBuffer(
-				p_clientSocket->m_receiveBuffer,
-				sendBytes);
-
-			// Send 구현
-			Send(*p_clientSocket, sendBytes);
-
-			// 다시 수신 대기
-			Recv(*p_clientSocket);
-
+			ReceivePacketsIOCP(p_clientSocket);
 		}
 	}
 }
@@ -305,6 +259,72 @@ bool NetworkManagerServer::GetCompletionStatus()
 	}
 
 	return ret;
+}
+bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
+{
+	cout << "listen Socket!!!" << endl;
+
+	// m_clientCandidateSocket로부터 신규 client socket을 iocp에 추가
+	// listenSocket과 동일한 context로 clientSocket을 최적화
+	setsockopt(
+		m_clientCandidateSocket.m_socket,
+		SOL_SOCKET,
+		SO_UPDATE_ACCEPT_CONTEXT,
+		reinterpret_cast<const char*>(&m_listenSocket),
+		sizeof(m_listenSocket));
+
+	// SOCKET 타입은 UINT_PTR일 뿐이다. 아래와 같이 값을 대입하고
+	// 이후에 m_clientCandidateSocket을 다시 listen에 사용하더라도
+	// m_clientCandidateSocket 변수는 새로운 clientSocket의 주소를 가지고 있을 것이다.
+	// // ac, 104, ... 이런 값으로 출력.
+	// 어쨌든 연결될 때마다 다른 값이다.
+	shared_ptr<Socket> clientSocket = make_shared<Socket>();
+	clientSocket->m_socket = m_clientCandidateSocket.m_socket;
+
+	// 신규 client를 IOCP에 추가
+	const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(clientSocket.get());
+	cout << "completionKey: " << completionKey << endl;
+
+	if (AddSocketIOCP(clientSocket, completionKey) == nullptr) {
+		cout << "Add IOCP error: " << WSAGetLastError() << endl;
+		return false;
+	}
+
+	// 이후 completionKey로 clientSocket 참조 위해 map에 저장해둔다.
+	m_clientsMap.insert({ completionKey, clientSocket });
+
+	// 다시 listenSocket을 accept로 변경
+	// listenSocket.AcceptEx() 형태로 쓰는 게 좋을 것 같다. 추후 리팩터링 진행.
+	m_clientCandidateSocket.m_socket = Socket::CreateWSASocket();
+	AcceptEx();
+
+	// 연결한 clientSocket을 recv로 전환
+	Recv(*clientSocket);
+
+	return true;
+}
+HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket>& clientSocket, const ULONG_PTR completionKey)
+{
+	return CreateIoCompletionPort(
+		reinterpret_cast<HANDLE>(clientSocket->m_socket),
+		mh_iocp,
+		completionKey,
+		0);
+}
+void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket)
+{
+	auto& packetQueue = PacketQueue::GetInstance();
+	packetQueue.Push(p_clientSocket->m_receiveBuffer);
+
+	//p_clientSocket->SetSendBuffer(
+	//	p_clientSocket->m_receiveBuffer,
+	//	sendBytes);
+
+	//// Send 구현
+	//Send(*p_clientSocket, sendBytes);
+
+	// 다시 수신 대기
+	Recv(*p_clientSocket);
 }
 int NetworkManagerServer::Recv(Socket& clientSocket)
 {
@@ -345,7 +365,6 @@ int NetworkManagerServer::Send(Socket& clientSocket, size_t len)
 
 	return retCode;
 }
-
 
 void NetworkManagerServer::closeSockets()
 {
