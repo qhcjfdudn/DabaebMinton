@@ -2,6 +2,7 @@
 #include "WorldServer.h"
 
 #include "ReceiveQueue.h"
+#include "SendQueue.h"
 
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
@@ -9,11 +10,14 @@ WorldServer& WorldServer::GetInstance() {
 }
 
 void WorldServer::Update() {
-	auto& packetQueue = ReceiveQueue::GetInstance();
+	auto& receiveQueue = ReceiveQueue::GetInstance();
+	auto& sendQueue = SendQueue::GetInstance();
 
-	while (packetQueue.Empty() == false)
+	while (receiveQueue.Empty() == false)
 	{
-		string received = packetQueue.Front();
+		std::string received = receiveQueue.Front();
 		cout << received << endl;
+
+		sendQueue.Push(received);
 	}
 }

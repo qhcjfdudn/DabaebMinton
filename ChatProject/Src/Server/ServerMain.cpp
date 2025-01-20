@@ -19,7 +19,8 @@ int main() {
 		//networkInstance.ReceivePackets();
 		networkInstance.ProcessIOCPEvent();
 		worldInstance.Update();
-		networkInstance.SendPackets();
+		//networkInstance.SendPackets();
+		networkInstance.SendPacketsIOCP();
 
 		//engine.isRunning = false;
 	}

@@ -3,6 +3,7 @@
 
 #include "Engine.h"
 #include "ReceiveQueue.h"
+#include "SendQueue.h"
 
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
@@ -348,19 +349,36 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 
 	return retCode;
 }
-int NetworkManagerServer::Send(Socket& clientSocket, size_t len)
+void NetworkManagerServer::SendPacketsIOCP()
+{
+	auto& sendQueue = SendQueue::GetInstance();
+
+	while (sendQueue.Empty() == false)
+	{
+		string data = sendQueue.Front();
+		
+		// broadcast
+		for (auto clientSocketPair : m_clientsMap)
+		{
+			auto clientSocket = clientSocketPair.second;
+			clientSocket->SetSendBuffer(data.c_str(), data.size());
+			Send(clientSocket, data.size());
+		}
+	}
+}
+int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 {
 	WSABUF b;
-	b.buf = clientSocket.m_sendBuffer;
+	b.buf = clientSocket->m_sendBuffer;
 	b.len = static_cast<ULONG>(len);
 
 	int retCode = WSASend(
-		clientSocket.m_socket,
+		clientSocket->m_socket,
 		&b,
 		1,
-		&clientSocket.m_numberOfBytesSent,
-		clientSocket.m_sendFlags,
-		&clientSocket.m_sendOverlappedStruct,
+		&clientSocket->m_numberOfBytesSent,
+		clientSocket->m_sendFlags,
+		&clientSocket->m_sendOverlappedStruct,
 		NULL);
 
 	return retCode;
