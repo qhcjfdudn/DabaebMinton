@@ -1,16 +1,16 @@
 #pragma once
-class PacketQueue
+class ReceiveQueue
 {
 public:
-	static PacketQueue& GetInstance();
+	static ReceiveQueue& GetInstance();
 
 	void Push(const string& str);
 	string Front();
 	bool Empty();
 
 private:
-	PacketQueue() {}
-	~PacketQueue() {}
+	ReceiveQueue() {}
+	~ReceiveQueue() {}
 
 	// NetworkManager와 World의 서로 다른 thread에서 접근할테니
 	// lock/unlock 고민 필요

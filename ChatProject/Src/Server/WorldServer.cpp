@@ -1,7 +1,7 @@
 #include "ServerPCH.h"
 #include "WorldServer.h"
 
-#include "PacketQueue.h"
+#include "ReceiveQueue.h"
 
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
@@ -9,7 +9,7 @@ WorldServer& WorldServer::GetInstance() {
 }
 
 void WorldServer::Update() {
-	auto& packetQueue = PacketQueue::GetInstance();
+	auto& packetQueue = ReceiveQueue::GetInstance();
 
 	while (packetQueue.Empty() == false)
 	{
