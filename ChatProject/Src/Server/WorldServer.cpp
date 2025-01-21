@@ -1,8 +1,7 @@
 #include "ServerPCH.h"
 #include "WorldServer.h"
 
-#include "ReceiveQueue.h"
-#include "SendQueue.h"
+#include "PacketQueue.h"
 
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
@@ -10,8 +9,8 @@ WorldServer& WorldServer::GetInstance() {
 }
 
 void WorldServer::Update() {
-	auto& receiveQueue = ReceiveQueue::GetInstance();
-	auto& sendQueue = SendQueue::GetInstance();
+	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
+	auto& sendQueue = PacketQueue::GetSendStaticInstance();
 
 	while (receiveQueue.Empty() == false)
 	{

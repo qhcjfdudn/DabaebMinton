@@ -39,10 +39,7 @@
     <ClCompile Include="Socket.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ReceiveQueue.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="SendQueue.cpp">
+    <ClCompile Include="PacketQueue.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,10 +65,7 @@
     <ClInclude Include="Socket.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ReceiveQueue.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="SendQueue.h">
+    <ClInclude Include="PacketQueue.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

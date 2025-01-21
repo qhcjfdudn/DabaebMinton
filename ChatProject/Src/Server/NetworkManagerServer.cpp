@@ -2,8 +2,7 @@
 #include "NetworkManagerServer.h"
 
 #include "Engine.h"
-#include "ReceiveQueue.h"
-#include "SendQueue.h"
+#include "PacketQueue.h"
 
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
@@ -315,7 +314,7 @@ HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket> clientSocket,
 }
 void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket)
 {
-	auto& receiveQueue = ReceiveQueue::GetInstance();
+	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
 	receiveQueue.Push(p_clientSocket->m_receiveBuffer);
 
 	//p_clientSocket->SetSendBuffer(
@@ -352,7 +351,7 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 }
 void NetworkManagerServer::SendPacketsIOCP()
 {
-	auto& sendQueue = SendQueue::GetInstance();
+	auto& sendQueue = PacketQueue::GetSendStaticInstance();
 
 	while (sendQueue.Empty() == false)
 	{
