@@ -12,11 +12,12 @@ SOCKET Socket::CreateWSASocket()
 		WSA_FLAG_OVERLAPPED);
 }
 
-int Socket::BindServer(unsigned int port) {
+int Socket::Bind(const char* const ip, unsigned int port) {
 	sockaddr_in s_in = {};
 	s_in.sin_family = AF_INET;
-	s_in.sin_addr.S_un.S_addr = INADDR_ANY;
+	s_in.sin_addr.S_un.S_addr = inet_addr(ip);
 	s_in.sin_port = htons(port);
+	
 
 	return bind(m_socket, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in));
 }

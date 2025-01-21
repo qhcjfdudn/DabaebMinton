@@ -101,7 +101,7 @@ void NetworkManagerServer::InitIOCP() {
 	
 	cout << "listenSocket 생성 완료" << endl;
 
-	if (m_listenSocket.BindServer(50000) == SOCKET_ERROR) {
+	if (m_listenSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
 		cout << "bind error: " << WSAGetLastError() << endl;
 		return;
 	}

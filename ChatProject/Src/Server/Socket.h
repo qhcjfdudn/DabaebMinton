@@ -7,7 +7,7 @@ public:
 	
 	static SOCKET CreateWSASocket();
 	
-	int BindServer(unsigned int port);
+	int Bind(const char* const ip, unsigned int port);
 	
 	void SetSendBuffer(const char* str, size_t len);
 	
