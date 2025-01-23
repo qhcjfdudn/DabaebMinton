@@ -207,14 +207,15 @@ void NetworkManagerServer::ProcessIOCPEvent()
 	for (int i = 0; i < m_iocpEvent.m_eventCount; i++)
 	{
 		auto& readEvent = m_iocpEvent.m_events[i];
-		if (readEvent.lpCompletionKey == 0) // listenSocket. AcceptEx에 의해 신규 client 접속
+		ULONG_PTR completionKey = readEvent.lpCompletionKey;
+		if (completionKey == 0) // listenSocket. AcceptEx에 의해 신규 client 접속
 		{
 			if (ProcessAcceptedClientSocketIOCP() == false)
 				return;
 		}
 		else // clientSocket
 		{
-			shared_ptr<Socket> p_clientSocket = m_clientsMap[readEvent.lpCompletionKey];
+			shared_ptr<Socket> p_clientSocket = m_clientsMap[completionKey];
 
 			// event가 WSASend의 완료에 의해 발생했다면, 무시하자.
 			if (readEvent.lpOverlapped == &p_clientSocket->m_sendOverlappedStruct)
@@ -225,6 +226,12 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			size_t sendBytes = readEvent.dwNumberOfBytesTransferred;
 			
 			// sendBytes == 0일 때 clientSocket 제거 로직 필요
+			if (sendBytes <= 0)
+			{
+				closesocket(p_clientSocket->m_socket);
+				cout << "close socket: " << completionKey << endl;
+				continue;
+			}
 
 			// 수신 내용 출력
 			p_clientSocket->m_receiveBuffer[sendBytes] = 0;
