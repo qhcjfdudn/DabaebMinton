@@ -15,7 +15,7 @@ void WorldServer::Update() {
 	while (receiveQueue.Empty() == false)
 	{
 		std::string received = receiveQueue.Front();
-		cout << "received: " << received << endl;
+		cout << "[" << system_clock::now() << "] received: " << received << endl;
 
 		sendQueue.Push(received);
 	}
