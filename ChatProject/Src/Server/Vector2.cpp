@@ -2,11 +2,7 @@
 #include "Vector2.h"
 
 
-Vector2::Vector2()
-{
-	_x = 0;
-	_y = 0;
-}
+Vector2::Vector2() : _x(0), _y(0) {}
 Vector2::Vector2(float x, float y) : _x(x), _y(y) {}
 
 Vector2 Vector2::operator+(const Vector2& other) const
