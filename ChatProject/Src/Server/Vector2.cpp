@@ -37,11 +37,8 @@ float Vector2::Magnitude() const
 }
 Vector2 Vector2::Normalrize() const
 {
-	Vector2 normal;
 	float magnitude = Magnitude();
-	normal._x = _x / magnitude;
-	normal._y = _y / magnitude;
-	return normal;
+	return { _x / magnitude, _y / magnitude };
 }
 
 float Vector2::DotProduct(const Vector2& other) const
