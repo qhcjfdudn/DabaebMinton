@@ -136,6 +136,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Shuttlecock.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="IOCPEvent.cpp" />
@@ -146,9 +147,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Socket.cpp" />
+    <ClCompile Include="Vector2.cpp" />
     <ClCompile Include="WorldServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Shuttlecock.h" />
+    <ClInclude Include="Constant.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="IOCPEvent.h" />
@@ -156,6 +160,7 @@
     <ClInclude Include="PacketQueue.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="Socket.h" />
+    <ClInclude Include="Vector2.h" />
     <ClInclude Include="WorldServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
