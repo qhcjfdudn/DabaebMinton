@@ -16,6 +16,6 @@ public:
 	float Magnitude() const; // ∫§≈Õ ≈©±‚
 	Vector2 Normalrize() const; // ¥‹¿ß ∫§≈Õ
 	
-	float DotProduct(const Vector2& other) const;
+	float Dot(const Vector2& other) const;
 	float Cross(const Vector2& other) const;
 };

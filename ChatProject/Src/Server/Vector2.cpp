@@ -1,7 +1,6 @@
 #include "ServerPCH.h"
 #include "Vector2.h"
 
-
 Vector2::Vector2() : _x(0), _y(0) {}
 Vector2::Vector2(float x, float y) : _x(x), _y(y) {}
 
@@ -41,7 +40,7 @@ Vector2 Vector2::Normalrize() const
 	return { _x / magnitude, _y / magnitude };
 }
 
-float Vector2::DotProduct(const Vector2& other) const
+float Vector2::Dot(const Vector2& other) const
 {
 	return _x * other._x + _y * other._y;
 }
