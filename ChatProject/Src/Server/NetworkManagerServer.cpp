@@ -223,10 +223,8 @@ void NetworkManagerServer::ProcessIOCPEvent()
 				continue;
 			}
 
-			size_t sendBytes = readEvent.dwNumberOfBytesTransferred;
-			
-			// sendBytes == 0일 때 clientSocket 제거 로직 필요
-			if (sendBytes <= 0)
+			size_t receivedBytes = readEvent.dwNumberOfBytesTransferred;
+			if (receivedBytes == 0) // sendBytes == 0일 때 clientSocket 제거 로직 필요
 			{
 				closesocket(p_clientSocket->m_socket);
 				cout << "close socket: " << completionKey << endl;
@@ -234,7 +232,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			}
 
 			// 수신 내용 출력
-			p_clientSocket->m_receiveBuffer[sendBytes] = 0;
+			p_clientSocket->m_receiveBuffer[receivedBytes] = 0;
 
 			ReceivePacketsIOCP(p_clientSocket);
 		}
@@ -323,13 +321,6 @@ void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSo
 {
 	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
 	receiveQueue.Push(p_clientSocket->m_receiveBuffer);
-
-	//p_clientSocket->SetSendBuffer(
-	//	p_clientSocket->m_receiveBuffer,
-	//	sendBytes);
-
-	//// Send 구현
-	//Send(*p_clientSocket, sendBytes);
 
 	// 다시 수신 대기
 	Recv(p_clientSocket);
