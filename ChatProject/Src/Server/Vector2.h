@@ -8,10 +8,11 @@ public:
 	Vector2();
 	Vector2(float x, float y);
 
-	Vector2 operator+(const Vector2& other) const; // ∫§≈Õ µ°º¿
-	Vector2 operator-(const Vector2& other) const; // ∫§≈Õ ª¨º¿
-	bool operator==(const Vector2& other) const; // ∫§≈Õ ∫Ò±≥
-	bool operator<(const Vector2& other) const; // ∫§≈Õ ∫Ò±≥
+	Vector2 operator+(const Vector2& other) const;	// ∫§≈Õ µ°º¿
+	Vector2 operator-(const Vector2& other) const;	// ∫§≈Õ ª¨º¿
+	Vector2 operator*(float scalar) const;			// ∫§≈Õ Ω∫ƒÆ∂Û ∞ˆ
+	bool operator==(const Vector2& other) const;	// ∫§≈Õ ∫Ò±≥
+	bool operator<(const Vector2& other) const;		// ∫§≈Õ ∫Ò±≥
 
 	float Magnitude() const; // ∫§≈Õ ≈©±‚
 	Vector2 Normalrize() const; // ¥‹¿ß ∫§≈Õ

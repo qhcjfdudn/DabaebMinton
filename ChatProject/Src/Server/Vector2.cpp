@@ -18,6 +18,10 @@ Vector2 Vector2::operator-(const Vector2& other) const
 
 	return Vector2(x, y);
 }
+Vector2 Vector2::operator*(float scalar) const
+{
+	return { _x * scalar, _y * scalar };
+}
 bool Vector2::operator==(const Vector2& other) const
 {
 	return _x == other._x && _y == other._y;
