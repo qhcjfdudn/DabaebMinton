@@ -138,7 +138,9 @@
   <ItemGroup>
     <ClCompile Include="Shuttlecock.cpp" />
     <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="GameObject.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="IOCPEvent.cpp" />
     <ClCompile Include="NetworkManagerServer.cpp" />
     <ClCompile Include="PacketQueue.cpp" />
@@ -147,7 +149,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Socket.cpp" />
-    <ClCompile Include="Vector2.cpp" />
+    <ClCompile Include="Vector2.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="WorldServer.cpp" />
   </ItemGroup>
   <ItemGroup>
