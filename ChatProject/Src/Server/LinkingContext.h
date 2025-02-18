@@ -9,7 +9,7 @@ public:
 
 	unsigned int GetNetworkId(shared_ptr<GameObject> gameObject);
 	shared_ptr<GameObject> GetGameObject(unsigned int networkId);
-	void AddGameObject(shared_ptr<GameObject> gameObject, unsigned int networkId);
+	void AddGameObject(shared_ptr<GameObject> gameObject);
 	void RemoveGameObject(unsigned int networkId);
 
 private:
