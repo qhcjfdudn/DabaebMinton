@@ -3,13 +3,16 @@
 class GameObject
 {
 public:
-	GameObject();
+	GameObject(Vector2 position);
 	virtual ~GameObject() {}
 
 	virtual void Update() {}
 
+	void SetVelocity(Vector2 velocity);
+	void MoveNextPosition();
+
 private:
-	unsigned int _gameObjectId;
+	unsigned int _networkId;
 	Vector2 _position;
 	Vector2 _velocity;
 };
