@@ -12,6 +12,7 @@ int main() {
 	networkInstance.InitIOCP();
 
 	auto& worldInstance = WorldServer::GetInstance();
+	worldInstance.InitWorld();
 
 	cout << "engine start" << endl;
 	while (engine.isRunning) {

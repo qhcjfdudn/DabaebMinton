@@ -10,6 +10,21 @@ WorldServer& WorldServer::GetInstance() {
 	return instance;
 }
 
+void WorldServer::InitWorld()
+{
+	// Shuttlecock 만들기
+	Vector2 position(0, 0);
+	auto shuttlecock = make_shared<Shuttlecock>(position);
+	shuttlecock->setRadius(10);
+	shuttlecock->SetVelocity({ 0, 1 });
+	
+	_gameObjects.push_back(shuttlecock);
+
+	// LinkingContext에 등록
+	auto& linkingContext = LinkingContext::GetInstance();
+	linkingContext.AddGameObject(shuttlecock);
+}
+
 void WorldServer::Update() {
 	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
 	auto& sendQueue = PacketQueue::GetSendStaticInstance();
@@ -23,21 +38,11 @@ void WorldServer::Update() {
 
 		sendQueue.Push(received);
 	}
+
+	for (auto& gameObject : _gameObjects)
+	{
+		gameObject->Update();
+		// replication update code here (send packet)
+	}
 }
 
-void WorldServer::InitWorld()
-{
-	// Shuttlecock 만들기
-	Vector2 position(0, 0);
-	auto shuttlecock = make_shared<Shuttlecock>(position);
-	shuttlecock->setRadius(10);
-	
-	_gameObjects.push_back(shuttlecock);
-
-	// LinkingContext에 등록
-	auto& linkingContext = LinkingContext::GetInstance();
-
-	unsigned int networkId = linkingContext.GetNetworkId(shuttlecock);
-	linkingContext.AddGameObject(shuttlecock, networkId);
-
-}
