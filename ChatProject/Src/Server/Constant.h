@@ -2,5 +2,9 @@
 
 namespace Constant
 {
-	const int deltaTime = 16;
+#ifdef STAGING_ENV
+	const float FIXED_TIMESTEP = 5.0f;
+#else
+	const float FIXED_TIMESTEP = 0.2f;
+#endif
 }
