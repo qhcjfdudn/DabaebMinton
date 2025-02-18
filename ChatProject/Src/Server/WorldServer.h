@@ -15,7 +15,7 @@ private:
 	WorldServer() = default;
 	~WorldServer() {}
 
-	system_clock::time_point lastTime;
+	system_clock::time_point _lastTime;
 
 	std::vector<shared_ptr<GameObject>> _gameObjects;
 };

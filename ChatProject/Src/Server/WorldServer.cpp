@@ -25,7 +25,7 @@ void WorldServer::InitWorld()
 	auto& linkingContext = LinkingContext::GetInstance();
 	linkingContext.AddGameObject(shuttlecock);
 
-	lastTime = system_clock::now();
+	_lastTime = system_clock::now();
 }
 
 void WorldServer::FixedUpdate() {
@@ -45,7 +45,7 @@ void WorldServer::FixedUpdate() {
 	}
 
 	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - lastTime;
+	std::chrono::duration<double> elapsedTime = currentTime - _lastTime;
 	if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
 	//if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
 	{
@@ -58,7 +58,7 @@ void WorldServer::FixedUpdate() {
 			// replication update code here (send packet)
 		}
 
-		lastTime = currentTime;
+		_lastTime = currentTime;
 	}
 }
 
