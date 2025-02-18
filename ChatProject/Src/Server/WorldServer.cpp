@@ -2,6 +2,8 @@
 #include "WorldServer.h"
 
 #include "PacketQueue.h"
+#include "Shuttlecock.h"
+#include "LinkingContext.h"
 
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
@@ -21,4 +23,21 @@ void WorldServer::Update() {
 
 		sendQueue.Push(received);
 	}
+}
+
+void WorldServer::InitWorld()
+{
+	// Shuttlecock 만들기
+	Vector2 position(0, 0);
+	auto shuttlecock = make_shared<Shuttlecock>(position);
+	shuttlecock->setRadius(10);
+	
+	_gameObjects.push_back(shuttlecock);
+
+	// LinkingContext에 등록
+	auto& linkingContext = LinkingContext::GetInstance();
+
+	unsigned int networkId = linkingContext.GetNetworkId(shuttlecock);
+	linkingContext.AddGameObject(shuttlecock, networkId);
+
 }

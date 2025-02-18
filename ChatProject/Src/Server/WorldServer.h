@@ -9,9 +9,10 @@ public:
 	void Update();
 
 private:
-	WorldServer() {}
+	WorldServer() = default;
 	~WorldServer() {}
 
-	std::vector<GameObject*> gameObjects;
-	std::queue<GameObject*> updateQueue;
+	void InitWorld();
+
+	std::vector<shared_ptr<GameObject>> _gameObjects;
 };
