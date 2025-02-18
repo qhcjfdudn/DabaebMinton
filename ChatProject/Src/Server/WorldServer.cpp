@@ -49,6 +49,8 @@ void WorldServer::FixedUpdate() {
 	if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
 	//if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
 	{
+		_lastTime = currentTime;
+		
 		const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
 		cout << "[" << now << "] FixedUpdate" << endl;
 
@@ -58,7 +60,6 @@ void WorldServer::FixedUpdate() {
 			// replication update code here (send packet)
 		}
 
-		_lastTime = currentTime;
 	}
 }
 
