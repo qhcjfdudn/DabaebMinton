@@ -18,6 +18,6 @@ int Shuttlecock::getRadius()
 
 void Shuttlecock::Update()
 {
-	
+	GameObject::Update();
 }
 

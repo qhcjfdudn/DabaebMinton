@@ -7,6 +7,11 @@ GameObject::GameObject(Vector2 position) : _position(position), _velocity()
 {
 }
 
+void GameObject::Update()
+{
+	MoveNextPosition();
+}
+
 void GameObject::SetVelocity(Vector2 velocity)
 {
 	_velocity = velocity;

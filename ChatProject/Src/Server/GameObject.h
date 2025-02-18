@@ -6,7 +6,7 @@ public:
 	GameObject(Vector2 position);
 	virtual ~GameObject() {}
 
-	virtual void Update() {}
+	virtual void Update();
 
 	void SetVelocity(Vector2 velocity);
 	void MoveNextPosition();
