@@ -48,6 +48,12 @@
     <ClCompile Include="Vector2.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="LinkingContext.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetworkManagerServer.h">
@@ -81,6 +87,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Vector2.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkingContext.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

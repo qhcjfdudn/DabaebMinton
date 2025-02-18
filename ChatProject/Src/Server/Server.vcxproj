@@ -136,6 +136,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="LinkingContext.cpp" />
+    <ClCompile Include="ReplicationManager.cpp" />
     <ClCompile Include="Shuttlecock.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GameObject.cpp">
@@ -155,6 +157,8 @@
     <ClCompile Include="WorldServer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LinkingContext.h" />
+    <ClInclude Include="ReplicationManager.h" />
     <ClInclude Include="Shuttlecock.h" />
     <ClInclude Include="Constant.h" />
     <ClInclude Include="Engine.h" />
