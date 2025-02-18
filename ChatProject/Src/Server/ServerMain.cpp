@@ -19,7 +19,7 @@ int main() {
 
 		//networkInstance.ReceivePackets();
 		networkInstance.ProcessIOCPEvent();
-		worldInstance.Update();
+		worldInstance.FixedUpdate();
 		//networkInstance.SendPackets();
 		networkInstance.SendPacketsIOCP();
 

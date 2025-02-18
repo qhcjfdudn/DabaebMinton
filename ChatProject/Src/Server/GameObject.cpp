@@ -3,11 +3,12 @@
 
 #include "Constant.h"
 
-GameObject::GameObject(Vector2 position) : _position(position), _velocity()
+GameObject::GameObject(Vector2 position) : 
+	_position(position), _velocity(), _networkId(0)
 {
 }
 
-void GameObject::Update()
+void GameObject::FixedUpdate()
 {
 	MoveNextPosition();
 }
@@ -19,5 +20,5 @@ void GameObject::SetVelocity(Vector2 velocity)
 
 void GameObject::MoveNextPosition()
 {
-	_position = _position + _velocity * Constant::deltaTime;
+	_position = _position + _velocity * Constant::FIXED_TIMESTEP;
 }

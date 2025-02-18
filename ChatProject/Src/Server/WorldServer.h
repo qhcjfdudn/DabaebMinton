@@ -9,11 +9,13 @@ public:
 	
 	void InitWorld();
 	
-	void Update();
+	void FixedUpdate();
 
 private:
 	WorldServer() = default;
 	~WorldServer() {}
+
+	system_clock::time_point lastTime;
 
 	std::vector<shared_ptr<GameObject>> _gameObjects;
 };

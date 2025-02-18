@@ -4,6 +4,7 @@
 #include "PacketQueue.h"
 #include "Shuttlecock.h"
 #include "LinkingContext.h"
+#include "Constant.h"
 
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
@@ -23,9 +24,13 @@ void WorldServer::InitWorld()
 	// LinkingContext에 등록
 	auto& linkingContext = LinkingContext::GetInstance();
 	linkingContext.AddGameObject(shuttlecock);
+
+	lastTime = system_clock::now();
 }
 
-void WorldServer::Update() {
+void WorldServer::FixedUpdate() {
+	// 아래 receive packet을 다루는 코드는 추후 ReplicationManager와 함께
+	// NetworkManager에서 동작하도록 변경
 	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
 	auto& sendQueue = PacketQueue::GetSendStaticInstance();
 
@@ -39,10 +44,21 @@ void WorldServer::Update() {
 		sendQueue.Push(received);
 	}
 
-	for (auto& gameObject : _gameObjects)
+	system_clock::time_point currentTime = system_clock::now();
+	std::chrono::duration<double> elapsedTime = currentTime - lastTime;
+	if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
+	//if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
 	{
-		gameObject->Update();
-		// replication update code here (send packet)
+		const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
+		cout << "[" << now << "] FixedUpdate" << endl;
+
+		for (auto& gameObject : _gameObjects)
+		{
+			gameObject->FixedUpdate();
+			// replication update code here (send packet)
+		}
+
+		lastTime = currentTime;
 	}
 }
 
