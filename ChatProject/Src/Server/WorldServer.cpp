@@ -24,7 +24,7 @@ void WorldServer::InitWorld()
 	auto& linkingContext = LinkingContext::GetInstance();
 	linkingContext.AddGameObject(shuttlecock);
 
-	_lastTime = system_clock::now();
+	_lastFixedUpdateTime = system_clock::now();
 }
 
 void WorldServer::FixedUpdate() {
@@ -44,11 +44,10 @@ void WorldServer::FixedUpdate() {
 	}
 
 	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - _lastTime;
+	std::chrono::duration<double> elapsedTime = currentTime - _lastFixedUpdateTime;
 	if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
-	//if (elapsedTime.count() >= Constant::FIXED_TIMESTEP)
 	{
-		_lastTime = currentTime;
+		_lastFixedUpdateTime = currentTime;
 		
 		const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
 		cout << "[" << now << "] FixedUpdate" << endl;
