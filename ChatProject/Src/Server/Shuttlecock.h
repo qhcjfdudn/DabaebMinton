@@ -5,7 +5,7 @@
 class Shuttlecock : public GameObject
 {
 public:
-	Shuttlecock(Vector2 position);
+	Shuttlecock(Vector2 position, Vector2 velocity);
 	~Shuttlecock() override = default;
 	
 	void setRadius(int radius);
@@ -14,7 +14,7 @@ public:
 	void FixedUpdate() override;
 
 private:
-	int _radius;
+	int _radius = 10;
 
 };
 

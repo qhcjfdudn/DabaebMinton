@@ -1,8 +1,8 @@
 #include "ServerPCH.h"
 #include "Shuttlecock.h"
 
-Shuttlecock::Shuttlecock(Vector2 position) : 
-	GameObject(position), _radius(0)
+Shuttlecock::Shuttlecock(Vector2 position, Vector2 velocity) :
+	GameObject(position, velocity)
 {
 }
 

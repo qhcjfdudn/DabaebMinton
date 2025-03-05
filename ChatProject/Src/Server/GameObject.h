@@ -3,7 +3,8 @@
 class GameObject
 {
 public:
-	GameObject(Vector2 position);
+	GameObject(Vector2 position, Vector2 velocity);
+
 	virtual ~GameObject() {}
 
 	virtual void FixedUpdate();

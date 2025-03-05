@@ -15,9 +15,8 @@ void WorldServer::InitWorld()
 {
 	// Shuttlecock ¸¸µé±â
 	Vector2 position(0, 0);
-	auto shuttlecock = make_shared<Shuttlecock>(position);
-	shuttlecock->setRadius(10);
-	shuttlecock->SetVelocity({ 0, 1 });
+	Vector2 velocity(0, 1);
+	auto shuttlecock = make_shared<Shuttlecock>(position, velocity);
 	
 	_gameObjects.push_back(shuttlecock);
 

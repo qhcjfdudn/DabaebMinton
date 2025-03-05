@@ -3,8 +3,8 @@
 
 #include "Constant.h"
 
-GameObject::GameObject(Vector2 position) : 
-	_position(position), _velocity(), _networkId(0)
+GameObject::GameObject(Vector2 position, Vector2 velocity) :
+	_position(position), _velocity(velocity), _networkId(0)
 {
 }
 
