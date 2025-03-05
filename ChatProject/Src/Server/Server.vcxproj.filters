@@ -54,6 +54,9 @@
     <ClCompile Include="ReplicationManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="OutputMemoryBitStream.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NetworkManagerServer.h">
@@ -93,6 +96,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ReplicationManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputMemoryBitStream.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
