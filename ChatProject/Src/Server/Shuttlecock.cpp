@@ -18,7 +18,7 @@ int Shuttlecock::getRadius()
 
 void Shuttlecock::FixedUpdate()
 {
-	GameObject::FixedUpdate();
+	MoveNextPosition();
 	cout << "Shuttlecock FixedUpdate" << endl;
 	cout << "Position: " << _position._x << ", " << _position._y << endl;
 }
