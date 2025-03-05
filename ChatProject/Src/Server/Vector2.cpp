@@ -33,6 +33,12 @@ bool Vector2::operator<(const Vector2& other) const
 
 	return _x < other._x;
 }
+Vector2& Vector2::operator+=(const Vector2& other)
+{
+	_x += other._x;
+	_y += other._y;
+	return *this;
+}
 
 float Vector2::Magnitude() const
 {

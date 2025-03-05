@@ -20,5 +20,5 @@ void GameObject::SetVelocity(Vector2 velocity)
 
 void GameObject::MoveNextPosition()
 {
-	_position = _position + _velocity * Constant::FIXED_TIMESTEP;
+	_position += _velocity * Constant::FIXED_TIMESTEP;
 }
