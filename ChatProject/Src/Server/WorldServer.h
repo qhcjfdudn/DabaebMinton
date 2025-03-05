@@ -9,6 +9,7 @@ public:
 	
 	void InitWorld();
 	
+	void Update();
 	void FixedUpdate();
 
 private:

@@ -27,6 +27,24 @@ void WorldServer::InitWorld()
 	_lastFixedUpdateTime = _lastPacketUpdateTime = system_clock::now();
 }
 
+void WorldServer::Update()
+{
+	// 아래 receive packet을 다루는 코드는 추후 ReplicationManager와 함께
+	// NetworkManager에서 동작하도록 변경
+	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
+	auto& sendQueue = PacketQueue::GetSendStaticInstance();
+
+	while (receiveQueue.Empty() == false)
+	{
+		std::string received = receiveQueue.Front();
+
+		const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
+		cout << "[" << now << "] received: " << received << endl;
+
+		sendQueue.Push(received);
+	}
+}
+
 void WorldServer::FixedUpdate() {
 	system_clock::time_point currentTime = system_clock::now();
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
@@ -54,21 +72,6 @@ void WorldServer::FixedUpdate() {
 		cout << "[" << now << "] Packet Add" << endl;
 
 		// replication update code here (send packet)
-
-		// 아래 receive packet을 다루는 코드는 추후 ReplicationManager와 함께
-		// NetworkManager에서 동작하도록 변경
-		auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
-		auto& sendQueue = PacketQueue::GetSendStaticInstance();
-
-		while (receiveQueue.Empty() == false)
-		{
-			std::string received = receiveQueue.Front();
-
-			const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
-			cout << "[" << now << "] received: " << received << endl;
-
-			sendQueue.Push(received);
-		}
 		
 		_lastPacketUpdateTime = currentTime;
 	}
