@@ -3,6 +3,7 @@
 
 #include "PacketQueue.h"
 #include "Shuttlecock.h"
+#include "ReplicationManager.h"
 #include "LinkingContext.h"
 #include "Constant.h"
 
@@ -48,10 +49,8 @@ void WorldServer::Update()
 void WorldServer::FixedUpdate() {
 	system_clock::time_point currentTime = system_clock::now();
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
-	std::chrono::duration<double> elapsedTime;
+	std::chrono::duration<double> elapsedTime = currentTime - _lastFixedUpdateTime;
 
-	// 물리 Update
-	elapsedTime = currentTime - _lastFixedUpdateTime;
 	if (elapsedTime.count() >= Constant::FIXED_UPDATE_TIMESTEP)
 	{
 		cout << "[" << now << "] FixedUpdate" << endl;
@@ -64,15 +63,24 @@ void WorldServer::FixedUpdate() {
 		
 		_lastFixedUpdateTime = currentTime;
 	}
+}
 
-	// Packet Add
-	elapsedTime = currentTime - _lastPacketUpdateTime;
+void WorldServer::WriteWorldStateToPacket()
+{
+	system_clock::time_point currentTime = system_clock::now();
+	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
+	std::chrono::duration<double> elapsedTime = currentTime - _lastPacketUpdateTime;
+
 	if (elapsedTime.count() >= Constant::PACKET_PERIOD)
 	{
-		cout << "[" << now << "] Packet Add" << endl;
+		cout << "[" << now << "] WriteWorldStateToPacket" << endl;
 
 		// replication update code here (send packet)
-		
+		auto& replicationManager = ReplicationManager::GetInstance();
+
+		// delta가 있는 객체만 Update 하고 싶다.
+		//replicationManager.ReplicateUpdate()
+
 		_lastPacketUpdateTime = currentTime;
 	}
 }
