@@ -62,10 +62,11 @@ void WorldServer::FixedUpdate() {
 	for (auto& gameObject : _gameObjects)
 	{
 		NetworkId_t networkId = gameObject->GetNetworkId();
-		if (gameObject->FixedUpdate() && _networkIdCheckMap[networkId] == false)
+		if (gameObject->FixedUpdate() && 
+			_updatedObjectNetworkIds.find(networkId) == _updatedObjectNetworkIds.end())
 		{
-			_networkIdCheckMap[networkId] = true;
-			_waitForWriteToStreamQueue.push(networkId);
+			_updatedObjectNetworkIds.insert(networkId);
+			_pendingSerializationQueue.push(networkId);
 		}
 	}
 
@@ -94,15 +95,16 @@ void WorldServer::WriteWorldStateToStream()
 	// 큐의 원소를 모두 pop 하면서 stream에 기록
 	// PacketQueue에 넣을 때 stream 값이 복사되기 때문에, 여기서 stream을 생성하고 소멸시켜도
 	// 문제 없다.
-	while (_waitForWriteToStreamQueue.empty() == false)
+	int pending_serialization_count = static_cast<int>(_pendingSerializationQueue.size());
+	while (pending_serialization_count--)
 	{
-		NetworkId_t networkId = _waitForWriteToStreamQueue.front();
-		_waitForWriteToStreamQueue.pop();
+		NetworkId_t networkId = _pendingSerializationQueue.front();
+		_pendingSerializationQueue.pop();
 
 		auto gameObject = linkingContext.GetGameObject(networkId);
 		replicationManager.ReplicateUpdate(inStream, gameObject);
 
-		_networkIdCheckMap[networkId] = false;
+		_updatedObjectNetworkIds.erase(networkId);
 	}
 
 	if (inStream.GetBitLength() <= 0)

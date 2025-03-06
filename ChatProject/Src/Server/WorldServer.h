@@ -22,6 +22,6 @@ private:
 
 	std::vector<shared_ptr<GameObject>> _gameObjects;
 
-	unordered_map<NetworkId_t, bool> _networkIdCheckMap;
-	queue<NetworkId_t> _waitForWriteToStreamQueue;
+	unordered_set<NetworkId_t> _updatedObjectNetworkIds;
+	queue<NetworkId_t> _pendingSerializationQueue;
 };

@@ -7,6 +7,7 @@
 #include <thread>
 #include <list>
 #include <unordered_map>
+#include <unordered_set>
 #include <chrono>
 
 #include <WinSock2.h>
@@ -28,6 +29,7 @@ using std::chrono::zoned_time;
 using std::chrono::current_zone;
 
 using std::unordered_map;
+using std::unordered_set;
 using std::queue;
 
 using NetworkId_t = unsigned int;
