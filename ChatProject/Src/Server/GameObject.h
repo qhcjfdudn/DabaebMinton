@@ -1,5 +1,7 @@
 #pragma once
 
+class OutputMemoryBitStream;
+
 class GameObject
 {
 public:
@@ -12,6 +14,9 @@ public:
 	
 	virtual bool FixedUpdate();
 	void MoveNextPosition();
+
+	virtual unsigned int GetClassId();
+	virtual void Write(OutputMemoryBitStream& inStream);
 
 
 protected:

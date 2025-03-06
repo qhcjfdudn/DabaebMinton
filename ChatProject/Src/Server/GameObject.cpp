@@ -29,3 +29,13 @@ void GameObject::MoveNextPosition()
 {
 	_position += _velocity * Constant::FIXED_UPDATE_TIMESTEP;
 }
+
+unsigned int GameObject::GetClassId()
+{
+	return 0;
+}
+
+void GameObject::Write(OutputMemoryBitStream& inStream)
+{
+
+}

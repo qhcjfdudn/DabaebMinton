@@ -2,10 +2,13 @@
 #include "WorldServer.h"
 
 #include "PacketQueue.h"
-#include "Shuttlecock.h"
+#include "OutputMemoryBitStream.h"
 #include "ReplicationManager.h"
 #include "LinkingContext.h"
+
 #include "Constant.h"
+
+#include "Shuttlecock.h"
 
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
@@ -97,7 +100,7 @@ void WorldServer::WriteWorldStateToStream()
 		_waitForWriteToStreamQueue.pop();
 
 		auto gameObject = linkingContext.GetGameObject(networkId);
-		replicationManager.ReplicateUpdate(inStream, gameObject.get());
+		replicationManager.ReplicateUpdate(inStream, gameObject);
 
 		_networkIdCheckMap[networkId] = false;
 	}

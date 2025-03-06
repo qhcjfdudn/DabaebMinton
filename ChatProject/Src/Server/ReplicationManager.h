@@ -1,21 +1,19 @@
 #pragma once
 
-#include "OutputMemoryBitStream.h"
-#include "LinkingContext.h"
+class OutputMemoryBitStream;
+class GameObject;
+class LinkingContext;
 
 class ReplicationManager
 {
 public:
 	static ReplicationManager& GetInstance();
 
-	void ReplicateUpdate(OutputMemoryBitStream& inStream,
-		GameObject* inGameObject);
-
-private:
-	ReplicationManager() :
-		_linkingContext(LinkingContext::GetInstance()) {}
-	~ReplicationManager() = default;
+	void ReplicateUpdate(OutputMemoryBitStream& inStream, shared_ptr<GameObject> inGameObject);
 
 	LinkingContext& _linkingContext;
-};
 
+private:
+	ReplicationManager();
+	~ReplicationManager() = default;
+};
