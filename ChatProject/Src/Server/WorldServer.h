@@ -11,7 +11,7 @@ public:
 	
 	void Update();
 	void FixedUpdate();
-	void WriteWorldStateToPacket();
+	void WriteWorldStateToStream();
 
 private:
 	WorldServer() = default;

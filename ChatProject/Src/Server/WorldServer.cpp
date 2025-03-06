@@ -65,7 +65,7 @@ void WorldServer::FixedUpdate() {
 	}
 }
 
-void WorldServer::WriteWorldStateToPacket()
+void WorldServer::WriteWorldStateToStream()
 {
 	system_clock::time_point currentTime = system_clock::now();
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
@@ -73,7 +73,7 @@ void WorldServer::WriteWorldStateToPacket()
 
 	if (elapsedTime.count() >= Constant::PACKET_PERIOD)
 	{
-		cout << "[" << now << "] WriteWorldStateToPacket" << endl;
+		cout << "[" << now << "] WriteWorldStateToStream" << endl;
 
 		// replication update code here (send packet)
 		auto& replicationManager = ReplicationManager::GetInstance();

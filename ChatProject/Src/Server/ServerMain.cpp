@@ -21,7 +21,7 @@ int main() {
 		networkInstance.ProcessIOCPEvent();
 		worldInstance.Update();
 		worldInstance.FixedUpdate();
-		worldInstance.WriteWorldStateToPacket();
+		worldInstance.WriteWorldStateToStream();
 		//networkInstance.SendPackets();
 		networkInstance.SendPacketsIOCP();
 
