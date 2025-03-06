@@ -51,18 +51,18 @@ void WorldServer::FixedUpdate() {
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	std::chrono::duration<double> elapsedTime = currentTime - _lastFixedUpdateTime;
 
-	if (elapsedTime.count() >= Constant::FIXED_UPDATE_TIMESTEP)
-	{
-		cout << "[" << now << "] FixedUpdate" << endl;
+	if (elapsedTime.count() < Constant::FIXED_UPDATE_TIMESTEP)
+		return;
 
-		for (auto& gameObject : _gameObjects)
-		{
-			gameObject->FixedUpdate();
-			// replication update code here (send packet)
-		}
-		
-		_lastFixedUpdateTime = currentTime;
+	cout << "[" << now << "] FixedUpdate" << endl;
+
+	for (auto& gameObject : _gameObjects)
+	{
+		gameObject->FixedUpdate();
+		// replication update code here (send packet)
 	}
+
+	_lastFixedUpdateTime = currentTime;
 }
 
 void WorldServer::WriteWorldStateToStream()
@@ -71,17 +71,19 @@ void WorldServer::WriteWorldStateToStream()
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	std::chrono::duration<double> elapsedTime = currentTime - _lastPacketUpdateTime;
 
-	if (elapsedTime.count() >= Constant::PACKET_PERIOD)
-	{
-		cout << "[" << now << "] WriteWorldStateToStream" << endl;
+	if (elapsedTime.count() < Constant::PACKET_PERIOD)
+		return;
 
-		// replication update code here (send packet)
-		auto& replicationManager = ReplicationManager::GetInstance();
+	cout << "[" << now << "] WriteWorldStateToStream" << endl;
 
-		// delta가 있는 객체만 Update 하고 싶다.
-		//replicationManager.ReplicateUpdate()
+	// replication update code here (send packet)
+	auto& replicationManager = ReplicationManager::GetInstance();
 
-		_lastPacketUpdateTime = currentTime;
-	}
+	// delta가 있는 객체만 Update 하고 싶다.
+	// => Update가 있는 객체의 GUID를 기록한 Queue로 구현
+	// 
+	//replicationManager.ReplicateUpdate()
+
+	_lastPacketUpdateTime = currentTime;
 }
 
