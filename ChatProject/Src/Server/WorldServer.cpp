@@ -48,12 +48,12 @@ void WorldServer::Update()
 
 void WorldServer::FixedUpdate() {
 	system_clock::time_point currentTime = system_clock::now();
-	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	std::chrono::duration<double> elapsedTime = currentTime - _lastFixedUpdateTime;
 
 	if (elapsedTime.count() < Constant::FIXED_UPDATE_TIMESTEP)
 		return;
 
+	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] FixedUpdate" << endl;
 
 	for (auto& gameObject : _gameObjects)
@@ -72,7 +72,6 @@ void WorldServer::FixedUpdate() {
 void WorldServer::WriteWorldStateToStream()
 {
 	system_clock::time_point currentTime = system_clock::now();
-	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	std::chrono::duration<double> elapsedTime = currentTime - _lastPacketUpdateTime;
 
 	if (elapsedTime.count() < Constant::PACKET_PERIOD)
@@ -80,6 +79,7 @@ void WorldServer::WriteWorldStateToStream()
 
 	_lastPacketUpdateTime = currentTime;
 
+	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] WriteWorldStateToStream" << endl;
 
 	auto& linkingContext = LinkingContext::GetInstance();
