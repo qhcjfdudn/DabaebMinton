@@ -21,4 +21,7 @@ private:
 	system_clock::time_point _lastPacketUpdateTime;
 
 	std::vector<shared_ptr<GameObject>> _gameObjects;
+
+	unordered_map<NetworkId_t, bool> _networkIdCheckMap;
+	queue<NetworkId_t> _waitForWriteToStreamQueue;
 };

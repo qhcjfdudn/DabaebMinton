@@ -11,7 +11,7 @@ public:
 	void setRadius(int radius);
 	int getRadius();
 
-	void FixedUpdate() override;
+	bool FixedUpdate() override;
 
 private:
 	int _radius = 10;

@@ -8,14 +8,21 @@ GameObject::GameObject(Vector2 position, Vector2 velocity) :
 {
 }
 
-void GameObject::FixedUpdate()
+NetworkId_t GameObject::GetNetworkId()
 {
-	MoveNextPosition();
+	return _networkId;
 }
 
 void GameObject::SetVelocity(Vector2 velocity)
 {
 	_velocity = velocity;
+}
+
+bool GameObject::FixedUpdate()
+{
+	MoveNextPosition();
+
+	return true;
 }
 
 void GameObject::MoveNextPosition()

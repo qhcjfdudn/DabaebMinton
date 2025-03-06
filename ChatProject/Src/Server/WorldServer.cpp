@@ -58,8 +58,12 @@ void WorldServer::FixedUpdate() {
 
 	for (auto& gameObject : _gameObjects)
 	{
-		gameObject->FixedUpdate();
-		// replication update code here (send packet)
+		NetworkId_t networkId = gameObject->GetNetworkId();
+		if (gameObject->FixedUpdate() && _networkIdCheckMap[networkId] == false)
+		{
+			_networkIdCheckMap[networkId] = true;
+			_waitForWriteToStreamQueue.push(networkId);
+		}
 	}
 
 	_lastFixedUpdateTime = currentTime;
@@ -74,16 +78,34 @@ void WorldServer::WriteWorldStateToStream()
 	if (elapsedTime.count() < Constant::PACKET_PERIOD)
 		return;
 
+	_lastPacketUpdateTime = currentTime;
+
 	cout << "[" << now << "] WriteWorldStateToStream" << endl;
 
-	// replication update code here (send packet)
+	auto& linkingContext = LinkingContext::GetInstance();
 	auto& replicationManager = ReplicationManager::GetInstance();
+	OutputMemoryBitStream inStream;
 
 	// delta가 있는 객체만 Update 하고 싶다.
 	// => Update가 있는 객체의 GUID를 기록한 Queue로 구현
-	// 
-	//replicationManager.ReplicateUpdate()
+	// 큐의 원소를 모두 pop 하면서 stream에 기록
+	// PacketQueue에 넣을 때 stream 값이 복사되기 때문에, 여기서 stream을 생성하고 소멸시켜도
+	// 문제 없다.
+	while (_waitForWriteToStreamQueue.empty() == false)
+	{
+		NetworkId_t networkId = _waitForWriteToStreamQueue.front();
+		_waitForWriteToStreamQueue.pop();
 
-	_lastPacketUpdateTime = currentTime;
+		auto gameObject = linkingContext.GetGameObject(networkId);
+		replicationManager.ReplicateUpdate(inStream, gameObject.get());
+
+		_networkIdCheckMap[networkId] = false;
+	}
+
+	if (inStream.GetBitLength() <= 0)
+		return;
+
+	auto& sendQueue = PacketQueue::GetSendStaticInstance();
+	sendQueue.Push(inStream.GetBufferPtr());
 }
 
