@@ -95,8 +95,8 @@ void WorldServer::WriteWorldStateToStream()
 	// 큐의 원소를 모두 pop 하면서 stream에 기록
 	// PacketQueue에 넣을 때 stream 값이 복사되기 때문에, 여기서 stream을 생성하고 소멸시켜도
 	// 문제 없다.
-	int pending_serialization_count = static_cast<int>(_pendingSerializationQueue.size());
-	while (pending_serialization_count--)
+	int pendingSerializationCount = static_cast<int>(_pendingSerializationQueue.size());
+	while (pendingSerializationCount--)
 	{
 		NetworkId_t networkId = _pendingSerializationQueue.front();
 		_pendingSerializationQueue.pop();
