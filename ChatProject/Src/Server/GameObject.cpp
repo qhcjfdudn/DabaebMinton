@@ -2,6 +2,7 @@
 #include "GameObject.h"
 
 #include "Constant.h"
+#include "OutputMemoryBitStream.h"
 
 GameObject::GameObject(Vector2 position, Vector2 velocity) :
 	_position(position), _velocity(velocity), _networkId(0)
@@ -32,10 +33,11 @@ void GameObject::MoveNextPosition()
 
 unsigned int GameObject::GetClassId()
 {
-	return 0;
+	return 'GMOJ';
 }
 
 void GameObject::Write(OutputMemoryBitStream& inStream)
 {
-
+	inStream.Write(_position);
+	inStream.Write(_velocity);
 }

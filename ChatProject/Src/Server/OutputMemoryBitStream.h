@@ -29,6 +29,7 @@ public:
 	}
 
 	void Write(uint32_t inData);
+	void Write(float inData);
 	void Write(std::string inData);
 	void Write(Vector2 inData);
 

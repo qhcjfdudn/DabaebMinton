@@ -56,6 +56,11 @@ void OutputMemoryBitStream::Write(uint32_t inData)
 	WriteBits(&inData, sizeof(uint32_t) << 3);
 }
 
+void OutputMemoryBitStream::Write(float inData)
+{
+	WriteBits(&inData, sizeof(float) << 3);
+}
+
 void OutputMemoryBitStream::Write(std::string inData)
 {
 
@@ -63,4 +68,6 @@ void OutputMemoryBitStream::Write(std::string inData)
 
 void OutputMemoryBitStream::Write(Vector2 inData)
 {
+	Write(inData._x);
+	Write(inData._y);
 }
