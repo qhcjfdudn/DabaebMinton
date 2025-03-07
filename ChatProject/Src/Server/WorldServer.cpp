@@ -10,6 +10,8 @@
 
 #include "Shuttlecock.h"
 
+#include "GetRequiredBits.h"
+
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
 	return instance;
@@ -89,6 +91,9 @@ void WorldServer::WriteWorldStateToStream()
 	auto& linkingContext = LinkingContext::GetInstance();
 	auto& replicationManager = ReplicationManager::GetInstance();
 	OutputMemoryBitStream inStream;
+
+	inStream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
+		GetRequiredBits< static_cast<int>(PacketType::PT_Max)>::value);
 
 	// delta가 있는 객체만 Update 하고 싶다.
 	// => Update가 있는 객체의 GUID를 기록한 Queue로 구현

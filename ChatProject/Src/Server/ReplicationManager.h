@@ -17,3 +17,11 @@ private:
 	ReplicationManager();
 	~ReplicationManager() = default;
 };
+
+enum class PacketType
+{
+	PT_Hello,
+	PT_ReplicationData,
+	PT_Disconnect,
+	PT_Max
+};
