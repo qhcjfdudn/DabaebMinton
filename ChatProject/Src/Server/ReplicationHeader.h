@@ -5,8 +5,12 @@
 class ReplicationHeader
 {
 public:
-	enum class ReplicationAction {
-		RA_Create, RA_Update, RA_Delete, RA_Max
+	enum class ReplicationAction
+	{
+		RA_Create, 
+		RA_Update, 
+		RA_Delete, 
+		RA_Max
 	};
 
 	ReplicationHeader(ReplicationAction ra, NetworkId_t nid = 0, unsigned int cid = 0) :
