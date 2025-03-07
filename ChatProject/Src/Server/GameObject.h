@@ -21,9 +21,7 @@ public:
 
 protected:
 	Vector2 _position;
-
-private:
-	NetworkId_t _networkId;
 	Vector2 _velocity;
+	NetworkId_t _networkId;
 };
 
