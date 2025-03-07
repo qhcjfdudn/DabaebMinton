@@ -17,4 +17,3 @@ private:
 	int _radius = 10;
 
 };
-

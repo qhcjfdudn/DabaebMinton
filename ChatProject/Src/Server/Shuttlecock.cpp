@@ -24,4 +24,3 @@ bool Shuttlecock::FixedUpdate()
 
 	return true;
 }
-
