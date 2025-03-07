@@ -201,6 +201,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GetRequiredBits.h" />
     <ClInclude Include="LinkingContext.h" />
     <ClInclude Include="OutputMemoryBitStream.h" />
     <ClInclude Include="ReplicationHeader.h" />
