@@ -113,4 +113,3 @@ void WorldServer::WriteWorldStateToStream()
 	auto& sendQueue = PacketQueue::GetSendStaticInstance();
 	sendQueue.Push(inStream.GetBufferPtr());
 }
-
