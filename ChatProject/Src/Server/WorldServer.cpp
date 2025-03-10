@@ -12,6 +12,8 @@
 
 #include "GetRequiredBits.h"
 
+#include <bitset>
+
 WorldServer& WorldServer::GetInstance() {
 	static WorldServer instance;
 	return instance;
@@ -82,9 +84,13 @@ void WorldServer::WriteWorldStateToStream()
 		return;
 
 	_lastPacketUpdateTime = currentTime;
-
+	
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] WriteWorldStateToStream" << endl;
+	cout << "pendingSize: " << _pendingSerializationQueue.size() << endl;
+
+	if (_pendingSerializationQueue.empty())
+		return;
 
 	auto& replicationManager = ReplicationManager::GetInstance();
 	OutputMemoryBitStream inStream;
@@ -111,6 +117,12 @@ void WorldServer::WriteWorldStateToStream()
 
 	if (inStream.GetBitLength() <= 0)
 		return;
+
+	for (unsigned int i = 0; i < inStream.GetBitLength(); i += 8)
+	{
+		cout << std::bitset<8>(inStream.GetBufferPtr()[i]) << " ";
+	}
+	cout << endl;
 
 	auto& sendQueue = PacketQueue::GetSendStaticInstance();
 	sendQueue.Push(inStream.GetBufferPtr());
