@@ -4,9 +4,11 @@
 void OutputMemoryBitStream::ReallocBuffer(uint32_t newBitCapacity) {
 	char* newBuffer = new char[newBitCapacity];
 
-	memcpy(newBuffer, _buffer, _bitHead);
-
-	free(_buffer);
+	if (_buffer != nullptr)
+	{
+		memcpy(newBuffer, _buffer, _bitHead);
+		free(_buffer);
+	}
 
 	_buffer = newBuffer;
 }
