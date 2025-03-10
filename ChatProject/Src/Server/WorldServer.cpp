@@ -55,14 +55,12 @@ void WorldServer::FixedUpdate() {
 	if (elapsedTime.count() < Constant::FIXED_UPDATE_TIMESTEP)
 		return;
 
-	auto& linkingContext = LinkingContext::GetInstance();
-
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] FixedUpdate" << endl;
 
 	for (auto& gameObject : _gameObjects)
 	{
-		NetworkId_t networkId = linkingContext.GetNetworkId(gameObject);
+		NetworkId_t networkId = _linkingContext.GetNetworkId(gameObject);
 
 		if (gameObject->FixedUpdate() && 
 			_updatedObjectNetworkIds.find(networkId) == _updatedObjectNetworkIds.end())
@@ -88,7 +86,6 @@ void WorldServer::WriteWorldStateToStream()
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] WriteWorldStateToStream" << endl;
 
-	auto& linkingContext = LinkingContext::GetInstance();
 	auto& replicationManager = ReplicationManager::GetInstance();
 	OutputMemoryBitStream inStream;
 
@@ -106,7 +103,7 @@ void WorldServer::WriteWorldStateToStream()
 		NetworkId_t networkId = _pendingSerializationQueue.front();
 		_pendingSerializationQueue.pop();
 
-		auto gameObject = linkingContext.GetGameObject(networkId);
+		auto gameObject = _linkingContext.GetGameObject(networkId);
 		replicationManager.ReplicateUpdate(inStream, gameObject);
 		
 		_updatedObjectNetworkIds.erase(networkId);
