@@ -1,6 +1,7 @@
 #pragma once
 
 class GameObject;
+class LinkingContext;
 
 class WorldServer
 {
@@ -14,7 +15,7 @@ public:
 	void WriteWorldStateToStream();
 
 private:
-	WorldServer() = default;
+	WorldServer();
 	~WorldServer() {}
 
 	system_clock::time_point _lastFixedUpdateTime;
@@ -24,4 +25,6 @@ private:
 
 	unordered_set<NetworkId_t> _updatedObjectNetworkIds;
 	queue<NetworkId_t> _pendingSerializationQueue;
+
+	LinkingContext& _linkingContext;
 };

@@ -5,13 +5,8 @@
 #include "OutputMemoryBitStream.h"
 
 GameObject::GameObject(Vector2 position, Vector2 velocity) :
-	_position(position), _velocity(velocity), _networkId(0)
+	_position(position), _velocity(velocity)
 {
-}
-
-NetworkId_t GameObject::GetNetworkId()
-{
-	return _networkId;
 }
 
 void GameObject::SetVelocity(Vector2 velocity)

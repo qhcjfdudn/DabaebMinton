@@ -27,10 +27,7 @@ void WorldServer::InitWorld()
 	_gameObjects.push_back(shuttlecock);
 
 	// LinkingContext¿¡ µî·Ï
-	auto& linkingContext = LinkingContext::GetInstance();
-	linkingContext.AddGameObject(shuttlecock);
-
-	_lastFixedUpdateTime = _lastPacketUpdateTime = system_clock::now();
+	_linkingContext.AddGameObject(shuttlecock);
 }
 
 void WorldServer::Update()
@@ -58,12 +55,15 @@ void WorldServer::FixedUpdate() {
 	if (elapsedTime.count() < Constant::FIXED_UPDATE_TIMESTEP)
 		return;
 
+	auto& linkingContext = LinkingContext::GetInstance();
+
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] FixedUpdate" << endl;
 
 	for (auto& gameObject : _gameObjects)
 	{
-		NetworkId_t networkId = gameObject->GetNetworkId();
+		NetworkId_t networkId = linkingContext.GetNetworkId(gameObject);
+
 		if (gameObject->FixedUpdate() && 
 			_updatedObjectNetworkIds.find(networkId) == _updatedObjectNetworkIds.end())
 		{
@@ -108,7 +108,7 @@ void WorldServer::WriteWorldStateToStream()
 
 		auto gameObject = linkingContext.GetGameObject(networkId);
 		replicationManager.ReplicateUpdate(inStream, gameObject);
-
+		
 		_updatedObjectNetworkIds.erase(networkId);
 	}
 
@@ -117,4 +117,10 @@ void WorldServer::WriteWorldStateToStream()
 
 	auto& sendQueue = PacketQueue::GetSendStaticInstance();
 	sendQueue.Push(inStream.GetBufferPtr());
+}
+
+WorldServer::WorldServer() :
+	_linkingContext(LinkingContext::GetInstance())
+{ 
+	_lastFixedUpdateTime = _lastPacketUpdateTime = system_clock::now();
 }

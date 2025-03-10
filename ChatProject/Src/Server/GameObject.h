@@ -9,7 +9,6 @@ public:
 
 	virtual ~GameObject() {}
 
-	NetworkId_t GetNetworkId();
 	void SetVelocity(Vector2 velocity);
 	
 	virtual bool FixedUpdate();
@@ -22,6 +21,5 @@ public:
 protected:
 	Vector2 _position;
 	Vector2 _velocity;
-	NetworkId_t _networkId;
 };
 
