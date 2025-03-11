@@ -10,10 +10,13 @@ public:
 	OutputMemoryBitStream() :
 		_buffer(nullptr), _bitHead(0), _bitCapacity(0)
 	{
-		ReallocBuffer(256);		// 32bytes
+		ReallocBuffer(32);		// 32bytes
 	}
 	~OutputMemoryBitStream()
 	{
+		if (_buffer == nullptr)
+			return;
+
 		free(_buffer);
 	}
 

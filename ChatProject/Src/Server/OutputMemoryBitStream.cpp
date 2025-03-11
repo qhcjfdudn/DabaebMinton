@@ -41,10 +41,11 @@ void OutputMemoryBitStream::WriteBits(uint8_t inData, size_t inBitCount)
 void OutputMemoryBitStream::WriteBits(const void* inData, size_t inBitCount)
 {
 	const char* srcByte = static_cast<const char*>(inData);
+	//printf("%d %d", srcByte[0], srcByte[1]);
 
 	while (inBitCount > 8) {
 		WriteBits(*srcByte, 8);
-		srcByte++;
+		++srcByte;
 		inBitCount -= 8;
 	}
 
