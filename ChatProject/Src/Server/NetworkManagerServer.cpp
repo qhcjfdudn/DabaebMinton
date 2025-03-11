@@ -223,7 +223,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 				continue;
 			}
 
-			size_t receivedBytes = readEvent.dwNumberOfBytesTransferred;
+			unsigned int receivedBytes = readEvent.dwNumberOfBytesTransferred;
 			if (receivedBytes == 0) // sendBytes == 0일 때 clientSocket 제거 로직 필요
 			{
 				closesocket(p_clientSocket->m_socket);
@@ -231,10 +231,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 				continue;
 			}
 
-			// 수신 내용 출력
-			p_clientSocket->m_receiveBuffer[receivedBytes] = 0;
-
-			ReceivePacketsIOCP(p_clientSocket);
+			ReceivePacketsIOCP(p_clientSocket, receivedBytes);
 		}
 	}
 }
@@ -317,10 +314,11 @@ HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket> clientSocket,
 		completionKey,
 		0);
 }
-void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket)
+void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket, unsigned int receivedBytes)
 {
+	Packet packet{ p_clientSocket->m_receiveBuffer, receivedBytes };
 	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
-	receiveQueue.Push(p_clientSocket->m_receiveBuffer);
+	receiveQueue.PushCopy(packet);
 
 	// 다시 수신 대기
 	Recv(p_clientSocket);
@@ -353,14 +351,16 @@ void NetworkManagerServer::SendPacketsIOCP()
 
 	while (sendQueue.Empty() == false)
 	{
-		string data = sendQueue.Front();
+		auto data = sendQueue.Front();
+		unsigned int sentBytes = data->GetLength();
+		cout << "sentBytes: " << sentBytes << endl;
 		
 		// broadcast
 		for (auto clientSocketPair : m_clientsMap)
 		{
 			auto clientSocket = clientSocketPair.second;
-			clientSocket->SetSendBuffer(data.c_str(), data.size());
-			Send(clientSocket, data.size());
+			clientSocket->SetSendBuffer(data->GetBuffer(), sentBytes);
+			Send(clientSocket, sentBytes);
 		}
 	}
 }

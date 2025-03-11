@@ -18,7 +18,7 @@ public:
 	bool GetCompletionStatus();
 	bool ProcessAcceptedClientSocketIOCP();
 	HANDLE AddSocketIOCP(std::shared_ptr<Socket> clientSocket, const ULONG_PTR completionKey);
-	void ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket);
+	void ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket, unsigned int receivedBytes);
 	int Recv(shared_ptr<Socket> clientSocket);
 	void SendPacketsIOCP();
 	int Send(shared_ptr<Socket> clientSocket, size_t len);

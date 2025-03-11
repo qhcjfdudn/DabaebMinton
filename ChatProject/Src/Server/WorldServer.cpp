@@ -41,12 +41,12 @@ void WorldServer::Update()
 
 	while (receiveQueue.Empty() == false)
 	{
-		std::string received = receiveQueue.Front();
+		shared_ptr<Packet> received = receiveQueue.Front();
 
 		const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
-		cout << "[" << now << "] received: " << received << endl;
+		cout << "[" << now << "] received: " << received->GetBuffer() << endl;
 
-		sendQueue.Push(received);
+		sendQueue.PushCopy(*received);
 	}
 }
 
@@ -124,8 +124,10 @@ void WorldServer::WriteWorldStateToStream()
 	}
 	cout << endl;
 
+	Packet packet{ inStream.GetBufferPtr(), inStream.GetByteLength() };
+
 	auto& sendQueue = PacketQueue::GetSendStaticInstance();
-	sendQueue.Push(inStream.GetBufferPtr());
+	sendQueue.PushCopy(packet);
 }
 
 WorldServer::WorldServer() :
