@@ -29,14 +29,28 @@ Packet::~Packet()
 	free(_buffer);
 }
 
-const char* Packet::GetBuffer()
+const char* Packet::GetBuffer() const
 {
 	return _buffer;
 }
 
-unsigned int Packet::GetLength()
+unsigned int Packet::GetLength() const
 {
 	return _len;
+}
+
+void Packet::PrintInHex() const
+{
+	cout.setf(std::ios::hex, std::ios::basefield);
+	cout.setf(std::ios::uppercase);
+	for (unsigned int i = 0; i < _len; ++i)
+	{
+		cout << std::setw(2) << std::setfill('0') << static_cast<int>((static_cast<unsigned char>(_buffer[i])));
+		cout << " ";
+	}
+	cout << endl;
+	cout.unsetf(std::ios::hex);
+	cout.unsetf(std::ios::uppercase);
 }
 
 PacketQueue& PacketQueue::GetReceiveStaticInstance()

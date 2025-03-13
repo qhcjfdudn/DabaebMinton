@@ -8,8 +8,10 @@ public:
 	Packet(Packet&& src) noexcept;
 	~Packet();
 
-	const char* GetBuffer();
-	unsigned int GetLength();
+	const char* GetBuffer() const;
+	unsigned int GetLength() const;
+
+	void PrintInHex() const;
 
 private:
 	char* _buffer;
