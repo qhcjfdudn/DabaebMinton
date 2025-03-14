@@ -91,9 +91,9 @@ void WorldServer::WriteWorldStateToStream()
 		return;
 
 	auto& replicationManager = ReplicationManager::GetInstance();
-	OutputMemoryBitStream inStream;
+	OutputMemoryBitStream outStream;
 
-	inStream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
+	outStream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
 		GetRequiredBits< static_cast<int>(PacketType::PT_Max)>::value);
 
 	// delta가 있는 객체만 Update 하고 싶다.
@@ -108,18 +108,18 @@ void WorldServer::WriteWorldStateToStream()
 		_pendingSerializationQueue.pop();
 
 		auto gameObject = _linkingContext.GetGameObject(networkId);
-		replicationManager.ReplicateUpdate(inStream, gameObject);
+		replicationManager.ReplicateUpdate(outStream, gameObject);
 		
 		_updatedObjectNetworkIds.erase(networkId);
 	}
 
-	if (inStream.GetBitLength() <= 0)
+	if (outStream.GetBitLength() <= 0)
 		return;
 
-	cout << "inStream.GetBitLength(): " << inStream.GetBitLength() << endl;
-	cout << "inStream.GetByteLength(): " << inStream.GetByteLength() << endl;
+	cout << "outStream.GetBitLength(): " << outStream.GetBitLength() << endl;
+	cout << "outStream.GetByteLength(): " << outStream.GetByteLength() << endl;
 
-	Packet packet{ inStream.GetBufferPtr(), inStream.GetByteLength() };
+	Packet packet{ outStream.GetBufferPtr(), outStream.GetByteLength() };
 
 	packet.PrintInHex();
 
