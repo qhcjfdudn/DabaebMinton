@@ -37,5 +37,7 @@ ChatProject/Output
 ChatProject/Build
 ChatProject/Src/Server/Server.vcxproj.user
 ChatProject/Src/Client/Client.vcxproj.user
+ChatProject/Src/UtilProject
 
+ChatProject/ExternalLibrary
 resources/

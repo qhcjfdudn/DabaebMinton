@@ -116,11 +116,13 @@
       <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);Ws2_32.lib;</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);Ws2_32.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevelAABB_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevelDynamics_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevel_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCharacterKinematic_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCommon_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCooking_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXExtensions_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXFoundation_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXPvdSDK_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXTask_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXVehicle2_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXVehicle_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysX_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PVDRuntime_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/SceneQuery_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/SimulationController_static_64.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

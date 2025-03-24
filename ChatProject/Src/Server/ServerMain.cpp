@@ -5,8 +5,9 @@
 #include "WorldServer.h"
 
 int main() {
-	auto& engine = Engine::GetInstance();
-	
+	auto& engineInstance = Engine::GetInstance();
+	engineInstance.initPhysics(false);
+
 	auto& networkInstance = NetworkManagerServer::GetInstance();
 	//networkInstance.Init();
 	networkInstance.InitIOCP();
@@ -14,8 +15,9 @@ int main() {
 	auto& worldInstance = WorldServer::GetInstance();
 	worldInstance.InitWorld();
 
-	cout << "engine start" << endl;
-	while (engine.isRunning) {
+	cout << "engineInstance start" << endl;
+	while (engineInstance.isRunning) {
+		engineInstance.stepPhysics(true);
 
 		//networkInstance.ReceivePackets();
 		networkInstance.ProcessIOCPEvent();
@@ -24,8 +26,8 @@ int main() {
 		worldInstance.WriteWorldStateToStream();
 		//networkInstance.SendPackets();
 		networkInstance.SendPacketsIOCP();
-
-		//engine.isRunning = false;
 	}
-	cout << "engine end" << endl;
+
+	engineInstance.cleanupPhysics(true);
+	cout << "engineInstance end" << endl;
 }
