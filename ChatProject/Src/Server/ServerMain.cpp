@@ -38,4 +38,6 @@ int main() {
 
 	engineInstance.cleanupPhysics();
 	cout << "engineInstance end" << endl;
+
+	// 모든 thread의 join 필요
 }
