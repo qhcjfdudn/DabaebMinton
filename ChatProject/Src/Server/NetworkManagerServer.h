@@ -25,8 +25,6 @@ public:
 
 	std::unordered_map<ULONG_PTR, shared_ptr<Socket>> m_clientsMap;
 
-	bool isRunning = true;
-
 private:
 	NetworkManagerServer();
 	~NetworkManagerServer();
