@@ -10,40 +10,38 @@ class Engine
 {
 public:
 	static Engine& GetInstance();
-	bool isRunning;
+	bool isRunning = true;
 
 	void TurnOff();
 
 	void initPhysics();
+	void cleanupPhysics();
+	void stepPhysics();
 
-	static PxRigidDynamic* createDynamic(
+	PxRigidDynamic* createDynamic(
 		const PxTransform& t,
 		const PxGeometry& geometry,
 		const PxVec3& velocity = PxVec3(0));
 
-	static void createStack(
+	void createStack(
 		const PxTransform& t, 
 		PxU32 size, 
 		PxReal halfExtent);
 
-	void stepPhysics();
-
-	void cleanupPhysics();
-
 private:
-	Engine();
+	Engine() = default;
 	~Engine() {}
 
-	static PxDefaultAllocator		gAllocator;
-	static PxDefaultErrorCallback	gErrorCallback;
-	static PxFoundation*			gFoundation;
-	static PxPhysics*				gPhysics;
-	static PxDefaultCpuDispatcher*	gDispatcher;
-	static PxScene*					gScene;
-	static PxMaterial*				gMaterial;
-	static PxPvd*					gPvd;
+	PxDefaultAllocator		gAllocator{};
+	PxDefaultErrorCallback	gErrorCallback{};
+	PxFoundation*			gFoundation = nullptr;
+	PxPhysics*				gPhysics = nullptr;
+	PxDefaultCpuDispatcher*	gDispatcher = nullptr;
+	PxScene*				gScene = nullptr;
+	PxMaterial*				gMaterial = nullptr;
+	PxPvd*					gPvd = nullptr;
 
-	static PxReal stackZ;
+	PxReal stackZ = 10.0f;
 
 	Observer observer;
 };

@@ -1,23 +1,10 @@
 #include "ServerPCH.h"
 #include "Engine.h"
 
-PxDefaultAllocator		Engine::gAllocator;
-PxDefaultErrorCallback	Engine::gErrorCallback;
-PxFoundation*			Engine::gFoundation = NULL;
-PxPhysics*				Engine::gPhysics = NULL;
-PxDefaultCpuDispatcher* Engine::gDispatcher = NULL;
-PxScene*				Engine::gScene = NULL;
-PxMaterial*				Engine::gMaterial = NULL;
-PxPvd*					Engine::gPvd = NULL;
-
-PxReal Engine::stackZ = 10.0f;
-
 Engine& Engine::GetInstance() {
 	static Engine instance;
 	return instance;
 }
-
-Engine::Engine() : isRunning(true) {}
 
 void Engine::TurnOff()
 {
@@ -88,6 +75,7 @@ void Engine::createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 
 void Engine::stepPhysics()
 {
+	// FixedUpdate °³³ä
 	gScene->simulate(1.0f / 60.0f);
 	gScene->fetchResults(true);
 }
