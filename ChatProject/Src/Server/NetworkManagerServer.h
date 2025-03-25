@@ -8,10 +8,6 @@ class NetworkManagerServer
 public:
 	static NetworkManagerServer& GetInstance();
 
-	void Init();
-	void ReceivePackets();
-	void SendPackets();
-
 	void InitIOCP();
 	void AcceptEx();
 	void ProcessIOCPEvent();
@@ -23,18 +19,13 @@ public:
 	void SendPacketsIOCP();
 	int Send(shared_ptr<Socket> clientSocket, size_t len);
 
-	void closeSockets();
-
-	std::thread* m_acceptSocketThread = nullptr;
-
-	std::list<SOCKET> m_clientSockets;
-	std::vector<std::list<SOCKET>::iterator> m_clientSocketItersToErase;
-
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 
 	static const int MAX_IOCP_EVENT_COUNT = 1000;
 
 	std::unordered_map<ULONG_PTR, shared_ptr<Socket>> m_clientsMap;
+
+	bool isRunning = true;
 
 private:
 	NetworkManagerServer();
