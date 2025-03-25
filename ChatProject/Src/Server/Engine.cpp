@@ -47,6 +47,29 @@ void Engine::initPhysics()
 	cout << "initPhysics done." << endl;
 }
 
+void Engine::cleanupPhysics()
+{
+	PX_RELEASE(gScene);
+	PX_RELEASE(gDispatcher);
+	PX_RELEASE(gPhysics);
+	if (gPvd)
+	{
+		PxPvdTransport* transport = gPvd->getTransport();
+		PX_RELEASE(gPvd);
+		PX_RELEASE(transport);
+	}
+	PX_RELEASE(gFoundation);
+
+	cout << "cleanupPhysics done." << endl;
+}
+
+void Engine::stepPhysics()
+{
+	// FixedUpdate °³³ä
+	gScene->simulate(1.0f / 60.0f);
+	gScene->fetchResults(true);
+}
+
 PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
 	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
@@ -71,27 +94,4 @@ void Engine::createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 		}
 	}
 	shape->release();
-}
-
-void Engine::stepPhysics()
-{
-	// FixedUpdate °³³ä
-	gScene->simulate(1.0f / 60.0f);
-	gScene->fetchResults(true);
-}
-
-void Engine::cleanupPhysics()
-{
-	PX_RELEASE(gScene);
-	PX_RELEASE(gDispatcher);
-	PX_RELEASE(gPhysics);
-	if (gPvd)
-	{
-		PxPvdTransport* transport = gPvd->getTransport();
-		PX_RELEASE(gPvd);
-		PX_RELEASE(transport);
-	}
-	PX_RELEASE(gFoundation);
-
-	cout << "cleanupPhysics done." << endl;
 }
