@@ -19,7 +19,13 @@ Engine& Engine::GetInstance() {
 
 Engine::Engine() : isRunning(true) {}
 
-void Engine::initPhysics(bool interactive)
+void Engine::TurnOff()
+{
+	isRunning = false;
+	observer.notify(ObserverEvent::EngineOff);
+}
+
+void Engine::initPhysics()
 {
 	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
 
@@ -51,9 +57,6 @@ void Engine::initPhysics(bool interactive)
 	for (PxU32 i = 0; i < 5; i++)
 		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
 
-	if (!interactive)
-		createDynamic(PxTransform(PxVec3(0, 40, 100)), PxSphereGeometry(10), PxVec3(0, -50, -100));
-
 	cout << "initPhysics done." << endl;
 }
 
@@ -83,13 +86,13 @@ void Engine::createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 	shape->release();
 }
 
-void Engine::stepPhysics(bool /*interactive*/)
+void Engine::stepPhysics()
 {
 	gScene->simulate(1.0f / 60.0f);
 	gScene->fetchResults(true);
 }
 
-void Engine::cleanupPhysics(bool /*interactive*/)
+void Engine::cleanupPhysics()
 {
 	PX_RELEASE(gScene);
 	PX_RELEASE(gDispatcher);

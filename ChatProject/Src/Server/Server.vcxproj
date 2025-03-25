@@ -148,6 +148,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Observer.cpp" />
     <ClCompile Include="OutputMemoryBitStream.cpp" />
     <ClCompile Include="ReplicationHeader.cpp" />
     <ClCompile Include="ReplicationManager.cpp">
@@ -205,6 +206,7 @@
   <ItemGroup>
     <ClInclude Include="GetRequiredBits.h" />
     <ClInclude Include="LinkingContext.h" />
+    <ClInclude Include="Observer.h" />
     <ClInclude Include="OutputMemoryBitStream.h" />
     <ClInclude Include="ReplicationHeader.h" />
     <ClInclude Include="ReplicationManager.h" />

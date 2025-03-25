@@ -2,6 +2,8 @@
 
 #include <PxPhysicsAPI.h>
 
+#include "Observer.h"
+
 using namespace physx;
 
 class Engine
@@ -10,7 +12,9 @@ public:
 	static Engine& GetInstance();
 	bool isRunning;
 
-	void initPhysics(bool interactive);
+	void TurnOff();
+
+	void initPhysics();
 
 	static PxRigidDynamic* createDynamic(
 		const PxTransform& t,
@@ -22,9 +26,9 @@ public:
 		PxU32 size, 
 		PxReal halfExtent);
 
-	void stepPhysics(bool /*interactive*/);
+	void stepPhysics();
 
-	void cleanupPhysics(bool /*interactive*/);
+	void cleanupPhysics();
 
 private:
 	Engine();
@@ -40,5 +44,7 @@ private:
 	static PxPvd*					gPvd;
 
 	static PxReal stackZ;
+
+	Observer observer;
 };
 
