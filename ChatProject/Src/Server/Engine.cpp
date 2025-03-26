@@ -1,6 +1,8 @@
 #include "ServerPCH.h"
 #include "Engine.h"
 
+#include "Constant.h"
+
 Engine& Engine::GetInstance() {
 	static Engine instance;
 	return instance;
@@ -37,9 +39,6 @@ void Engine::initPhysics()
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
 
-	CreatePlain(0.f, 1.f, 0.f, 0.f);
-	CreateBox(PxTransform{ PxVec3{ 10, 5, 0 } }, 1, 1, 1);
-
 	cout << "initPhysics done." << endl;
 }
 
@@ -61,8 +60,7 @@ void Engine::cleanupPhysics()
 
 void Engine::stepPhysics()
 {
-	// FixedUpdate °³³ä
-	pxScene->simulate(1.0f / 60.0f);
+	pxScene->simulate(Constant::PHYSX_FIXED_UPDATE_TIMESTEP);
 	pxScene->fetchResults(true);
 }
 

@@ -32,4 +32,6 @@ using std::unordered_map;
 using std::unordered_set;
 using std::queue;
 
+using std::thread;
+
 using NetworkId_t = unsigned int;
