@@ -36,10 +36,8 @@ void Engine::initPhysics()
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
-	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
-	gScene->addActor(*groundPlane);
+	CreatePlain(0.f, 1.f, 0.f, 0.f);
 
 	for (PxU32 i = 0; i < 5; i++)
 		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
@@ -68,6 +66,14 @@ void Engine::stepPhysics()
 	// FixedUpdate °³³ä
 	gScene->simulate(1.0f / 60.0f);
 	gScene->fetchResults(true);
+}
+
+void Engine::CreatePlain(float nx, float ny, float nz, float distance)
+{
+	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(nx, ny, nz, distance), *gMaterial);
+	gScene->addActor(*groundPlane);
 }
 
 PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)

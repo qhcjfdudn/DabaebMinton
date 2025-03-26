@@ -18,6 +18,8 @@ public:
 	void cleanupPhysics();
 	void stepPhysics();
 
+	void CreatePlain(float nx, float ny, float nz, float distance);
+
 	PxRigidDynamic* createDynamic(
 		const PxTransform& t,
 		const PxGeometry& geometry,
