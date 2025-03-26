@@ -38,9 +38,7 @@ void Engine::initPhysics()
 	}
 
 	CreatePlain(0.f, 1.f, 0.f, 0.f);
-
-	for (PxU32 i = 0; i < 5; i++)
-		createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
+	CreateBox(PxTransform{ PxVec3{ 10, 5, 0 } }, 1, 1, 1);
 
 	cout << "initPhysics done." << endl;
 }
@@ -76,6 +74,21 @@ void Engine::CreatePlain(float nx, float ny, float nz, float distance)
 	pxScene->addActor(*groundPlane);
 }
 
+PxRigidDynamic* Engine::CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ)
+{
+	PxRigidDynamic* body = pxPhysics->createRigidDynamic(tp);
+
+	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, halfExtentZ), *pxMaterial);
+	body->attachShape(*shape);
+
+	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	pxScene->addActor(*body);
+
+	shape->release();
+
+	return body;
+}
+
 PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
 	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);
@@ -83,21 +96,4 @@ PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& ge
 	dynamic->setLinearVelocity(velocity);
 	pxScene->addActor(*dynamic);
 	return dynamic;
-}
-
-void Engine::createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
-{
-	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *pxMaterial);
-	for (PxU32 i = 0; i < size; i++)
-	{
-		for (PxU32 j = 0; j < size - i; j++)
-		{
-			PxTransform localTm(PxVec3(PxReal(j * 2) - PxReal(size - i), PxReal(i * 2 + 1), 0) * halfExtent);
-			PxRigidDynamic* body = pxPhysics->createRigidDynamic(t.transform(localTm));
-			body->attachShape(*shape);
-			PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-			pxScene->addActor(*body);
-		}
-	}
-	shape->release();
 }

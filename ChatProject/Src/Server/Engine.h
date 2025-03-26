@@ -20,15 +20,12 @@ public:
 
 	void CreatePlain(float nx, float ny, float nz, float distance);
 
+	PxRigidDynamic * CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ);
+
 	PxRigidDynamic* createDynamic(
 		const PxTransform& t,
 		const PxGeometry& geometry,
 		const PxVec3& velocity = PxVec3(0));
-
-	void createStack(
-		const PxTransform& t, 
-		PxU32 size, 
-		PxReal halfExtent);
 
 private:
 	Engine() = default;
