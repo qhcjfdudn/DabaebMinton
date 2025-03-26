@@ -8,8 +8,8 @@ class WorldServer
 public:
 	static WorldServer& GetInstance();
 	
-	void InitWorld();
-	
+	void InitLevel();
+
 	void Update();
 	void FixedUpdate();
 	void WriteWorldStateToStream();

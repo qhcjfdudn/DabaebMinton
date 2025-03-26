@@ -1,6 +1,7 @@
 #include "ServerPCH.h"
 #include "WorldServer.h"
 
+#include "Engine.h"
 #include "PacketQueue.h"
 #include "OutputMemoryBitStream.h"
 #include "ReplicationManager.h"
@@ -17,8 +18,14 @@ WorldServer& WorldServer::GetInstance() {
 	return instance;
 }
 
-void WorldServer::InitWorld()
+void WorldServer::InitLevel()
 {
+	// engine으로부터 초기 object 생성
+	auto& engineInstance = Engine::GetInstance();
+
+	engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
+	engineInstance.CreateBox(PxTransform{ PxVec3{ 10, 5, 0 } }, 1, 1, 1);
+
 	// Shuttlecock 만들기
 	Vector2 position(0, 0);
 	Vector2 velocity(0, 1);

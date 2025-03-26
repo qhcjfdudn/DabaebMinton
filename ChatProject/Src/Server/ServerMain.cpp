@@ -14,16 +14,10 @@ void signalHandler(int signum)
 	engineInstance.TurnOff();
 }
 
-void InitLevel()
-{
-	auto& engineInstance = Engine::GetInstance();
-
-	engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
-	engineInstance.CreateBox(PxTransform{ PxVec3{ 10, 5, 0 } }, 1, 1, 1);
-}
-
 int main()
 {
+	signal(SIGINT, signalHandler);
+	
 	auto& engineInstance = Engine::GetInstance();
 	engineInstance.initPhysics();
 
@@ -31,11 +25,7 @@ int main()
 	networkInstance.InitIOCP();
 
 	auto& worldInstance = WorldServer::GetInstance();
-	worldInstance.InitWorld();
-
-	signal(SIGINT, signalHandler);
-
-	InitLevel();
+	worldInstance.InitLevel();
 
 	thread physXThread([]() {
 		auto& engineInstance = Engine::GetInstance();
