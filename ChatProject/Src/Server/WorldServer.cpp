@@ -101,7 +101,7 @@ void WorldServer::WriteWorldStateToStream()
 	OutputMemoryBitStream outStream;
 
 	outStream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
-		GetRequiredBits< static_cast<int>(PacketType::PT_Max)>::value);
+		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
 
 	// delta가 있는 객체만 Update 하고 싶다.
 	// => Update가 있는 객체의 GUID를 기록한 Queue로 구현
