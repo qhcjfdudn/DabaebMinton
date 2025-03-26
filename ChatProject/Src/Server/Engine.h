@@ -34,14 +34,14 @@ private:
 	Engine() = default;
 	~Engine() {}
 
-	PxDefaultAllocator		gAllocator{};
-	PxDefaultErrorCallback	gErrorCallback{};
-	PxFoundation*			gFoundation = nullptr;
-	PxPhysics*				gPhysics = nullptr;
-	PxDefaultCpuDispatcher*	gDispatcher = nullptr;
-	PxScene*				gScene = nullptr;
-	PxMaterial*				gMaterial = nullptr;
-	PxPvd*					gPvd = nullptr;
+	PxDefaultAllocator		pxAllocator{};
+	PxDefaultErrorCallback	pxErrorCallback{};
+	PxFoundation*			pxFoundation = nullptr;
+	PxPhysics*				pxPhysics = nullptr;
+	PxDefaultCpuDispatcher*	pxDispatcher = nullptr;
+	PxScene*				pxScene = nullptr;
+	PxMaterial*				pxMaterial = nullptr;
+	PxPvd*					pxPvd = nullptr;
 
 	PxReal stackZ = 10.0f;
 

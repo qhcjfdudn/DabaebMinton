@@ -14,22 +14,22 @@ void Engine::TurnOff()
 
 void Engine::initPhysics()
 {
-	gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
+	pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, pxAllocator, pxErrorCallback);
 
-	gPvd = PxCreatePvd(*gFoundation);
+	pxPvd = PxCreatePvd(*pxFoundation);
 	PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10);
-	gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+	pxPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
-	gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
+	pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
 
-	PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+	PxSceneDesc sceneDesc(pxPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	gDispatcher = PxDefaultCpuDispatcherCreate(2);
-	sceneDesc.cpuDispatcher = gDispatcher;
+	pxDispatcher = PxDefaultCpuDispatcherCreate(2);
+	sceneDesc.cpuDispatcher = pxDispatcher;
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-	gScene = gPhysics->createScene(sceneDesc);
+	pxScene = pxPhysics->createScene(sceneDesc);
 
-	PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
+	PxPvdSceneClient* pvdClient = pxScene->getScenePvdClient();
 	if (pvdClient)
 	{
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
@@ -47,16 +47,16 @@ void Engine::initPhysics()
 
 void Engine::cleanupPhysics()
 {
-	PX_RELEASE(gScene);
-	PX_RELEASE(gDispatcher);
-	PX_RELEASE(gPhysics);
-	if (gPvd)
+	PX_RELEASE(pxScene);
+	PX_RELEASE(pxDispatcher);
+	PX_RELEASE(pxPhysics);
+	if (pxPvd)
 	{
-		PxPvdTransport* transport = gPvd->getTransport();
-		PX_RELEASE(gPvd);
+		PxPvdTransport* transport = pxPvd->getTransport();
+		PX_RELEASE(pxPvd);
 		PX_RELEASE(transport);
 	}
-	PX_RELEASE(gFoundation);
+	PX_RELEASE(pxFoundation);
 
 	cout << "cleanupPhysics done." << endl;
 }
@@ -64,39 +64,39 @@ void Engine::cleanupPhysics()
 void Engine::stepPhysics()
 {
 	// FixedUpdate °³³ä
-	gScene->simulate(1.0f / 60.0f);
-	gScene->fetchResults(true);
+	pxScene->simulate(1.0f / 60.0f);
+	pxScene->fetchResults(true);
 }
 
 void Engine::CreatePlain(float nx, float ny, float nz, float distance)
 {
-	gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	pxMaterial = pxPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-	PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(nx, ny, nz, distance), *gMaterial);
-	gScene->addActor(*groundPlane);
+	PxRigidStatic* groundPlane = PxCreatePlane(*pxPhysics, PxPlane(nx, ny, nz, distance), *pxMaterial);
+	pxScene->addActor(*groundPlane);
 }
 
 PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
-	PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
+	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);
 	dynamic->setAngularDamping(0.5f);
 	dynamic->setLinearVelocity(velocity);
-	gScene->addActor(*dynamic);
+	pxScene->addActor(*dynamic);
 	return dynamic;
 }
 
 void Engine::createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 {
-	PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
+	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *pxMaterial);
 	for (PxU32 i = 0; i < size; i++)
 	{
 		for (PxU32 j = 0; j < size - i; j++)
 		{
 			PxTransform localTm(PxVec3(PxReal(j * 2) - PxReal(size - i), PxReal(i * 2 + 1), 0) * halfExtent);
-			PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
+			PxRigidDynamic* body = pxPhysics->createRigidDynamic(t.transform(localTm));
 			body->attachShape(*shape);
 			PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-			gScene->addActor(*body);
+			pxScene->addActor(*body);
 		}
 	}
 	shape->release();
