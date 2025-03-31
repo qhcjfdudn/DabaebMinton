@@ -9,8 +9,10 @@ GameObject::GameObject(PxVec2 position, PxVec2 velocity) :
 
 GameObject::~GameObject()
 {
-	if (_rigidbody != nullptr)
-		_rigidbody->release();
+	if (_rigidbody != nullptr)	// memory free needed but runtime error
+	{
+		//_rigidbody->release();
+	}
 }
 
 void GameObject::SetVelocity(PxVec2 velocity)
