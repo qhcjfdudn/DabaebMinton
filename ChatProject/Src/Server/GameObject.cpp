@@ -5,9 +5,12 @@
 #include "OutputMemoryBitStream.h"
 
 GameObject::GameObject(PxVec2 position, PxVec2 velocity) :
-	_location(position), _velocity(velocity)
+	_location(position), _velocity(velocity), _rigidbody(nullptr) {}
+
+GameObject::~GameObject()
 {
-	_rigidbody = nullptr;
+	if (_rigidbody != nullptr)
+		_rigidbody->release();
 }
 
 void GameObject::SetVelocity(PxVec2 velocity)

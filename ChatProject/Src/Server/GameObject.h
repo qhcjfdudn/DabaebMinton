@@ -7,7 +7,7 @@ class GameObject
 public:
 	GameObject(PxVec2 location, PxVec2 velocity);
 
-	virtual ~GameObject() {}
+	virtual ~GameObject();
 
 	void SetVelocity(PxVec2 velocity);
 	
