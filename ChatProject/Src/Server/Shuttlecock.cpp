@@ -8,9 +8,16 @@ Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 	GameObject(location, velocity)
 {
 	Engine& engineInstance = Engine::GetInstance();
-	PxRigidDynamic* cork = engineInstance.CreateSphere2D(location, _radius);
-	cork->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
-	cork->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+	_rigidbody = engineInstance.CreateSphere2D(location, _radius);
+
+	if (_rigidbody == nullptr)
+	{
+		cout << "cork: CreateSphere2D error" << endl;
+		return;
+	}
+
+	_rigidbody->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
+	_rigidbody->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
 }
 
 void Shuttlecock::setRadius(float radius)
@@ -25,7 +32,7 @@ float Shuttlecock::getRadius()
 
 bool Shuttlecock::FixedUpdate()
 {
-	MoveNextPosition();
+	SetCurrentLocation();
 	cout << "Shuttlecock FixedUpdate" << endl;
 	cout << "Position: " << _location.x << ", " << _location.y << endl;
 

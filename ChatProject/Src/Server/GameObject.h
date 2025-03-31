@@ -12,7 +12,7 @@ public:
 	void SetVelocity(PxVec2 velocity);
 	
 	virtual bool FixedUpdate();
-	void MoveNextPosition();
+	void SetCurrentLocation();
 
 	virtual unsigned int GetClassId();
 	virtual void Write(OutputMemoryBitStream& inStream);
@@ -21,5 +21,7 @@ public:
 protected:
 	PxVec2 _location;
 	PxVec2 _velocity;
+
+	PxRigidDynamic* _rigidbody;
 };
 

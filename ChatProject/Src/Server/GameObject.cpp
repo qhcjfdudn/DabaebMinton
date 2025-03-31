@@ -7,6 +7,7 @@
 GameObject::GameObject(PxVec2 position, PxVec2 velocity) :
 	_location(position), _velocity(velocity)
 {
+	_rigidbody = nullptr;
 }
 
 void GameObject::SetVelocity(PxVec2 velocity)
@@ -16,14 +17,15 @@ void GameObject::SetVelocity(PxVec2 velocity)
 
 bool GameObject::FixedUpdate()
 {
-	MoveNextPosition();
+	SetCurrentLocation();
 
 	return true;
 }
 
-void GameObject::MoveNextPosition()
+void GameObject::SetCurrentLocation()
 {
-	_location += _velocity * Constant::FIXED_UPDATE_TIMESTEP;
+	PxVec3 curLocation{ _rigidbody->getGlobalPose().p };
+	_location = PxVec2{ curLocation.x, curLocation.y };
 }
 
 unsigned int GameObject::GetClassId()
