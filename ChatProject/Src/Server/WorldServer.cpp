@@ -30,7 +30,7 @@ void WorldServer::InitLevel()
 
 	// Shuttlecock
 	PxVec2 location(-3, 10);
-	PxVec2 velocity(0, 1);
+	PxVec2 velocity(2, 5);
 	auto shuttlecock = make_shared<Shuttlecock>(location, velocity);
 
 	_gameObjects.push_back(shuttlecock);

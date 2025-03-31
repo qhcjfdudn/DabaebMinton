@@ -12,7 +12,7 @@ public:
 	void SetVelocity(PxVec2 velocity);
 	
 	virtual bool FixedUpdate();
-	void SetCurrentLocation();
+	void SetCurrentTransform();
 
 	virtual unsigned int GetClassId();
 	virtual void Write(OutputMemoryBitStream& inStream);

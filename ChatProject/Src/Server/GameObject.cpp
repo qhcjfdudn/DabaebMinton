@@ -22,15 +22,19 @@ void GameObject::SetVelocity(PxVec2 velocity)
 
 bool GameObject::FixedUpdate()
 {
-	SetCurrentLocation();
+	SetCurrentTransform();
 
 	return true;
 }
 
-void GameObject::SetCurrentLocation()
+void GameObject::SetCurrentTransform()
 {
 	PxVec3 curLocation{ _rigidbody->getGlobalPose().p };
 	_location = PxVec2{ curLocation.x, curLocation.y };
+
+	PxVec3 curVelocity{ _rigidbody->getLinearVelocity() };
+	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
+
 }
 
 unsigned int GameObject::GetClassId()

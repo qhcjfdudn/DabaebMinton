@@ -9,6 +9,7 @@ Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 {
 	Engine& engineInstance = Engine::GetInstance();
 	_rigidbody = engineInstance.CreateSphere2D(location, _radius);
+	_rigidbody->setLinearVelocity(PxVec3{ velocity.x, velocity.y, 0.f });
 
 	if (_rigidbody == nullptr)
 	{
@@ -32,7 +33,7 @@ float Shuttlecock::getRadius()
 
 bool Shuttlecock::FixedUpdate()
 {
-	SetCurrentLocation();
+	SetCurrentTransform();
 	cout << "Shuttlecock FixedUpdate" << endl;
 	cout << "Position: " << _location.x << ", " << _location.y << endl;
 
