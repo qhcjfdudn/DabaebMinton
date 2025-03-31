@@ -3,7 +3,7 @@
 
 #include "OutputMemoryBitStream.h"
 
-Shuttlecock::Shuttlecock(Vector2 position, Vector2 velocity) :
+Shuttlecock::Shuttlecock(PxVec2 position, PxVec2 velocity) :
 	GameObject(position, velocity)
 {
 }
@@ -22,7 +22,7 @@ bool Shuttlecock::FixedUpdate()
 {
 	MoveNextPosition();
 	cout << "Shuttlecock FixedUpdate" << endl;
-	cout << "Position: " << _position._x << ", " << _position._y << endl;
+	cout << "Position: " << _position.x << ", " << _position.y << endl;
 
 	return true;
 }

@@ -7,7 +7,7 @@ class OutputMemoryBitStream;
 class Shuttlecock : public GameObject
 {
 public:
-	Shuttlecock(Vector2 position, Vector2 velocity);
+	Shuttlecock(PxVec2 position, PxVec2 velocity);
 	~Shuttlecock() override = default;
 	
 	void setRadius(int radius);

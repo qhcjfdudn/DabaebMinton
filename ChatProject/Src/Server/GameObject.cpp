@@ -4,12 +4,12 @@
 #include "Constant.h"
 #include "OutputMemoryBitStream.h"
 
-GameObject::GameObject(Vector2 position, Vector2 velocity) :
+GameObject::GameObject(PxVec2 position, PxVec2 velocity) :
 	_position(position), _velocity(velocity)
 {
 }
 
-void GameObject::SetVelocity(Vector2 velocity)
+void GameObject::SetVelocity(PxVec2 velocity)
 {
 	_velocity = velocity;
 }

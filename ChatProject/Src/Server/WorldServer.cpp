@@ -29,8 +29,8 @@ void WorldServer::InitLevel()
 	engineInstance.CreateBox2DStatic(PxVec2{ 0, 2.5 }, 0.5, 2.5);
 
 	// Shuttlecock ¸¸µé±â
-	Vector2 position(0, 0);
-	Vector2 velocity(0, 1);
+	PxVec2 position(0, 0);
+	PxVec2 velocity(0, 1);
 	auto shuttlecock = make_shared<Shuttlecock>(position, velocity);
 
 	_gameObjects.push_back(shuttlecock);

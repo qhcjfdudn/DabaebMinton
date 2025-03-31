@@ -69,8 +69,8 @@ void OutputMemoryBitStream::Write(std::string inData)
 
 }
 
-void OutputMemoryBitStream::Write(Vector2 inData)
+void OutputMemoryBitStream::Write(PxVec2 inData)
 {
-	Write(inData._x);
-	Write(inData._y);
+	Write(inData.x);
+	Write(inData.y);
 }

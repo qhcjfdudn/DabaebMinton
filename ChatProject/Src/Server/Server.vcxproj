@@ -193,11 +193,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="Vector2.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="WorldServer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
@@ -219,7 +214,6 @@
     <ClInclude Include="PacketQueue.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="Socket.h" />
-    <ClInclude Include="Vector2.h" />
     <ClInclude Include="WorldServer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

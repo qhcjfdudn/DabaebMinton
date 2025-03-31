@@ -2,8 +2,6 @@
 #include <iostream>
 #include <string>
 
-#include "Vector2.h"
-
 class OutputMemoryBitStream
 {
 public:
@@ -34,7 +32,7 @@ public:
 	void Write(uint32_t inData);
 	void Write(float inData);
 	void Write(std::string inData);
-	void Write(Vector2 inData);
+	void Write(PxVec2 inData);
 
 private:
 	void ReallocBuffer(uint32_t newBitCapacity);
