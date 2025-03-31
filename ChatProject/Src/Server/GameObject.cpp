@@ -5,7 +5,7 @@
 #include "OutputMemoryBitStream.h"
 
 GameObject::GameObject(PxVec2 position, PxVec2 velocity) :
-	_position(position), _velocity(velocity)
+	_location(position), _velocity(velocity)
 {
 }
 
@@ -23,7 +23,7 @@ bool GameObject::FixedUpdate()
 
 void GameObject::MoveNextPosition()
 {
-	_position += _velocity * Constant::FIXED_UPDATE_TIMESTEP;
+	_location += _velocity * Constant::FIXED_UPDATE_TIMESTEP;
 }
 
 unsigned int GameObject::GetClassId()
@@ -33,6 +33,6 @@ unsigned int GameObject::GetClassId()
 
 void GameObject::Write(OutputMemoryBitStream& inStream)
 {
-	inStream.Write(_position);
+	inStream.Write(_location);
 	inStream.Write(_velocity);
 }

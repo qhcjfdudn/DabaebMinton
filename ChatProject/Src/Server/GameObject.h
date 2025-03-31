@@ -5,7 +5,7 @@ class OutputMemoryBitStream;
 class GameObject
 {
 public:
-	GameObject(PxVec2 position, PxVec2 velocity);
+	GameObject(PxVec2 location, PxVec2 velocity);
 
 	virtual ~GameObject() {}
 
@@ -19,7 +19,7 @@ public:
 
 
 protected:
-	PxVec2 _position;
+	PxVec2 _location;
 	PxVec2 _velocity;
 };
 
