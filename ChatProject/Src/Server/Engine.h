@@ -20,6 +20,8 @@ public:
 	PxRigidDynamic* CreateBox2D(const PxVec2& location, float halfExtentX, float halfExtentY);
 	void CreateBox2DStatic(const PxVec2& location, float halfExtentX, float halfExtentY);
 
+	PxRigidDynamic* CreateSphere2D(const PxVec2& location, float halfExtentRadius);
+
 	PxRigidDynamic* createDynamic(
 		const PxTransform& t,
 		const PxGeometry& geometry,
