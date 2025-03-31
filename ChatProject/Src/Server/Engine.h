@@ -1,7 +1,5 @@
 #pragma once
 
-#include <PxPhysicsAPI.h>
-
 #include "Observer.h"
 
 using namespace physx;

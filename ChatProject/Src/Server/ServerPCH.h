@@ -13,6 +13,8 @@
 #include <WinSock2.h>
 #include <mswsock.h>
 
+#include <PxPhysicsAPI.h>
+
 #include "Vector2.h"
 
 using std::shared_ptr;
