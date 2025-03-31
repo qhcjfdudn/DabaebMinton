@@ -37,3 +37,5 @@ using std::queue;
 using std::thread;
 
 using NetworkId_t = unsigned int;
+
+using namespace physx;

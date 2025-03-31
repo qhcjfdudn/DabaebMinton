@@ -2,8 +2,6 @@
 
 #include "Observer.h"
 
-using namespace physx;
-
 class Engine
 {
 public:
