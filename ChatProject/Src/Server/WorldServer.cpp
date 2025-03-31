@@ -28,10 +28,10 @@ void WorldServer::InitLevel()
 	// Net
 	engineInstance.CreateBox2DStatic(PxVec2{ 0, 2.5 }, 0.5, 2.5);
 
-	// Shuttlecock ¸¸µé±â
-	PxVec2 position(0, 0);
+	// Shuttlecock
+	PxVec2 location(-3, 10);
 	PxVec2 velocity(0, 1);
-	auto shuttlecock = make_shared<Shuttlecock>(position, velocity);
+	auto shuttlecock = make_shared<Shuttlecock>(location, velocity);
 
 	_gameObjects.push_back(shuttlecock);
 

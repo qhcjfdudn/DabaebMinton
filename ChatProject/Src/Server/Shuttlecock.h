@@ -7,11 +7,11 @@ class OutputMemoryBitStream;
 class Shuttlecock : public GameObject
 {
 public:
-	Shuttlecock(PxVec2 position, PxVec2 velocity);
+	Shuttlecock(PxVec2 location, PxVec2 velocity);
 	~Shuttlecock() override = default;
 	
-	void setRadius(int radius);
-	int getRadius();
+	void setRadius(float radius);
+	float getRadius();
 
 	bool FixedUpdate() override;
 
@@ -19,6 +19,5 @@ public:
 	void Write(OutputMemoryBitStream& inStream) override;
 
 private:
-	int _radius = 10;
-
+	float _radius = 1.5;
 };
