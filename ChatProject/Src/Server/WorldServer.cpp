@@ -24,7 +24,9 @@ void WorldServer::InitLevel()
 	auto& engineInstance = Engine::GetInstance();
 
 	engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
-	engineInstance.CreateBox(PxTransform{ PxVec3{ 10, 5, 0 } }, 1, 1, 1);
+	
+	// Net
+	engineInstance.CreateBox2DStatic(PxVec2{ 0, 2.5 }, 0.5, 2.5);
 
 	// Shuttlecock ¸¸µé±â
 	Vector2 position(0, 0);

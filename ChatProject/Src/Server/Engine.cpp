@@ -87,6 +87,32 @@ PxRigidDynamic* Engine::CreateBox(const PxTransform& tp, float halfExtentX, floa
 	return body;
 }
 
+PxRigidDynamic* Engine::CreateBox2D(const PxVec2& location, float halfExtentX, float halfExtentY)
+{
+	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
+
+	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxMaterial);
+	body->attachShape(*shape);
+
+	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	pxScene->addActor(*body);
+
+	shape->release();
+
+	return body;
+}
+
+void Engine::CreateBox2DStatic(const PxVec2& location, float halfExtentX, float halfExtentY)
+{
+	PxRigidStatic* body = pxPhysics->createRigidStatic(PxTransform{ location.x, location.y, 0 });
+
+	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxMaterial);
+	body->attachShape(*shape);
+	pxScene->addActor(*body);
+
+	shape->release();
+}
+
 PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
 	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);

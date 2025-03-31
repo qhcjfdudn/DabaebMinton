@@ -27,6 +27,8 @@ int main()
 	auto& worldInstance = WorldServer::GetInstance();
 	worldInstance.InitLevel();
 
+	// fps 업데이트를 위해 별도 thread 동작
+	// 리팩터링 적용 필요
 	thread physXThread([]() {
 		auto& engineInstance = Engine::GetInstance();
 		system_clock::time_point _lastFixedUpdateTime = system_clock::now();
