@@ -32,3 +32,10 @@ void LinkingContext::RemoveGameObject(NetworkId_t networkId)
 	_networkIdToGameObjectMap.erase(networkId);
 	_gameObjectToNetworkIdMap.erase(gameObject);
 }
+
+void LinkingContext::RemoveGameObject(shared_ptr<GameObject> gameObject)
+{
+	NetworkId_t networkId = _gameObjectToNetworkIdMap[gameObject];
+	_networkIdToGameObjectMap.erase(networkId);
+	_gameObjectToNetworkIdMap.erase(gameObject);
+}

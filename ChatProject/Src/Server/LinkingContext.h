@@ -11,6 +11,7 @@ public:
 	shared_ptr<GameObject> GetGameObject(NetworkId_t networkId);
 	void AddGameObject(shared_ptr<GameObject> gameObject);
 	void RemoveGameObject(NetworkId_t networkId);
+	void RemoveGameObject(shared_ptr<GameObject> gameObject);
 
 private:
 	LinkingContext() = default;
