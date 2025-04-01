@@ -60,8 +60,10 @@ void Engine::cleanupPhysics()
 
 void Engine::stepPhysics()
 {
+	pxScene->lockWrite();
 	pxScene->simulate(Constant::PHYSX_FIXED_UPDATE_TIMESTEP);
 	pxScene->fetchResults(true);
+	pxScene->unlockWrite();
 }
 
 void Engine::CreatePlain(float nx, float ny, float nz, float distance)
