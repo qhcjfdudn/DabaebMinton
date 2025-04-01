@@ -68,6 +68,9 @@ void Engine::stepPhysics()
 
 void Engine::RemoveActor(PxActor* actor)
 {
+	if (actor == nullptr || actor->isReleasable() == false)
+		return;
+
 	cout << "RemoveActor" << endl;
 	pxScene->removeActor(*actor);
 	actor->release(); // 메모리 해제

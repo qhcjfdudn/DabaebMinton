@@ -39,6 +39,16 @@ void WorldServer::InitLevel()
 	_linkingContext.AddGameObject(shuttlecock);
 }
 
+void WorldServer::RemoveAll()
+{
+	auto& linkingContext = LinkingContext::GetInstance();
+
+	for (auto& gameObject : _gameObjects)
+		linkingContext.RemoveGameObject(gameObject);
+
+	_gameObjects.clear();
+}
+
 void WorldServer::Update()
 {
 	// 아래 receive packet을 다루는 코드는 추후 ReplicationManager와 함께
@@ -92,12 +102,12 @@ void WorldServer::WriteWorldStateToStream()
 
 	_lastPacketUpdateTime = currentTime;
 	
+	if (_pendingSerializationQueue.empty())
+		return;
+
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] WriteWorldStateToStream" << endl;
 	cout << "pendingSize: " << _pendingSerializationQueue.size() << endl;
-
-	if (_pendingSerializationQueue.empty())
-		return;
 
 	auto& replicationManager = ReplicationManager::GetInstance();
 	OutputMemoryBitStream outStream;

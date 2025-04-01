@@ -27,6 +27,23 @@ int main()
 	auto& worldInstance = WorldServer::GetInstance();
 	worldInstance.InitLevel();
 
+	thread userInputThread([] {
+		auto& engineInstance = Engine::GetInstance();
+		string cmd;
+		while (engineInstance.isRunning)
+		{
+			std::getline(std::cin, cmd);
+			if (cmd == "r")
+			{
+				WorldServer::GetInstance().RemoveAll();
+			}
+			else if (cmd == "s")
+			{
+				WorldServer::GetInstance().InitLevel();
+			}
+		}
+		});
+
 	// fps 업데이트를 위해 별도 thread 동작
 	// 리팩터링 적용 필요
 	thread physXThread([]() {
@@ -57,9 +74,10 @@ int main()
 	}
 
 	physXThread.join();
+	userInputThread.join();
 
+	worldInstance.RemoveAll();
 	engineInstance.cleanupPhysics();
 	
-	// 모든 thread의 join 필요
 	cout << "Server Main done." << endl;
 }

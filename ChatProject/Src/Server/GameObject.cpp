@@ -3,16 +3,14 @@
 
 #include "Constant.h"
 #include "OutputMemoryBitStream.h"
+#include "Engine.h"
 
-GameObject::GameObject(PxVec2 position, PxVec2 velocity) :
-	_location(position), _velocity(velocity), _rigidbody(nullptr) {}
+GameObject::GameObject(PxVec2 location, PxVec2 velocity) :
+	_location(location), _velocity(velocity), _rigidbody(nullptr) {}
 
 GameObject::~GameObject()
 {
-	if (_rigidbody != nullptr)	// memory free needed but runtime error
-	{
-		//_rigidbody->release();
-	}
+	Engine::GetInstance().RemoveActor(_rigidbody);
 }
 
 void GameObject::SetVelocity(PxVec2 velocity)
