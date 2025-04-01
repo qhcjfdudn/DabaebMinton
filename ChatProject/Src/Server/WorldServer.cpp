@@ -77,6 +77,8 @@ void WorldServer::FixedUpdate() {
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] FixedUpdate" << endl;
 
+	// gameObject에 접근하는 게 lock이 되어야 한다.
+	// 다른 thread에서 요소 변경 가능하기 때문.
 	for (auto& gameObject : _gameObjects)
 	{
 		NetworkId_t networkId = _linkingContext.GetNetworkId(gameObject);
