@@ -9,14 +9,14 @@ Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 {
 	Engine& engineInstance = Engine::GetInstance();
 	_rigidbody = engineInstance.CreateSphere2D(location, _radius);
-	_rigidbody->setLinearVelocity(PxVec3{ velocity.x, velocity.y, 0.f });
-
+	
 	if (_rigidbody == nullptr)
 	{
-		cout << "cork: CreateSphere2D error" << endl;
+		cout << "Shuttlecock(): CreateSphere2D error" << endl;
 		return;
 	}
-
+	
+	_rigidbody->setLinearVelocity(PxVec3{ velocity.x, velocity.y, 0.f });
 	_rigidbody->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
 	_rigidbody->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
 }
