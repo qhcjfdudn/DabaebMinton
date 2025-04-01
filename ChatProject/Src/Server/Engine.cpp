@@ -66,12 +66,21 @@ void Engine::stepPhysics()
 	pxScene->unlockWrite();
 }
 
+void Engine::RemoveActor(PxActor* actor)
+{
+	cout << "RemoveActor" << endl;
+	pxScene->removeActor(*actor);
+	actor->release(); // 메모리 해제
+}
+
 void Engine::CreatePlain(float nx, float ny, float nz, float distance)
 {
 	pxMaterial = pxPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
 	PxRigidStatic* groundPlane = PxCreatePlane(*pxPhysics, PxPlane(nx, ny, nz, distance), *pxMaterial);
+	pxScene->lockWrite();
 	pxScene->addActor(*groundPlane);
+	pxScene->unlockWrite();
 }
 
 PxRigidDynamic* Engine::CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ)
@@ -82,7 +91,10 @@ PxRigidDynamic* Engine::CreateBox(const PxTransform& tp, float halfExtentX, floa
 	body->attachShape(*shape);
 
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+
+	pxScene->lockWrite();
 	pxScene->addActor(*body);
+	pxScene->unlockWrite();
 
 	shape->release();
 
@@ -97,7 +109,10 @@ PxRigidDynamic* Engine::CreateBox2D(const PxVec2& location, float halfExtentX, f
 	body->attachShape(*shape);
 
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+
+	pxScene->lockWrite();
 	pxScene->addActor(*body);
+	pxScene->unlockWrite();
 
 	shape->release();
 
@@ -110,7 +125,10 @@ void Engine::CreateBox2DStatic(const PxVec2& location, float halfExtentX, float 
 
 	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxMaterial);
 	body->attachShape(*shape);
+	
+	pxScene->lockWrite();
 	pxScene->addActor(*body);
+	pxScene->unlockWrite();
 
 	shape->release();
 }
@@ -122,7 +140,10 @@ PxRigidDynamic* Engine::CreateSphere2D(const PxVec2& location, float halfExtentR
 	body->attachShape(*shape);
 
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
+	
+	pxScene->lockWrite();
 	pxScene->addActor(*body);
+	pxScene->unlockWrite();
 
 	shape->release();
 
@@ -134,6 +155,10 @@ PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& ge
 	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);
 	dynamic->setAngularDamping(0.5f);
 	dynamic->setLinearVelocity(velocity);
+
+	pxScene->lockWrite();
 	pxScene->addActor(*dynamic);
+	pxScene->unlockWrite();
+
 	return dynamic;
 }
