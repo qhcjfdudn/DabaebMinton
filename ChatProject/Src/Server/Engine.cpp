@@ -76,6 +76,26 @@ void Engine::RemoveActor(PxActor* actor)
 	actor->release(); // 메모리 해제
 }
 
+void Engine::LockWrite()
+{
+	pxScene->lockWrite();
+}
+
+void Engine::UnlockWrite()
+{
+	pxScene->unlockWrite();
+}
+
+void Engine::LockRead()
+{
+	pxScene->lockRead();
+}
+
+void Engine::UnlockRead()
+{
+	pxScene->unlockRead();
+}
+
 void Engine::CreatePlain(float nx, float ny, float nz, float distance)
 {
 	pxMaterial = pxPhysics->createMaterial(0.5f, 0.5f, 0.6f);

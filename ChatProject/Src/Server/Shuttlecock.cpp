@@ -16,9 +16,11 @@ Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 		return;
 	}
 	
+	engineInstance.LockWrite();
 	_rigidbody->setLinearVelocity(PxVec3{ velocity.x, velocity.y, 0.f });
 	_rigidbody->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
 	_rigidbody->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+	engineInstance.UnlockWrite();
 }
 
 void Shuttlecock::setRadius(float radius)

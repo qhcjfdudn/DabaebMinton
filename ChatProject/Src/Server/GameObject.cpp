@@ -27,12 +27,18 @@ bool GameObject::FixedUpdate()
 
 void GameObject::SetCurrentTransform()
 {
+	// simulate 중에는 getGlobalPose()를 사용할 수 없다는 에러 메시지 발견
+	// 물리 엔진에 접근해 값을 알아오고자 할 때는 lockRead()를 걸어야 한다.
+	
+	auto& engineInstance = Engine::GetInstance();
+	
+	engineInstance.LockRead();
 	PxVec3 curLocation{ _rigidbody->getGlobalPose().p };
-	_location = PxVec2{ curLocation.x, curLocation.y };
-
 	PxVec3 curVelocity{ _rigidbody->getLinearVelocity() };
+	engineInstance.UnlockRead();
+	
+	_location = PxVec2{ curLocation.x, curLocation.y };
 	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
-
 }
 
 unsigned int GameObject::GetClassId()

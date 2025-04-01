@@ -16,6 +16,11 @@ public:
 
 	void RemoveActor(PxActor* actor);
 
+	void LockWrite();
+	void UnlockWrite();
+	void LockRead();
+	void UnlockRead();
+
 	void CreatePlain(float nx, float ny, float nz, float distance);
 
 	PxRigidDynamic* CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ);
