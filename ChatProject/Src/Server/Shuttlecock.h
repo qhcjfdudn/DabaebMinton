@@ -8,7 +8,6 @@ class Shuttlecock : public GameObject
 {
 public:
 	Shuttlecock(PxVec2 location, PxVec2 velocity);
-	~Shuttlecock() override = default;
 	
 	void setRadius(float radius);
 	float getRadius();
