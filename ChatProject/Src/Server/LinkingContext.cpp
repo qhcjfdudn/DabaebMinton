@@ -7,6 +7,13 @@ LinkingContext& LinkingContext::GetInstance()
 	return instance;
 }
 
+void LinkingContext::Clear()
+{
+	_networkIdToGameObjectMap.clear();
+	_gameObjectToNetworkIdMap.clear();
+	_nextNetworkId = 1;
+}
+
 NetworkId_t LinkingContext::GetNetworkId(shared_ptr<GameObject> gameObject)
 {
 	if (_gameObjectToNetworkIdMap.find(gameObject) == _gameObjectToNetworkIdMap.end())

@@ -7,6 +7,8 @@ class LinkingContext
 public:
 	static LinkingContext& GetInstance();
 
+	void Clear();
+
 	NetworkId_t GetNetworkId(shared_ptr<GameObject> gameObject);
 	shared_ptr<GameObject> GetGameObject(NetworkId_t networkId);
 	void AddGameObject(shared_ptr<GameObject> gameObject);
