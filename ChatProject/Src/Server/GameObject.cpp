@@ -5,21 +5,21 @@
 #include "OutputMemoryBitStream.h"
 #include "Engine.h"
 
-DirtyFlag operator| (DirtyFlag lhs, DirtyFlag rhs) {
-	return static_cast<DirtyFlag>(static_cast<int>(lhs) | static_cast<int>(rhs));
+ReplicationFlag operator| (ReplicationFlag lhs, ReplicationFlag rhs) {
+	return static_cast<ReplicationFlag>(static_cast<int>(lhs) | static_cast<int>(rhs));
 }
 
-DirtyFlag& operator|= (DirtyFlag& lhs, DirtyFlag rhs) {
+ReplicationFlag& operator|= (ReplicationFlag& lhs, ReplicationFlag rhs) {
 	lhs = lhs | rhs;
 	return lhs;
 }
 
-DirtyFlag operator&(DirtyFlag lhs, DirtyFlag rhs)
+ReplicationFlag operator&(ReplicationFlag lhs, ReplicationFlag rhs)
 {
-	return static_cast<DirtyFlag>(static_cast<int>(lhs) & static_cast<int>(rhs));
+	return static_cast<ReplicationFlag>(static_cast<int>(lhs) & static_cast<int>(rhs));
 }
 
-bool hasFlag(DirtyFlag flags, DirtyFlag flag)
+bool hasFlag(ReplicationFlag flags, ReplicationFlag flag)
 {
 	return static_cast<bool>(flags & flag);
 }
@@ -32,9 +32,9 @@ GameObject::~GameObject()
 	Engine::GetInstance().RemoveActor(_rigidbody);
 }
 
-void GameObject::SetDirtyFlag(DirtyFlag flag)
+void GameObject::SetDirtyFlag(ReplicationFlag flag)
 {
-	dirtyFlag |= flag;
+	replicationFlag |= flag;
 }
 
 void GameObject::SetVelocity(PxVec2 velocity)

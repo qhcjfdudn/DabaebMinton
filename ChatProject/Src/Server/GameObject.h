@@ -2,28 +2,28 @@
 
 class OutputMemoryBitStream;
 
-enum class DirtyFlag {
+enum class ReplicationFlag {
 	DF_NONE = 0,
 	DF_CREATE = 1,
 	DF_UPDATE = 2,
 	DF_DELETE = 4,
 	DF_ALL = DF_CREATE | DF_UPDATE | DF_DELETE
 };
-DirtyFlag operator| (DirtyFlag lhs, DirtyFlag rhs);
-DirtyFlag& operator|= (DirtyFlag& lhs, DirtyFlag rhs);
-DirtyFlag operator& (DirtyFlag lhs, DirtyFlag rhs);
+ReplicationFlag operator| (ReplicationFlag lhs, ReplicationFlag rhs);
+ReplicationFlag& operator|= (ReplicationFlag& lhs, ReplicationFlag rhs);
+ReplicationFlag operator& (ReplicationFlag lhs, ReplicationFlag rhs);
 
-bool hasFlag(DirtyFlag flags, DirtyFlag flag);
+bool hasFlag(ReplicationFlag flags, ReplicationFlag flag);
 
 class GameObject
 {
 public:
-	DirtyFlag dirtyFlag = DirtyFlag::DF_NONE;
+	ReplicationFlag replicationFlag = ReplicationFlag::DF_NONE;
 
 	GameObject(PxVec2 location, PxVec2 velocity);
 	virtual ~GameObject();
 
-	void SetDirtyFlag(DirtyFlag flag);
+	void SetDirtyFlag(ReplicationFlag flag);
 
 	void SetVelocity(PxVec2 velocity);
 	

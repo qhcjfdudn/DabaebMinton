@@ -67,10 +67,10 @@ void WorldServer::RemoveGameObject(size_t idx)
 {
 	auto& go = _gameObjects[idx];
 
-	if (hasFlag(go->dirtyFlag, DirtyFlag::DF_ALL) == false)
+	if (hasFlag(go->replicationFlag, ReplicationFlag::DF_ALL) == false)
 		_pendingSerializationQueue.push(go);
 
-	go->SetDirtyFlag(DirtyFlag::DF_DELETE);
+	go->SetDirtyFlag(ReplicationFlag::DF_DELETE);
 	
 	swap(go, _gameObjects.back());
 	_gameObjects.pop_back();
@@ -114,12 +114,12 @@ void WorldServer::FixedUpdate() {
 		if (gameObject->FixedUpdate() == false)
 			continue;
 		
-		DirtyFlag& dirtyFlag = gameObject->dirtyFlag;
+		ReplicationFlag& replicationFlag = gameObject->replicationFlag;
 
-		if (hasFlag(dirtyFlag, (DirtyFlag::DF_UPDATE | DirtyFlag::DF_DELETE)))
+		if (hasFlag(replicationFlag, (ReplicationFlag::DF_UPDATE | ReplicationFlag::DF_DELETE)))
 			continue;
 
-		gameObject->SetDirtyFlag(DirtyFlag::DF_UPDATE);
+		gameObject->SetDirtyFlag(ReplicationFlag::DF_UPDATE);
 		_pendingSerializationQueue.push(gameObject);
 	}
 }
@@ -152,25 +152,25 @@ void WorldServer::WriteWorldStateToStream()
 		shared_ptr<GameObject> go = _pendingSerializationQueue.front();
 		_pendingSerializationQueue.pop();
 
-		DirtyFlag& dirtyFlag = go->dirtyFlag;
+		ReplicationFlag& replicationFlag = go->replicationFlag;
 
-		if (hasFlag(dirtyFlag, DirtyFlag::DF_DELETE))
+		if (hasFlag(replicationFlag, ReplicationFlag::DF_DELETE))
 		{
 			cout << "DF_DELETE" << endl;
 			replicationManager.ReplicateDelete(outStream, go);
 			_linkingContext.RemoveGameObject(go);
 		}
-		else if (hasFlag(dirtyFlag, DirtyFlag::DF_UPDATE))
+		else if (hasFlag(replicationFlag, ReplicationFlag::DF_UPDATE))
 		{
 			replicationManager.ReplicateUpdate(outStream, go);
 		}
-		else if (hasFlag(dirtyFlag, DirtyFlag::DF_CREATE))
+		else if (hasFlag(replicationFlag, ReplicationFlag::DF_CREATE))
 		{
 			//replicationManager.ReplicateCreate(outStream, go);
 			//_linkingContext.AddGameObject(go);
 		}
 
-		dirtyFlag = DirtyFlag::DF_NONE;
+		replicationFlag = ReplicationFlag::DF_NONE;
 	}
 
 	if (outStream.GetBitLength() <= 0)
