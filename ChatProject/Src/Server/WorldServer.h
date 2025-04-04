@@ -10,8 +10,12 @@ public:
 	
 	void InitLevel();
 
-	void RemoveAll();
+	void RemoveAllGameObjects();
+	void RemoveGameObject(size_t idx);
+	void Remove(shared_ptr<GameObject> gameObject);
 
+	void Clear();
+	
 	void Update();
 	void FixedUpdate();
 	void WriteWorldStateToStream();
@@ -25,8 +29,7 @@ private:
 
 	vector<shared_ptr<GameObject>> _gameObjects;
 
-	unordered_set<NetworkId_t> _updatedObjectNetworkIds;
-	queue<NetworkId_t> _pendingSerializationQueue;
+	queue<shared_ptr<GameObject>> _pendingSerializationQueue;
 
 	LinkingContext& _linkingContext;
 };

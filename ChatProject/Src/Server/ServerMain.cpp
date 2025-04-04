@@ -35,7 +35,7 @@ int main()
 			std::getline(std::cin, cmd);
 			if (cmd == "r")
 			{
-				WorldServer::GetInstance().RemoveAll();
+				WorldServer::GetInstance().RemoveAllGameObjects();
 			}
 			else if (cmd == "s")
 			{
@@ -76,7 +76,7 @@ int main()
 	physXThread.join();
 	userInputThread.join();
 
-	worldInstance.RemoveAll();
+	worldInstance.Clear();
 	engineInstance.cleanupPhysics();
 	
 	cout << "Server Main done." << endl;

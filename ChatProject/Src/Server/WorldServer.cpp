@@ -18,6 +18,15 @@ WorldServer& WorldServer::GetInstance() {
 	return instance;
 }
 
+void WorldServer::Clear()
+{
+	RemoveAllGameObjects();
+
+	_pendingSerializationQueue = queue<shared_ptr<GameObject>>{};
+
+	_linkingContext.Clear();
+}
+
 void WorldServer::InitLevel()
 {
 	// engine으로부터 초기 object 생성
@@ -39,14 +48,32 @@ void WorldServer::InitLevel()
 	_linkingContext.AddGameObject(shuttlecock);
 }
 
-void WorldServer::RemoveAll()
+void WorldServer::RemoveAllGameObjects() {
+	for (int idx = static_cast<int>(_gameObjects.size()) - 1; idx >= 0; --idx)
+		RemoveGameObject(idx);
+}
+
+// World가 참조하는 gameObject를 지운다. O(N)이라 gameObjects가 많을수록 성능 저하 발생
+void WorldServer::Remove(shared_ptr<GameObject> gameObject) {
+	size_t idx = std::find(_gameObjects.begin(), _gameObjects.end(), gameObject) - _gameObjects.begin();
+	
+	if (idx >= _gameObjects.size())
+		return;
+
+	RemoveGameObject(idx);
+}
+
+void WorldServer::RemoveGameObject(size_t idx)
 {
-	auto& linkingContext = LinkingContext::GetInstance();
+	auto& go = _gameObjects[idx];
 
-	for (auto& gameObject : _gameObjects)
-		linkingContext.RemoveGameObject(gameObject);
+	if (hasFlag(go->dirtyFlag, DirtyFlag::DF_ALL) == false)
+		_pendingSerializationQueue.push(go);
 
-	_gameObjects.clear();
+	go->SetDirtyFlag(DirtyFlag::DF_DELETE);
+	
+	swap(go, _gameObjects.back());
+	_gameObjects.pop_back();
 }
 
 void WorldServer::Update()
@@ -74,24 +101,27 @@ void WorldServer::FixedUpdate() {
 	if (elapsedTime.count() < Constant::FIXED_UPDATE_TIMESTEP)
 		return;
 
+	_lastFixedUpdateTime = currentTime;
+
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] FixedUpdate" << endl;
 
-	// gameObject에 접근하는 게 lock이 되어야 한다.
-	// 다른 thread에서 요소 변경 가능하기 때문.
-	for (auto& gameObject : _gameObjects)
+	// 아래 코드가 안정성을 보장하는지 검증 필요
+	// ex) _gameObjects의 복사 중 _gameObjects의 요소의 추가/변경/삭제가 발생한다면?
+	auto gameObjects = _gameObjects;
+	for (auto& gameObject : gameObjects)
 	{
-		NetworkId_t networkId = _linkingContext.GetNetworkId(gameObject);
+		if (gameObject->FixedUpdate() == false)
+			continue;
+		
+		DirtyFlag& dirtyFlag = gameObject->dirtyFlag;
 
-		if (gameObject->FixedUpdate() && 
-			_updatedObjectNetworkIds.find(networkId) == _updatedObjectNetworkIds.end())
-		{
-			_updatedObjectNetworkIds.insert(networkId);
-			_pendingSerializationQueue.push(networkId);
-		}
+		if (hasFlag(dirtyFlag, (DirtyFlag::DF_UPDATE | DirtyFlag::DF_DELETE)))
+			continue;
+
+		gameObject->SetDirtyFlag(DirtyFlag::DF_UPDATE);
+		_pendingSerializationQueue.push(gameObject);
 	}
-
-	_lastFixedUpdateTime = currentTime;
 }
 
 void WorldServer::WriteWorldStateToStream()
@@ -111,27 +141,36 @@ void WorldServer::WriteWorldStateToStream()
 	cout << "[" << now << "] WriteWorldStateToStream" << endl;
 	cout << "pendingSize: " << _pendingSerializationQueue.size() << endl;
 
-	auto& replicationManager = ReplicationManager::GetInstance();
 	OutputMemoryBitStream outStream;
-
 	outStream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
 		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
 
-	// delta가 있는 객체만 Update 하고 싶다.
-	// => Update가 있는 객체의 GUID를 기록한 Queue로 구현
-	// 큐의 원소를 모두 pop 하면서 stream에 기록
-	// PacketQueue에 넣을 때 stream 값이 복사되기 때문에, 여기서 stream을 생성하고 소멸시켜도
-	// 문제 없다.
+	auto& replicationManager = ReplicationManager::GetInstance();
 	int pendingSerializationCount = static_cast<int>(_pendingSerializationQueue.size());
 	while (pendingSerializationCount--)
 	{
-		NetworkId_t networkId = _pendingSerializationQueue.front();
+		shared_ptr<GameObject> go = _pendingSerializationQueue.front();
 		_pendingSerializationQueue.pop();
 
-		auto gameObject = _linkingContext.GetGameObject(networkId);
-		replicationManager.ReplicateUpdate(outStream, gameObject);
-		
-		_updatedObjectNetworkIds.erase(networkId);
+		DirtyFlag& dirtyFlag = go->dirtyFlag;
+
+		if (hasFlag(dirtyFlag, DirtyFlag::DF_DELETE))
+		{
+			cout << "DF_DELETE" << endl;
+			replicationManager.ReplicateDelete(outStream, go);
+			_linkingContext.RemoveGameObject(go);
+		}
+		else if (hasFlag(dirtyFlag, DirtyFlag::DF_UPDATE))
+		{
+			replicationManager.ReplicateUpdate(outStream, go);
+		}
+		else if (hasFlag(dirtyFlag, DirtyFlag::DF_CREATE))
+		{
+			//replicationManager.ReplicateCreate(outStream, go);
+			//_linkingContext.AddGameObject(go);
+		}
+
+		dirtyFlag = DirtyFlag::DF_NONE;
 	}
 
 	if (outStream.GetBitLength() <= 0)

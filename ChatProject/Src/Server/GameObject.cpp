@@ -5,12 +5,36 @@
 #include "OutputMemoryBitStream.h"
 #include "Engine.h"
 
+DirtyFlag operator| (DirtyFlag lhs, DirtyFlag rhs) {
+	return static_cast<DirtyFlag>(static_cast<int>(lhs) | static_cast<int>(rhs));
+}
+
+DirtyFlag& operator|= (DirtyFlag& lhs, DirtyFlag rhs) {
+	lhs = lhs | rhs;
+	return lhs;
+}
+
+DirtyFlag operator&(DirtyFlag lhs, DirtyFlag rhs)
+{
+	return static_cast<DirtyFlag>(static_cast<int>(lhs) & static_cast<int>(rhs));
+}
+
+bool hasFlag(DirtyFlag flags, DirtyFlag flag)
+{
+	return static_cast<bool>(flags & flag);
+}
+
 GameObject::GameObject(PxVec2 location, PxVec2 velocity) :
 	_location(location), _velocity(velocity), _rigidbody(nullptr) {}
 
 GameObject::~GameObject()
 {
 	Engine::GetInstance().RemoveActor(_rigidbody);
+}
+
+void GameObject::SetDirtyFlag(DirtyFlag flag)
+{
+	dirtyFlag |= flag;
 }
 
 void GameObject::SetVelocity(PxVec2 velocity)
