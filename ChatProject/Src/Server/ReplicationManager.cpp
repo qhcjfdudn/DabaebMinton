@@ -21,6 +21,15 @@ void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, shared
 	inGameObject->Write(inStream);
 }
 
+void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& inStream, const shared_ptr<GameObject> inGameObject)
+{
+	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Delete,
+		_linkingContext.GetNetworkId(inGameObject),
+		inGameObject->GetClassId());
+	rh.Write(inStream);
+	inGameObject->Write(inStream);
+}
+
 ReplicationManager::ReplicationManager() :
 	_linkingContext(LinkingContext::GetInstance()) {
 }

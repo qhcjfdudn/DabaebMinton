@@ -10,6 +10,7 @@ public:
 	static ReplicationManager& GetInstance();
 
 	void ReplicateUpdate(OutputMemoryBitStream& inStream, shared_ptr<GameObject> inGameObject);
+	void ReplicateDelete(OutputMemoryBitStream& inStream, const shared_ptr<GameObject> inGameObject);
 
 	LinkingContext& _linkingContext;
 
