@@ -65,8 +65,7 @@ PacketQueue& PacketQueue::GetSendStaticInstance()
 	return s_SendInstance;
 }
 
-void PacketQueue::PushCopy(Packet packet)
-{
+void PacketQueue::PushCopy(const Packet& packet) {
 	_bufferQueue.push(make_shared<Packet>(packet));
 }
 
@@ -78,7 +77,6 @@ shared_ptr<Packet> PacketQueue::Front()
 	return ret;
 }
 
-bool PacketQueue::Empty()
-{
+bool PacketQueue::Empty() const {
 	return _bufferQueue.empty();
 }

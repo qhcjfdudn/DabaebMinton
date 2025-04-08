@@ -24,9 +24,9 @@ public:
 	static PacketQueue& GetReceiveStaticInstance();
 	static PacketQueue& GetSendStaticInstance();
 
-	void PushCopy(Packet packet);
+	void PushCopy(const Packet& packet);
 	shared_ptr<Packet> Front();
-	bool Empty();
+	bool Empty() const;
 
 private:
 	PacketQueue() {}
