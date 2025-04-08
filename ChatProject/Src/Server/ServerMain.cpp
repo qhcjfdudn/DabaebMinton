@@ -65,6 +65,7 @@ int main()
 		}
 		});
 
+	// Networking 동작과 world 동작을 별개 thread로 분리 필요
 	while (engineInstance.isRunning) {
 		networkInstance.ProcessIOCPEvent();
 		worldInstance.Update();
