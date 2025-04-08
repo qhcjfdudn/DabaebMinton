@@ -66,8 +66,7 @@ void Engine::stepPhysics()
 	pxScene->unlockWrite();
 }
 
-void Engine::RemoveActor(PxActor* actor)
-{
+void Engine::RemoveActor(PxActor* actor) {
 	if (actor == nullptr || actor->isReleasable() == false)
 		return;
 
@@ -76,23 +75,19 @@ void Engine::RemoveActor(PxActor* actor)
 	actor->release(); // 메모리 해제
 }
 
-void Engine::LockWrite()
-{
+void Engine::LockWrite() {
 	pxScene->lockWrite();
 }
 
-void Engine::UnlockWrite()
-{
+void Engine::UnlockWrite() {
 	pxScene->unlockWrite();
 }
 
-void Engine::LockRead()
-{
+void Engine::LockRead() {
 	pxScene->lockRead();
 }
 
-void Engine::UnlockRead()
-{
+void Engine::UnlockRead() {
 	pxScene->unlockRead();
 }
 
