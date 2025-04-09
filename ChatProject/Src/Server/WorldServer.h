@@ -2,6 +2,7 @@
 
 class GameObject;
 class LinkingContext;
+class OutputMemoryBitStream;
 
 class WorldServer
 {
@@ -19,6 +20,8 @@ public:
 	void Update();
 	void FixedUpdate();
 	void WriteWorldStateToStream();
+
+	int WriteByReplication(OutputMemoryBitStream& outStream);
 
 private:
 	WorldServer();

@@ -145,35 +145,9 @@ void WorldServer::WriteWorldStateToStream()
 	outStream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
 		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
 
-	auto& replicationManager = ReplicationManager::GetInstance();
-	int pendingSerializationCount = static_cast<int>(_pendingSerializationQueue.size());
-	while (pendingSerializationCount--)
-	{
-		shared_ptr<GameObject> go = _pendingSerializationQueue.front();
-		_pendingSerializationQueue.pop();
+	int replicatedObjectCount = WriteByReplication(outStream);
 
-		ReplicationFlag& replicationFlag = go->replicationFlag;
-
-		if (hasFlag(replicationFlag, ReplicationFlag::DF_DELETE))
-		{
-			cout << "DF_DELETE" << endl;
-			replicationManager.ReplicateDelete(outStream, go);
-			_linkingContext.RemoveGameObject(go);
-		}
-		else if (hasFlag(replicationFlag, ReplicationFlag::DF_UPDATE))
-		{
-			replicationManager.ReplicateUpdate(outStream, go);
-		}
-		else if (hasFlag(replicationFlag, ReplicationFlag::DF_CREATE))
-		{
-			//replicationManager.ReplicateCreate(outStream, go);
-			//_linkingContext.AddGameObject(go);
-		}
-
-		replicationFlag = ReplicationFlag::DF_NONE;
-	}
-
-	if (outStream.GetBitLength() <= 0)
+	if (replicatedObjectCount <= 0)
 		return;
 
 	cout << "outStream.GetBitLength(): " << outStream.GetBitLength() << endl;
@@ -183,8 +157,38 @@ void WorldServer::WriteWorldStateToStream()
 
 	packet.PrintInHex();
 
-	auto& sendQueue = PacketQueue::GetSendStaticInstance();
-	sendQueue.PushCopy(packet);
+	PacketQueue::GetSendStaticInstance()
+		.PushCopy(packet);
+}
+
+int WorldServer::WriteByReplication(OutputMemoryBitStream& outStream)
+{
+	auto& replicationManager = ReplicationManager::GetInstance();
+	int pendingSerializationCount = static_cast<int>(_pendingSerializationQueue.size());
+
+	for (int i = 0; i < pendingSerializationCount; ++i) {
+		shared_ptr<GameObject> go = _pendingSerializationQueue.front();
+		_pendingSerializationQueue.pop();
+
+		ReplicationFlag& replicationFlag = go->replicationFlag;
+
+		if (hasFlag(replicationFlag, ReplicationFlag::DF_DELETE)) {
+			cout << "DF_DELETE" << endl;
+			replicationManager.ReplicateDelete(outStream, go);
+			_linkingContext.RemoveGameObject(go);
+		}
+		else if (hasFlag(replicationFlag, ReplicationFlag::DF_UPDATE)) {
+			replicationManager.ReplicateUpdate(outStream, go);
+		}
+		else if (hasFlag(replicationFlag, ReplicationFlag::DF_CREATE)) {
+			//replicationManager.ReplicateCreate(outStream, go);
+			//_linkingContext.AddGameObject(go);
+		}
+
+		replicationFlag = ReplicationFlag::DF_NONE;
+	}
+
+	return pendingSerializationCount;
 }
 
 WorldServer::WorldServer() :
