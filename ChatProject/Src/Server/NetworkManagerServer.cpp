@@ -141,6 +141,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			if (receivedBytes == 0) // sendBytes == 0일 때 clientSocket 제거 로직 필요
 			{
 				closesocket(p_clientSocket->m_socket);
+				m_clientsMap.erase(completionKey);
 				cout << "close socket: " << completionKey << endl;
 				continue;
 			}
