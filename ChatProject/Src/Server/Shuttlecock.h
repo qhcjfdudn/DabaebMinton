@@ -9,8 +9,7 @@ class Shuttlecock : public GameObject
 public:
 	Shuttlecock(PxVec2 location, PxVec2 velocity);
 	
-	void setRadius(float radius);
-	float getRadius();
+	float GetRadius();
 
 	bool FixedUpdate() override;
 

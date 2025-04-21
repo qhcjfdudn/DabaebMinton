@@ -23,12 +23,7 @@ Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 	engineInstance.UnlockWrite();
 }
 
-void Shuttlecock::setRadius(float radius)
-{
-	_radius = radius;
-}
-
-float Shuttlecock::getRadius()
+float Shuttlecock::GetRadius()
 {
 	return _radius;
 }
