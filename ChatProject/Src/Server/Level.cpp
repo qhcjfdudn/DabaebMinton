@@ -11,6 +11,7 @@
 #include "ReplicationManager.h"
 
 #include "Shuttlecock.h"
+#include "Bottom.h"
 
 Level::Level()
 {
@@ -48,8 +49,13 @@ Level::~Level()
 void Level::InitLevel()
 {
 	auto& engineInstance = Engine::GetInstance();
+
+	auto bottom = make_shared<Bottom>(PxVec2(0, 0));
 	auto ground = engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
 	pxScene->addActor(*ground);
+	bottom->SetRigidbody(*ground);
+
+	staticGameObjects.push_back(bottom);
 
 	// Net
 	auto net = engineInstance.CreateBox2DStatic(PxVec2{ 0, 2.5 }, 0.5, 2.5);

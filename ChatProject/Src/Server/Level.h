@@ -4,6 +4,7 @@
 #include "ReplicationManager.h"
 
 class GameObject;
+class StaticGameObject;
 
 class Level
 {
@@ -15,6 +16,7 @@ public:
 	ReplicationManager replicationManager;
 
 	vector<shared_ptr<GameObject>> gameObjects;
+	vector<shared_ptr<StaticGameObject>> staticGameObjects;
 
 	void InitLevel();
 	void ClearLevel();
