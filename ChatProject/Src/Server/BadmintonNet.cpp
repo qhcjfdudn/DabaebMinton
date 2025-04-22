@@ -7,7 +7,7 @@
 BadmintonNet::BadmintonNet(PxVec2 location) : StaticGameObject(location)
 {
 	auto& engineInstance = Engine::GetInstance();
-	_rigidbody = engineInstance.CreateBox2DStatic(location, 0.5f, 2.5f);
+	_rigidbody = engineInstance.CreateBox2DStatic(location, _halfX, _halfY);
 }
 
 unsigned int BadmintonNet::GetClassId()
@@ -19,5 +19,6 @@ void BadmintonNet::Write(OutputMemoryBitStream& inStream)
 {
 	StaticGameObject::Write(inStream);
 	inStream.Write(_location);
-	inStream.Write(_velocity);
+	inStream.Write(_halfX);
+	inStream.Write(_halfY);
 }
