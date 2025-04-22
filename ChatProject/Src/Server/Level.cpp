@@ -62,15 +62,8 @@ void Level::InitLevel()
 	pxScene->addActor(*net);
 	
 	// Shuttlecock
-	PxVec2 location(-3, 10);
-	PxVec2 velocity(2, 5);
-	auto shuttlecock = make_shared<Shuttlecock>(location, velocity);
-
-	auto rigidbody = engineInstance.CreateSphere2D(location, velocity, shuttlecock->GetRadius());
-	PxRigidBodyExt::updateMassAndInertia(*rigidbody, 10.0f);
-	pxScene->addActor(*rigidbody);
-
-	shuttlecock->SetRigidbody(*rigidbody);
+	auto shuttlecock = make_shared<Shuttlecock>(PxVec2(-3, 10), PxVec2(2, 5));
+	pxScene->addActor(*shuttlecock->GetRigidbody());
 
 	gameObjects.push_back(shuttlecock);
 
@@ -131,8 +124,6 @@ void Level::Remove(PxActor* actor)
 	pxScene->lockWrite();
 	pxScene->removeActor(*actor);
 	pxScene->unlockWrite();
-
-	actor->release(); // 메모리 해제
 }
 
 void Level::Update()

@@ -7,9 +7,18 @@
 Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 	GameObject(location, velocity)
 {
+	auto& engineInstance = Engine::GetInstance();
+
+	_rigidbody = engineInstance.CreateSphere2D(location, velocity, _radius);
+	PxRigidBodyExt::updateMassAndInertia(*_rigidbody, 10.0f);
 }
 
-float Shuttlecock::GetRadius()
+Shuttlecock::~Shuttlecock()
+{
+	_rigidbody->release();
+}
+
+float Shuttlecock::GetRadius() const
 {
 	return _radius;
 }

@@ -6,8 +6,9 @@ class Shuttlecock : public GameObject
 {
 public:
 	Shuttlecock(PxVec2 location, PxVec2 velocity);
+	~Shuttlecock() override;
 
-	float GetRadius();
+	float GetRadius() const;
 
 	bool FixedUpdate() override;
 
