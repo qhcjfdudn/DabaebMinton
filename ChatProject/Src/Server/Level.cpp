@@ -11,7 +11,8 @@
 #include "ReplicationManager.h"
 
 #include "Shuttlecock.h"
-#include "Bottom.h"
+#include "BadmintonBottom.h"
+#include "BadmintonNet.h"
 
 Level::Level()
 {
@@ -50,21 +51,18 @@ void Level::InitLevel()
 {
 	auto& engineInstance = Engine::GetInstance();
 
-	auto bottom = make_shared<Bottom>(PxVec2(0, 0));
-	auto ground = engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
-	pxScene->addActor(*ground);
-	bottom->SetRigidbody(*ground);
-
+	auto bottom = make_shared<BadmintonBottom>(PxVec2{ 0, 0 });
+	pxScene->addActor(*bottom->GetRigidbody());
 	staticGameObjects.push_back(bottom);
 
 	// Net
-	auto net = engineInstance.CreateBox2DStatic(PxVec2{ 0, 2.5 }, 0.5, 2.5);
-	pxScene->addActor(*net);
+	auto net = make_shared<BadmintonNet>(PxVec2{ 0, 2.5f });
+	pxScene->addActor(*net->GetRigidbody());
+	staticGameObjects.push_back(net);
 	
 	// Shuttlecock
-	auto shuttlecock = make_shared<Shuttlecock>(PxVec2(-3, 10), PxVec2(2, 5));
+	auto shuttlecock = make_shared<Shuttlecock>(PxVec2{ -3, 10 }, PxVec2{ 2, 5 });
 	pxScene->addActor(*shuttlecock->GetRigidbody());
-
 	gameObjects.push_back(shuttlecock);
 
 	// LinkingContext¿¡ µî·Ï
@@ -74,6 +72,7 @@ void Level::InitLevel()
 void Level::ClearLevel()
 {
 	RemoveAllGameObjects();
+	RemoveAllStaticGameObjects();
 
 	_pendingSerializationQueue = queue<shared_ptr<GameObject>>{};
 
@@ -124,6 +123,24 @@ void Level::Remove(PxActor* actor)
 	pxScene->lockWrite();
 	pxScene->removeActor(*actor);
 	pxScene->unlockWrite();
+}
+
+void Level::RemoveAllStaticGameObjects()
+{
+	for (int idx = static_cast<int>(staticGameObjects.size()) - 1; idx >= 0; --idx)
+	{
+		auto& go = staticGameObjects[idx];
+		PxActor* actor = go->GetRigidbody();
+		if (actor == nullptr || actor->isReleasable() == false)
+			continue;
+
+		pxScene->lockWrite();
+		pxScene->removeActor(*actor);
+		pxScene->unlockWrite();
+
+		swap(go, staticGameObjects.back());
+		staticGameObjects.pop_back();
+	}
 }
 
 void Level::Update()

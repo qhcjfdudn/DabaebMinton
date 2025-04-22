@@ -28,6 +28,8 @@ public:
 	void RemoveGameObject(size_t idx);
 	void Remove(PxActor* actor);
 
+	void RemoveAllStaticGameObjects();
+
 	void Update();
 	void FixedUpdate();
 	void WriteWorldStateToStream();
