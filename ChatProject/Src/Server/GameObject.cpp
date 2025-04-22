@@ -4,13 +4,10 @@
 #include "Constant.h"
 #include "OutputMemoryBitStream.h"
 #include "Engine.h"
+#include "Level.h"
 
 GameObject::GameObject(PxVec2 location, PxVec2 velocity) :
-	_location(location), _velocity(velocity), _rigidbody(nullptr) {}
-
-GameObject::~GameObject()
-{
-	Engine::GetInstance().RemoveActor(_rigidbody);
+	_location(location), _velocity(velocity) {
 }
 
 void GameObject::SetDirtyFlag(ReplicationFlag flag)
@@ -21,6 +18,11 @@ void GameObject::SetDirtyFlag(ReplicationFlag flag)
 void GameObject::SetVelocity(PxVec2 velocity)
 {
 	_velocity = velocity;
+}
+
+void GameObject::SetRigidbody(PxRigidDynamic& rigidbody)
+{
+	_rigidbody = &rigidbody;
 }
 
 bool GameObject::FixedUpdate()
@@ -34,14 +36,10 @@ void GameObject::SetCurrentTransform()
 {
 	// simulate 중에는 getGlobalPose()를 사용할 수 없다는 에러 메시지 발견
 	// 물리 엔진에 접근해 값을 알아오고자 할 때는 lockRead()를 걸어야 한다.
-	
-	auto& engineInstance = Engine::GetInstance();
-	
-	engineInstance.LockRead();
+
 	PxVec3 curLocation{ _rigidbody->getGlobalPose().p };
 	PxVec3 curVelocity{ _rigidbody->getLinearVelocity() };
-	engineInstance.UnlockRead();
-	
+
 	_location = PxVec2{ curLocation.x, curLocation.y };
 	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
 }
@@ -55,4 +53,9 @@ void GameObject::Write(OutputMemoryBitStream& inStream)
 {
 	inStream.Write(_location);
 	inStream.Write(_velocity);
+}
+
+PxActor* GameObject::GetActor() const
+{
+	return _rigidbody;
 }

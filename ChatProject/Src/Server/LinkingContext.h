@@ -5,8 +5,6 @@ class GameObject;
 class LinkingContext
 {
 public:
-	static LinkingContext& GetInstance();
-
 	void Clear();
 
 	NetworkId_t GetNetworkId(shared_ptr<GameObject> gameObject);
@@ -16,12 +14,9 @@ public:
 	void RemoveGameObject(shared_ptr<GameObject> gameObject);
 
 private:
-	LinkingContext() = default;
-	~LinkingContext() = default;
-
 	std::unordered_map<NetworkId_t, shared_ptr<GameObject>> _networkIdToGameObjectMap;
 	std::unordered_map<shared_ptr<GameObject>, NetworkId_t> _gameObjectToNetworkIdMap;
-	
+
 	NetworkId_t _nextNetworkId = 1;
 };
 

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <PxScene.h>
-#include "ReplicationManagerNew.h"
+#include "ReplicationManager.h"
 
-class GameObjectNew;
+class GameObject;
 
 class Level
 {
@@ -12,9 +12,9 @@ public:
 	~Level();
 	
 	PxScene* pxScene = nullptr;
-	ReplicationManagerNew replicationManager;
+	ReplicationManager replicationManager;
 
-	vector<shared_ptr<GameObjectNew>> gameObjects;
+	vector<shared_ptr<GameObject>> gameObjects;
 
 	void InitLevel();
 	void ClearLevel();
@@ -37,6 +37,6 @@ public:
 private:
 	int WriteByReplication(OutputMemoryBitStream& outStream);
 
-	queue<shared_ptr<GameObjectNew>> _pendingSerializationQueue;
+	queue<shared_ptr<GameObject>> _pendingSerializationQueue;
 };
 

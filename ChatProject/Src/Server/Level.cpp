@@ -1,20 +1,20 @@
 #include "ServerPCH.h"
 #include "Level.h"
 
-#include "EngineNew.h"
+#include "Engine.h"
 
 #include "Constant.h"
 
 #include "PacketQueue.h"
 #include "OutputMemoryBitStream.h"
 #include "GetRequiredBits.h"
-#include "ReplicationManagerNew.h"
+#include "ReplicationManager.h"
 
-#include "ShuttlecockNew.h"
+#include "Shuttlecock.h"
 
 Level::Level()
 {
-	auto& engineInstance = EngineNew::GetInstance();
+	auto& engineInstance = Engine::GetInstance();
 	
 	PxSceneDesc sceneDesc(engineInstance.GetTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
@@ -47,7 +47,7 @@ Level::~Level()
 
 void Level::InitLevel()
 {
-	auto& engineInstance = EngineNew::GetInstance();
+	auto& engineInstance = Engine::GetInstance();
 	auto ground = engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
 	pxScene->addActor(*ground);
 
@@ -58,7 +58,7 @@ void Level::InitLevel()
 	// Shuttlecock
 	PxVec2 location(-3, 10);
 	PxVec2 velocity(2, 5);
-	auto shuttlecock = make_shared<ShuttlecockNew>(location, velocity);
+	auto shuttlecock = make_shared<Shuttlecock>(location, velocity);
 
 	auto rigidbody = engineInstance.CreateSphere2D(location, velocity, shuttlecock->GetRadius());
 	PxRigidBodyExt::updateMassAndInertia(*rigidbody, 10.0f);
@@ -76,7 +76,7 @@ void Level::ClearLevel()
 {
 	RemoveAllGameObjects();
 
-	_pendingSerializationQueue = queue<shared_ptr<GameObjectNew>>{};
+	_pendingSerializationQueue = queue<shared_ptr<GameObject>>{};
 
 	replicationManager.linkingContext.Clear();
 }
@@ -110,7 +110,7 @@ void Level::RemoveGameObject(size_t idx)
 
 	go->SetDirtyFlag(ReplicationFlag::DF_DELETE);
 
-	auto& engineInstance = EngineNew::GetInstance();
+	auto& engineInstance = Engine::GetInstance();
 	Remove(go->GetActor());
 
 	swap(go, gameObjects.back());
@@ -151,7 +151,7 @@ void Level::FixedUpdate()
 	auto gameObjectsCopied = gameObjects;
 	for (auto& gameObject : gameObjectsCopied)
 	{
-		auto& engineInstance = EngineNew::GetInstance();
+		auto& engineInstance = Engine::GetInstance();
 
 		pxScene->lockRead();
 		bool isChanged = gameObject->FixedUpdate();
@@ -212,7 +212,7 @@ int Level::WriteByReplication(OutputMemoryBitStream& outStream)
 	int pendingSerializationCount = static_cast<int>(_pendingSerializationQueue.size());
 
 	for (int i = 0; i < pendingSerializationCount; ++i) {
-		shared_ptr<GameObjectNew> go = _pendingSerializationQueue.front();
+		shared_ptr<GameObject> go = _pendingSerializationQueue.front();
 		_pendingSerializationQueue.pop();
 
 		ReplicationFlag& replicationFlag = go->replicationFlag;

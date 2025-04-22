@@ -23,28 +23,13 @@ void Engine::initPhysics()
 	pxPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
 	pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
-
-	PxSceneDesc sceneDesc(pxPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	pxDispatcher = PxDefaultCpuDispatcherCreate(2);
-	sceneDesc.cpuDispatcher = pxDispatcher;
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-	pxScene = pxPhysics->createScene(sceneDesc);
-
-	PxPvdSceneClient* pvdClient = pxScene->getScenePvdClient();
-	if (pvdClient)
-	{
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
-		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
-	}
 
 	cout << "initPhysics done." << endl;
 }
 
 void Engine::cleanupPhysics()
 {
-	PX_RELEASE(pxScene);
 	PX_RELEASE(pxDispatcher);
 	PX_RELEASE(pxPhysics);
 	if (pxPvd)
@@ -58,125 +43,91 @@ void Engine::cleanupPhysics()
 	cout << "cleanupPhysics done." << endl;
 }
 
-void Engine::stepPhysics()
+const PxTolerancesScale& Engine::GetTolerancesScale() const
 {
-	pxScene->lockWrite();
-	pxScene->simulate(Constant::PHYSX_FIXED_UPDATE_TIMESTEP);
-	pxScene->fetchResults(true);
-	pxScene->unlockWrite();
+	return pxPhysics->getTolerancesScale();
 }
 
-void Engine::RemoveActor(PxActor* actor) {
-	if (actor == nullptr || actor->isReleasable() == false)
-		return;
-
-	cout << "RemoveActor" << endl;
-	pxScene->removeActor(*actor);
-	actor->release(); // 메모리 해제
+PxCpuDispatcher* Engine::GetCpuDispatcher()
+{
+	return pxDispatcher;
 }
 
-void Engine::LockWrite() {
-	pxScene->lockWrite();
+PxScene* Engine::CreateScene(PxSceneDesc sceneDesc)
+{
+	return pxPhysics->createScene(sceneDesc);
 }
 
-void Engine::UnlockWrite() {
-	pxScene->unlockWrite();
-}
-
-void Engine::LockRead() {
-	pxScene->lockRead();
-}
-
-void Engine::UnlockRead() {
-	pxScene->unlockRead();
-}
-
-void Engine::CreatePlain(float nx, float ny, float nz, float distance)
+PxRigidStatic* Engine::CreatePlain(float nx, float ny, float nz, float distance)
 {
 	pxMaterial = pxPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-	PxRigidStatic* groundPlane = PxCreatePlane(*pxPhysics, PxPlane(nx, ny, nz, distance), *pxMaterial);
-	pxScene->lockWrite();
-	pxScene->addActor(*groundPlane);
-	pxScene->unlockWrite();
+	return PxCreatePlane(*pxPhysics, PxPlane(nx, ny, nz, distance), *pxMaterial);
 }
 
-PxRigidDynamic* Engine::CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ)
+PxRigidDynamic * Engine::CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ)
 {
 	PxRigidDynamic* body = pxPhysics->createRigidDynamic(tp);
 
 	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, halfExtentZ), *pxMaterial);
 	body->attachShape(*shape);
+	shape->release();
 
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-
-	pxScene->lockWrite();
-	pxScene->addActor(*body);
-	pxScene->unlockWrite();
-
-	shape->release();
 
 	return body;
 }
 
-PxRigidDynamic* Engine::CreateBox2D(const PxVec2& location, float halfExtentX, float halfExtentY)
+PxRigidDynamic * Engine::CreateBox2D(const PxVec2& location, float halfExtentX, float halfExtentY)
 {
 	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
 
 	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxMaterial);
 	body->attachShape(*shape);
+	shape->release();
 
 	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-
-	pxScene->lockWrite();
-	pxScene->addActor(*body);
-	pxScene->unlockWrite();
-
-	shape->release();
 
 	return body;
 }
 
-void Engine::CreateBox2DStatic(const PxVec2& location, float halfExtentX, float halfExtentY)
+PxRigidStatic* Engine::CreateBox2DStatic(const PxVec2& location, float halfExtentX, float halfExtentY)
 {
 	PxRigidStatic* body = pxPhysics->createRigidStatic(PxTransform{ location.x, location.y, 0 });
 
 	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxMaterial);
 	body->attachShape(*shape);
-	
-	pxScene->lockWrite();
-	pxScene->addActor(*body);
-	pxScene->unlockWrite();
-
-	shape->release();
-}
-
-PxRigidDynamic* Engine::CreateSphere2D(const PxVec2& location, float halfExtentRadius)
-{
-	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
-	PxShape* shape = pxPhysics->createShape(PxSphereGeometry(halfExtentRadius), *pxMaterial);
-	body->attachShape(*shape);
-
-	PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-	
-	pxScene->lockWrite();
-	pxScene->addActor(*body);
-	pxScene->unlockWrite();
-
 	shape->release();
 
 	return body;
 }
 
-PxRigidDynamic* Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
+PxRigidDynamic * Engine::CreateSphere2D(const PxVec2& location, const PxVec2& velocity, float halfExtentRadius)
+{
+	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
+
+	if (body == nullptr)
+	{
+		cout << "Shuttlecock(): CreateSphere2D error" << endl;
+		return nullptr;
+	}
+
+	body->setLinearVelocity(PxVec3{ velocity.x, velocity.y, 0.f });
+	body->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
+	body->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+
+	PxShape* shape = pxPhysics->createShape(PxSphereGeometry(halfExtentRadius), *pxMaterial);
+	body->attachShape(*shape);
+	shape->release();
+
+	return body;
+}
+
+PxRigidDynamic * Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
 	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);
 	dynamic->setAngularDamping(0.5f);
 	dynamic->setLinearVelocity(velocity);
-
-	pxScene->lockWrite();
-	pxScene->addActor(*dynamic);
-	pxScene->unlockWrite();
 
 	return dynamic;
 }

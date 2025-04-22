@@ -1,22 +1,19 @@
 #pragma once
 
+#include "LinkingContext.h"
+
 class OutputMemoryBitStream;
 class GameObject;
-class LinkingContext;
 
 class ReplicationManager
 {
 public:
-	static ReplicationManager& GetInstance();
+	ReplicationManager();
 
 	void ReplicateUpdate(OutputMemoryBitStream& inStream, shared_ptr<GameObject> inGameObject);
 	void ReplicateDelete(OutputMemoryBitStream& inStream, const shared_ptr<GameObject> inGameObject);
 
-	LinkingContext& _linkingContext;
-
-private:
-	ReplicationManager();
-	~ReplicationManager() = default;
+	LinkingContext linkingContext;
 };
 
 enum class PacketType

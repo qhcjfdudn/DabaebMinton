@@ -2,13 +2,11 @@
 
 #include "GameObject.h"
 
-class OutputMemoryBitStream;
-
 class Shuttlecock : public GameObject
 {
 public:
 	Shuttlecock(PxVec2 location, PxVec2 velocity);
-	
+
 	float GetRadius();
 
 	bool FixedUpdate() override;
@@ -19,3 +17,4 @@ public:
 private:
 	float _radius = 1.5;
 };
+

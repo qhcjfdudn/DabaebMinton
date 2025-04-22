@@ -2,19 +2,13 @@
 #include "ReplicationManager.h"
 
 #include "ReplicationHeader.h"
-#include "GameObject.h"
 #include "LinkingContext.h"
-
-ReplicationManager& ReplicationManager::GetInstance()
-{
-	static ReplicationManager instance;
-	return instance;
-}
+#include "GameObject.h"
 
 void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, shared_ptr<GameObject> inGameObject)
 {
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Update,
-		_linkingContext.GetNetworkId(inGameObject),
+		linkingContext.GetNetworkId(inGameObject),
 		inGameObject->GetClassId());
 
 	rh.Write(inStream);
@@ -24,12 +18,12 @@ void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, shared
 void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& inStream, const shared_ptr<GameObject> inGameObject)
 {
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Delete,
-		_linkingContext.GetNetworkId(inGameObject),
+		linkingContext.GetNetworkId(inGameObject),
 		inGameObject->GetClassId());
 	rh.Write(inStream);
 	inGameObject->Write(inStream);
 }
 
 ReplicationManager::ReplicationManager() :
-	_linkingContext(LinkingContext::GetInstance()) {
+	linkingContext{} {
 }

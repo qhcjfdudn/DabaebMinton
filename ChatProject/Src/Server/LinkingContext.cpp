@@ -1,12 +1,6 @@
 #include "ServerPCH.h"
 #include "LinkingContext.h"
 
-LinkingContext& LinkingContext::GetInstance()
-{
-	static LinkingContext instance;
-	return instance;
-}
-
 void LinkingContext::Clear()
 {
 	_networkIdToGameObjectMap.clear();

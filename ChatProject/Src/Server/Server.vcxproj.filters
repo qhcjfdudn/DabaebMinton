@@ -24,15 +24,6 @@
     <ClCompile Include="ServerPCH.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="WorldServer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="IOCPEvent.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -40,15 +31,6 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="PacketQueue.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Shuttlecock.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="LinkingContext.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicationManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="OutputMemoryBitStream.cpp">
@@ -63,22 +45,22 @@
     <ClCompile Include="Level.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicationManagerNew.cpp">
+    <ClCompile Include="ReplicationManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="LinkingContextNew.cpp">
+    <ClCompile Include="LinkingContext.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="EngineNew.cpp">
+    <ClCompile Include="Engine.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ReplicationFlag.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="GameObjectNew.cpp">
+    <ClCompile Include="GameObject.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ShuttlecockNew.cpp">
+    <ClCompile Include="Shuttlecock.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -87,15 +69,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ServerPCH.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldServer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="IOCPEvent.h">
@@ -108,15 +81,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Constant.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Shuttlecock.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="LinkingContext.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="OutputMemoryBitStream.h">
@@ -134,22 +98,22 @@
     <ClInclude Include="Level.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicationManagerNew.h">
+    <ClInclude Include="ReplicationManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="LinkingContextNew.h">
+    <ClInclude Include="LinkingContext.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="EngineNew.h">
+    <ClInclude Include="Engine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ReplicationFlag.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="GameObjectNew.h">
+    <ClInclude Include="GameObject.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ShuttlecockNew.h">
+    <ClInclude Include="Shuttlecock.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
