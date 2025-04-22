@@ -7,7 +7,7 @@ class StaticGameObject
 public:
 
 	StaticGameObject(PxVec2 location);
-	virtual ~StaticGameObject() {}
+	virtual ~StaticGameObject();
 
 	void SetRigidbody(PxRigidStatic& rigidbody);
 

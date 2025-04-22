@@ -6,6 +6,12 @@
 StaticGameObject::StaticGameObject(PxVec2 location) :
 	_location(location) {}
 
+StaticGameObject::~StaticGameObject()
+{
+	if (_rigidbody && _rigidbody->isReleasable())
+		_rigidbody->release();
+}
+
 void StaticGameObject::SetRigidbody(PxRigidStatic& rigidbody)
 {
 	_rigidbody = &rigidbody;
