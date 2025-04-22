@@ -144,17 +144,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EngineNew.cpp" />
+    <ClCompile Include="GameObjectNew.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="LinkingContext.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="LinkingContextNew.cpp" />
     <ClCompile Include="Observer.cpp" />
     <ClCompile Include="OutputMemoryBitStream.cpp" />
+    <ClCompile Include="ReplicationFlag.cpp" />
     <ClCompile Include="ReplicationHeader.cpp" />
     <ClCompile Include="ReplicationManager.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="ReplicationManagerNew.cpp" />
     <ClCompile Include="Shuttlecock.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
@@ -189,6 +195,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="ShuttlecockNew.cpp" />
     <ClCompile Include="Socket.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
@@ -199,12 +206,18 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EngineNew.h" />
+    <ClInclude Include="GameObjectNew.h" />
     <ClInclude Include="GetRequiredBits.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="LinkingContext.h" />
+    <ClInclude Include="LinkingContextNew.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OutputMemoryBitStream.h" />
+    <ClInclude Include="ReplicationFlag.h" />
     <ClInclude Include="ReplicationHeader.h" />
     <ClInclude Include="ReplicationManager.h" />
+    <ClInclude Include="ReplicationManagerNew.h" />
     <ClInclude Include="Shuttlecock.h" />
     <ClInclude Include="Constant.h" />
     <ClInclude Include="Engine.h" />
@@ -213,6 +226,7 @@
     <ClInclude Include="NetworkManagerServer.h" />
     <ClInclude Include="PacketQueue.h" />
     <ClInclude Include="ServerPCH.h" />
+    <ClInclude Include="ShuttlecockNew.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="WorldServer.h" />
   </ItemGroup>
