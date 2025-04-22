@@ -13,11 +13,6 @@ Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 	PxRigidBodyExt::updateMassAndInertia(*_rigidbody, 10.0f);
 }
 
-Shuttlecock::~Shuttlecock()
-{
-	_rigidbody->release();
-}
-
 float Shuttlecock::GetRadius() const
 {
 	return _radius;

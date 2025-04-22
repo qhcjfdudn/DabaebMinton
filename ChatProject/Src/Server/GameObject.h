@@ -10,7 +10,7 @@ public:
 	ReplicationFlag replicationFlag = ReplicationFlag::DF_NONE;
 
 	GameObject(PxVec2 location, PxVec2 velocity);
-	virtual ~GameObject() {}
+	virtual ~GameObject();
 
 	void SetDirtyFlag(ReplicationFlag flag);
 

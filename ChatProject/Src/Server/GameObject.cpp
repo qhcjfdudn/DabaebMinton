@@ -7,6 +7,12 @@ GameObject::GameObject(PxVec2 location, PxVec2 velocity) :
 	_location(location), _velocity(velocity) {
 }
 
+GameObject::~GameObject()
+{
+	if (_rigidbody && _rigidbody->isReleasable())
+		_rigidbody->release();
+}
+
 void GameObject::SetDirtyFlag(ReplicationFlag flag)
 {
 	replicationFlag |= flag;
