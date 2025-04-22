@@ -144,7 +144,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bottom.cpp" />
+    <ClCompile Include="BadmintonNet.cpp" />
+    <ClCompile Include="BadmintonBottom.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Level.cpp" />
@@ -183,7 +184,8 @@
     <ClCompile Include="StaticGameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bottom.h" />
+    <ClInclude Include="BadmintonNet.h" />
+    <ClInclude Include="BadmintonBottom.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GetRequiredBits.h" />

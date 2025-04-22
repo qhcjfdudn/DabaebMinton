@@ -1,10 +1,12 @@
 #pragma once
+
 #include "StaticGameObject.h"
-class Bottom : public StaticGameObject
+
+class BadmintonNet : public StaticGameObject
 {
 public:
-	Bottom(PxVec2 location);
-	~Bottom() override = default;
+	BadmintonNet(PxVec2 location);
 	unsigned int GetClassId() override;
 	void Write(OutputMemoryBitStream& inStream) override;
 };
+

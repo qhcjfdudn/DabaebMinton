@@ -66,7 +66,10 @@
     <ClCompile Include="StaticGameObject.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Bottom.cpp">
+    <ClCompile Include="BadmintonBottom.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="BadmintonNet.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,7 +128,10 @@
     <ClInclude Include="StaticGameObject.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Bottom.h">
+    <ClInclude Include="BadmintonBottom.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BadmintonNet.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
