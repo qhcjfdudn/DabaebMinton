@@ -111,7 +111,7 @@ void Level::RemoveGameObject(size_t idx)
 	go->SetDirtyFlag(ReplicationFlag::DF_DELETE);
 
 	auto& engineInstance = Engine::GetInstance();
-	Remove(go->GetActor());
+	Remove(go->GetRigidbody());
 
 	swap(go, gameObjects.back());
 	gameObjects.pop_back();

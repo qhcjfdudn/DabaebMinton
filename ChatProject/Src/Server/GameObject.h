@@ -23,7 +23,7 @@ public:
 	virtual unsigned int GetClassId();
 	virtual void Write(OutputMemoryBitStream& inStream);
 
-	PxActor* GetActor() const;
+	PxActor* GetRigidbody() const;
 
 protected:
 	PxVec2 _location;

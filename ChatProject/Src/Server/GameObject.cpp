@@ -1,10 +1,7 @@
 #include "ServerPCH.h"
 #include "GameObject.h"
 
-#include "Constant.h"
 #include "OutputMemoryBitStream.h"
-#include "Engine.h"
-#include "Level.h"
 
 GameObject::GameObject(PxVec2 location, PxVec2 velocity) :
 	_location(location), _velocity(velocity) {
@@ -55,7 +52,7 @@ void GameObject::Write(OutputMemoryBitStream& inStream)
 	inStream.Write(_velocity);
 }
 
-PxActor* GameObject::GetActor() const
+PxActor* GameObject::GetRigidbody() const
 {
 	return _rigidbody;
 }
