@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01366968d2f68d7498172bb7b62f63ae, type: 3}
+  m_Name: Default Racket
+  m_EditorClassIdentifier: 
+  racketName: Default Racket
+  weight: 10
+  height: 0.68
+  repulsionPower: 10
+  icon: {fileID: -4785297901407613064, guid: f7149941e70464943b6e4f71ed710c1a, type: 3}
+  sprite: {fileID: -4785297901407613064, guid: f7149941e70464943b6e4f71ed710c1a, type: 3}

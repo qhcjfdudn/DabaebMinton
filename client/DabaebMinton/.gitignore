@@ -46,3 +46,4 @@ fabric.properties
 # Custom
 .plastic/
 UserSettings/
+!Assets/Resources
