@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using static ShuttlecockMovementStrategyFactory;
 
 public class GameManager : MonoBehaviour
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("[ActionSwingShuttlecock] called.");
 
-        // hitPoint -> accuracy box·Î °³¼± ÇÊ¿ä
+        // hitPoint -> accuracy boxë¡œ ê°œì„  í•„ìš”
         BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
 
         if (hitBox.IncludesShuttlecock == false)
@@ -82,8 +82,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        // 1. ¼ÅÆ²ÄÛÀÌ ¸Â´Â ¼ø°£ÀÇ ³×Æ® ±âÁØ ³ôÀÌ, xÃà À§Ä¡, ¼¼±â¸¦ ÅëÇØ ±¸Á¾À» °áÁ¤
-        // Á¤È®µµ¸¦ ÅëÇØ ³¯¾Æ°¥ ±ËÀûÀ» °áÁ¤ // ±¸Á¾¸¶´Ù ´Ù¸£¹Ç·Î ±¸Á¾ ¾È¿¡¼­ °áÁ¤
+        _lastTouchedPlayer = player;
+
+        // 1. ì…”í‹€ì½•ì´ ë§ëŠ” ìˆœê°„ì˜ ë„¤íŠ¸ ê¸°ì¤€ ë†’ì´, xì¶• ìœ„ì¹˜, ì„¸ê¸°ë¥¼ í†µí•´ êµ¬ì¢…ì„ ê²°ì •
+        // ì •í™•ë„ë¥¼ í†µí•´ ë‚ ì•„ê°ˆ ê¶¤ì ì„ ê²°ì • // êµ¬ì¢…ë§ˆë‹¤ ë‹¤ë¥´ë¯€ë¡œ êµ¬ì¢… ì•ˆì—ì„œ ê²°ì •
         Vector2 shuttlecockPos = _shuttlecock.transform.position;
 
         float shuttlecockHeight = shuttlecockPos.y;
@@ -132,8 +134,6 @@ public class GameManager : MonoBehaviour
             DropshotShuttlecock(player);
             return;
         }
-
-        _lastTouchedPlayer = player;
     }
 
     public void ClearShuttlecock(Player player)
@@ -166,9 +166,9 @@ public class GameManager : MonoBehaviour
         _shuttlecock.Hit(GetSwingForce(player, 70f, 50f, 90f));
     }
 
-    public Vector2 GetSwingForce(Player player, float baseAngle, float minAngle, float maxAngle) // ÁÂ¿ì ¹æÇâÀ» ÇÑ ¹æÇâÀ¸·Î °è»ê °¡´ÉÇÏµµ·Ï forwardDir ÅëÇØ
-                                                                                                // ÁÂÇ¥¿Í ¹æÇâ ¼öÁ¤ÇÑ µÚ ºñÇà °¢µµ °è»ê.
-                                                                                                // ÀÌÈÄ ¹æÇâÀ» ´Ù½Ã ¸ÂÃçÁØ´Ù.
+    public Vector2 GetSwingForce(Player player, float baseAngle, float minAngle, float maxAngle) // ì¢Œìš° ë°©í–¥ì„ í•œ ë°©í–¥ìœ¼ë¡œ ê³„ì‚° ê°€ëŠ¥í•˜ë„ë¡ forwardDir í†µí•´
+                                                                                                // ì¢Œí‘œì™€ ë°©í–¥ ìˆ˜ì •í•œ ë’¤ ë¹„í–‰ ê°ë„ ê³„ì‚°.
+                                                                                                // ì´í›„ ë°©í–¥ì„ ë‹¤ì‹œ ë§ì¶°ì¤€ë‹¤.
     {
         BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
         AccuracyPoint accuracyPoint = hitBox.GetComponentInChildren<AccuracyPoint>();
@@ -198,7 +198,7 @@ public class GameManager : MonoBehaviour
             degree -= ratio * (degree - minAngle);
         }
 
-        float radian = degree * Mathf.Deg2Rad; // degree¸¦ radianÀ¸·Î º¯È¯
+        float radian = degree * Mathf.Deg2Rad; // degreeë¥¼ radianìœ¼ë¡œ ë³€í™˜
         Vector2 direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
         direction.x *= forwardDir;
 
