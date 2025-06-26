@@ -16,8 +16,6 @@ public class Shuttlecock : MonoBehaviour
             _movementStrategy.enable();
         }
     }
-    
-    // 자신이 왼쪽/오른쪽 중 어느 court에 있는지 알고 있는 flag 필요
 
     private Rigidbody2D _rigidbody;
 
@@ -50,13 +48,11 @@ public class Shuttlecock : MonoBehaviour
 
     private void SetSpriteRotation()
     {
-        // AddForce()�� ����Ǳ� ������ �̵� ���������� rotation�� �����Ǿ�� �Ѵ�.
-        if (_rigidbody.linearVelocity == Vector2.zero)
+        if (_rigidbody.linearVelocity.magnitude <= 1f)
         {
             return;
         }
 
-        // Sprite�� ��Ʋ���� ���ư��� ����� ��ġ�ϵ��� ����
         Vector2 norm = _rigidbody.linearVelocity.normalized;
         float angle = Mathf.Atan2(norm.y, norm.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle + 90, Vector3.forward);
