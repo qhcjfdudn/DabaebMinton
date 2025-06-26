@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using static ShuttlecockMovementStrategyFactory;
 
 public class GameManager : MonoBehaviour
@@ -273,6 +274,7 @@ public class GameManager : MonoBehaviour
             case EPauseReason.None:
                 Debug.LogWarning("[PauseGame] Pause reason is None.");
                 break;
+
             case EPauseReason.ShuttlecockTouchTheGround:
                 Debug.Log("[PauseGame] Shuttlecock touched the ground.");
 
@@ -331,9 +333,26 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        // 누군가 5점 달성시 게임 종료 및 메인 페이지로 이동
+        if (_uiScore.Player1Score >= 5 || _uiScore.Player2Score >= 5)
+        {
+            Debug.Log("[GameEnd] A player reached 5 points. Ending game...");
+            QuitGame();
+            return;
+        }
+
         await Awaitable.WaitForSecondsAsync(1f);
 
         StartNewGame();
+    }
+
+    private async void QuitGame()
+    {
+        Debug.Log("[QuitGame] Game is ending...");
+
+        await Awaitable.WaitForSecondsAsync(3f);
+
+        SceneManager.LoadScene("MainMenuScene");
     }
 
     private void CreateLevel()
@@ -445,5 +464,6 @@ public enum EGamePlayState
 public enum EPauseReason
 {
     None,
-    ShuttlecockTouchTheGround
+    ShuttlecockTouchTheGround,
+    MAX
 }

@@ -3,6 +3,15 @@ using UnityEngine;
 
 public class UIScore : MonoBehaviour
 {
+    public float Player1Score { 
+        get { return _player1Score; }
+        private set { _player1Score = value; }
+    }
+    public float Player2Score {
+        get { return _player2Score; }
+        private set { _player2Score = value; }
+    }
+
     private float _player1Score, _player2Score;
     TMP_Text _player1ScoreText, _player2ScoreText;
 
