@@ -2,12 +2,13 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class MainSceneController : MonoBehaviour
+public class MainMenuSceneController : MonoBehaviour
 {
     public Button _localPlayButton;
     public Button _onlinePlayButton;
     public Button _settingsButton;
     public Button _quitButton;
+
 
     public void onClickLocalPlayButton()
     {
@@ -38,4 +39,13 @@ public class MainSceneController : MonoBehaviour
         _onlinePlayButton.interactable = false; // 동작 미구현
         _settingsButton.interactable = false; // 동작 미구현
     }
+}
+
+public enum EPanelState
+{
+    None = 0,
+    MainMenu = 1,
+    Settings = 2,
+    OnlinePlay = 3,
+    LocalPlay = 4
 }
