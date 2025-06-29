@@ -447,6 +447,10 @@ public class GameManager : MonoBehaviour
 
         _uiScore = FindFirstObjectByType<UIScore>();
 
+        int score = PlayerPrefs.GetInt("score");
+        int difficulty = PlayerPrefs.GetInt("difficulty");
+        Debug.Log($"Score: {score}, Difficulty: {difficulty}");
+
         Debug.Log("End of GameManager Start()");
     }
 }
