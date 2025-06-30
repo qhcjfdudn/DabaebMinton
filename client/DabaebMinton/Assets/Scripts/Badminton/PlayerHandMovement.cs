@@ -1,10 +1,11 @@
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public abstract class PlayerHandMovement
 {
     protected PlayerHand _owner;
 
+    public virtual void OnStandingLeft(int frameIdx) { }
+    public virtual void OnStandingRight(int frameIdx) { }
     public virtual void OnMoveLeft(int frameIdx) { }
     public virtual void OnMoveRight(int frameIdx) { }
 }

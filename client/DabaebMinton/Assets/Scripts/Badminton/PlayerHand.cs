@@ -6,6 +6,16 @@ public class PlayerHand : MonoBehaviour
 
     public SpriteRenderer _racketSpriteRenderer;
 
+    public void OnStangindLeft(int frameIdx)
+    {
+        _handMovement.OnStandingLeft(frameIdx);
+    }
+
+    public void OnStandingRight(int frameIdx)
+    {
+        _handMovement.OnStandingRight(frameIdx);
+    }
+
     public void OnMoveLeft(int frameIdx)
     {
         _handMovement.OnMoveLeft(frameIdx);

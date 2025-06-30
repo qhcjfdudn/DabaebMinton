@@ -1,8 +1,5 @@
-﻿using System;
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
-
 
 public class Player : MonoBehaviour
 {
@@ -52,7 +49,11 @@ public class Player : MonoBehaviour
 
         switch (frameName)
         {
-            case "Standing":
+            case "LeftStanding":
+                _playerHand.OnStangindLeft(frameIdx);
+                break;
+            case "RightStanding":
+                _playerHand.OnStandingRight(frameIdx);
                 break;
             case "LeftMove":
                 _playerHand.OnMoveLeft(frameIdx);
