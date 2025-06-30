@@ -21,6 +21,9 @@ public class GameManager : MonoBehaviour
 
     private int _endScore;
 
+    public RectTransform _showingPlayResultPanel;
+    public TMPro.TMP_Text _winPlayerText;
+
     public void TogglePlayMode()
     {
         switch (PlayMode)
@@ -332,10 +335,12 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        // 누군가 5점 달성시 게임 종료 및 메인 페이지로 이동
+        // 누군가 endScore 점수 달성시 게임 종료 및 메인 페이지로 이동
         if (_uiScore.Player1Score >= _endScore || _uiScore.Player2Score >= _endScore)
         {
-            Debug.Log($"[GameEnd] A player reached { _endScore } points. Ending game...");
+            string winner = _uiScore.Player1Score >= _endScore ? _player1.name : _player2.name;
+
+            ShowWinnerText(winner);
             QuitGame();
             return;
         }
@@ -345,8 +350,15 @@ public class GameManager : MonoBehaviour
         StartNewGame();
     }
 
+    private void ShowWinnerText(string winner)
+    {
+        _winPlayerText.text = winner;
+        _showingPlayResultPanel.gameObject.SetActive(true);
+    }
+
     private async void QuitGame()
     {
+        Debug.Log($"[GameEnd] A player reached {_endScore} points. Ending game...");
         Debug.Log("[QuitGame] Game is ending...");
 
         await Awaitable.WaitForSecondsAsync(3f);
@@ -451,6 +463,8 @@ public class GameManager : MonoBehaviour
         SetShuttlecockMovementStrategy((EShuttlecockSpeed)difficulty);
 
         Debug.Log($"Score: {_endScore}, Difficulty: {difficulty}");
+
+        _showingPlayResultPanel.gameObject.SetActive(false);
 
         Debug.Log("End of GameManager Start()");
     }
