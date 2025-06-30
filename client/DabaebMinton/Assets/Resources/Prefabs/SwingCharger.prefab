@@ -45,6 +45,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6abac723fe64a444825ad53a963d4c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  min_charge_gauge_log_value: 0
+  max_charge_gauge_log_value: 0
+  min_ratio_value: 0
+  max_ratio_value: 0
   _chargeGauge: 0.2
 --- !u!1001 &2887138572289968214
 PrefabInstance:
@@ -80,7 +84,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2668729464037831669, guid: a0345786c3f1504428b6709a475e13c1, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 3
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2668729464037831669, guid: a0345786c3f1504428b6709a475e13c1, type: 3}
       propertyPath: m_SizeDelta.y
@@ -133,6 +137,10 @@ PrefabInstance:
     - target: {fileID: 2668729464037831669, guid: a0345786c3f1504428b6709a475e13c1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5365295030796143578, guid: a0345786c3f1504428b6709a475e13c1, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6835193233108710260, guid: a0345786c3f1504428b6709a475e13c1, type: 3}
       propertyPath: m_Name
