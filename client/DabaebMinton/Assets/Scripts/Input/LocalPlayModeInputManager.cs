@@ -89,7 +89,7 @@ public class LocalPlayModeInputManager : MonoBehaviour
             return;
         }
 
-        // charge ºº±‚ø° µ˚∂Û ∂ß∏∞¥Ÿ.
+        // charge ÏÑ∏Í∏∞Ïóê Îî∞Îùº ÎïåÎ¶∞Îã§.
         if (context.canceled)
         {
             if (charger.StopCharging(ESwingChargerState.Swing))
@@ -176,22 +176,6 @@ public class LocalPlayModeInputManager : MonoBehaviour
 
             return;
         }
-    }
-
-    public void OnInitShuttlecock(InputAction.CallbackContext context)
-    {
-        if (context.started)
-            return;
-
-        if (context.performed)
-        {
-            _gameManager.StartNewGame();
-            _gameManager.ChangeShuttlecockMovementStrategy();
-            return;
-        }
-
-        if (context.canceled)
-            return;
     }
 
     private void Move(Player player, Vector2 moveValue)

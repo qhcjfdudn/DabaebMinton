@@ -15,7 +15,7 @@ public class MainMenuSceneController : MonoBehaviour
     public int _score;
 
     public Button[] _difficultyButtons;
-    private EDifficultyType _selectedDifficulty;
+    private EShuttlecockSpeed _selectedDifficulty;
 
     public Button _gameStartButton;
 
@@ -75,7 +75,7 @@ public class MainMenuSceneController : MonoBehaviour
             _difficultyButtons[i].interactable = true; // 다른 난이도 버튼 활성화
         }
 
-        _selectedDifficulty = (EDifficultyType)difficultyType; // 선택한 난이도 저장
+        _selectedDifficulty = (EShuttlecockSpeed)difficultyType; // 선택한 난이도 저장
         _difficultyButtons[difficultyType].interactable = false; // 선택한 난이도 버튼 비활성화
     }
 
@@ -97,7 +97,7 @@ public class MainMenuSceneController : MonoBehaviour
         _score = 21;
         _scoreText.text = _score.ToString();
 
-        _selectedDifficulty = EDifficultyType.Normal; // 기본 난이도 설정
+        _selectedDifficulty = EShuttlecockSpeed.Normal; // 기본 난이도 설정
         _difficultyButtons[(int)_selectedDifficulty].interactable = false;
 
         _mainMenuPanel.gameObject.SetActive(true);
@@ -114,9 +114,9 @@ public enum EPanelState
     LocalPlay = 4
 }
 
-public enum EDifficultyType
+public enum EShuttlecockSpeed
 {
-    Easy = 0,
+    Slow = 0,
     Normal = 1,
-    Hard = 2
+    Fast = 2
 }

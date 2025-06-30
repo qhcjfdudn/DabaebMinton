@@ -76,15 +76,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "InitShuttlecock",
-                    "type": "Button",
-                    "id": "9e1f7647-c476-49a5-a1ac-5ffd976e409a",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -217,17 +208,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Player2Swing",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "cb828047-7f66-48ff-993f-93ade6c6c560",
-                    "path": "<Keyboard>/r",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "InitShuttlecock",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

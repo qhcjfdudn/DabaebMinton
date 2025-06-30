@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
 
     private EGamePlayState _gamePlayState;
 
+    private int _endScore;
+
     public void TogglePlayMode()
     {
         switch (PlayMode)
@@ -214,26 +216,23 @@ public class GameManager : MonoBehaviour
         _shuttlecock.Move(new Vector2(-5f, 6f));
     }
 
-    public void ChangeShuttlecockMovementStrategy()
+    public void SetShuttlecockMovementStrategy(EShuttlecockSpeed difficultyType)
     {
-        ShuttlecockMovementStrategy sh = _shuttlecock.MovementStrategy;
-        EShuttlecockMovementType movementType = EShuttlecockMovementType.Slow;
-
-        if (sh.GetType() == typeof(ShuttlecockMovementSlowStrategy))
+        switch (difficultyType)
         {
-            movementType = EShuttlecockMovementType.Normal;
+            case EShuttlecockSpeed.Slow:
+                _shuttlecock.MovementStrategy = CreateShuttlecockMovementStrategy(_shuttlecock, EShuttlecockMovementType.Slow);
+                break;
+            case EShuttlecockSpeed.Normal:
+                _shuttlecock.MovementStrategy = CreateShuttlecockMovementStrategy(_shuttlecock, EShuttlecockMovementType.Normal);
+                break;
+            case EShuttlecockSpeed.Fast:
+                _shuttlecock.MovementStrategy = CreateShuttlecockMovementStrategy(_shuttlecock, EShuttlecockMovementType.Fast);
+                break;
+            default:
+                Debug.LogError("Unknown difficulty type.");
+                break;
         }
-        else if (sh.GetType() == typeof(ShuttlecockMovementNormalStrategy))
-        {
-            movementType = EShuttlecockMovementType.Fast;
-            
-        }
-        else if (sh.GetType() == typeof(ShuttlecockMovementFastStrategy))
-        {
-            movementType = EShuttlecockMovementType.Slow;
-        }
-
-        _shuttlecock.MovementStrategy = CreateShuttlecockMovementStrategy(_shuttlecock, movementType);
     }
 
     public void PlaceInitPosition(Player player)
@@ -334,9 +333,9 @@ public class GameManager : MonoBehaviour
         }
 
         // 누군가 5점 달성시 게임 종료 및 메인 페이지로 이동
-        if (_uiScore.Player1Score >= 5 || _uiScore.Player2Score >= 5)
+        if (_uiScore.Player1Score >= _endScore || _uiScore.Player2Score >= _endScore)
         {
-            Debug.Log("[GameEnd] A player reached 5 points. Ending game...");
+            Debug.Log($"[GameEnd] A player reached { _endScore } points. Ending game...");
             QuitGame();
             return;
         }
@@ -447,9 +446,11 @@ public class GameManager : MonoBehaviour
 
         _uiScore = FindFirstObjectByType<UIScore>();
 
-        int score = PlayerPrefs.GetInt("score");
+        _endScore = PlayerPrefs.GetInt("score");
         int difficulty = PlayerPrefs.GetInt("difficulty");
-        Debug.Log($"Score: {score}, Difficulty: {difficulty}");
+        SetShuttlecockMovementStrategy((EShuttlecockSpeed)difficulty);
+
+        Debug.Log($"Score: {_endScore}, Difficulty: {difficulty}");
 
         Debug.Log("End of GameManager Start()");
     }
