@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BadmintonBottom : MonoBehaviour
+public class BadmintonPenaltyArea : MonoBehaviour
 {
     private GameManager _gameManager;
 

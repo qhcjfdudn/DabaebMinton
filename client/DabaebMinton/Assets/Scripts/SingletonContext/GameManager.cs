@@ -374,26 +374,7 @@ public class GameManager : MonoBehaviour
 
     private void CreateBadmintonCourt()
     {
-        GameObject court = GameObject.Find("BadmintonCourt");
-        court.transform.localScale = new Vector3(_badmintonCourtConfig.courtWidth, 1, 1);
-        court.transform.position = new Vector3(0, 0, 0);
-
         _badmintonNet = GameObject.Find("BadmintonNet").GetComponent<BadmintonNet>();
-        _badmintonNet.transform.localScale = new Vector3(0.1f, _badmintonCourtConfig.netHeight, 1);
-        _badmintonNet.transform.parent = court.transform;
-        _badmintonNet.transform.localPosition = new Vector3(0, _badmintonNet.transform.localScale.y / 2 + court.transform.localScale.y / 2, 0);
-
-        GameObject bottomLeft = GameObject.Find("BadmintonBottomLeft");
-        bottomLeft.transform.localPosition = new Vector3(-_badmintonCourtConfig.courtWidth / 2 - bottomLeft.transform.localScale.x / 2, 0, 0);
-
-        GameObject bottomRight = GameObject.Find("BadmintonBottomRight");
-        bottomRight.transform.localPosition = new Vector3(_badmintonCourtConfig.courtWidth / 2 + bottomLeft.transform.localScale.x / 2, 0, 0);
-
-        GameObject shortServiceLineLeft = GameObject.Find("BadmintonShortServiceLineLeft");
-        shortServiceLineLeft.transform.localPosition = new Vector3(-_badmintonCourtConfig.shortServiceLine, 0, 0);
-
-        GameObject shortServiceLineRight = GameObject.Find("BadmintonShortServiceLineRight");
-        shortServiceLineRight.transform.localPosition = new Vector3(_badmintonCourtConfig.shortServiceLine, 0, 0);
     }
 
     private void CreateShuttlecock()
