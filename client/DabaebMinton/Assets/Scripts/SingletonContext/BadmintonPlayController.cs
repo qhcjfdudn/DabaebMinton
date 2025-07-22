@@ -7,9 +7,8 @@ public class BadmintonPlayController : MonoBehaviour
 {
     public EPlayMode PlayMode { get; private set; }
 
-    public BadmintonCourtConfig _badmintonCourtConfig;
     BadmintonNet _badmintonNet;
-    BadmintonGround _badmintonCourt;
+    float shortServiceLine = 1.98f;
     Shuttlecock _shuttlecock;
 
     Player _player1, _player2;
@@ -100,7 +99,7 @@ public class BadmintonPlayController : MonoBehaviour
         SwingCharger charger = player.GetComponentInChildren<SwingCharger>();
         float chargeRatio = (charger.ChargeGauge - SwingCharger.MIN_CHARGE_VALUE) / (SwingCharger.MAX_CHARGE_VALUE - SwingCharger.MIN_CHARGE_VALUE);
 
-        if (_badmintonCourtConfig.shortServiceLine > Mathf.Abs(player.transform.position.x))
+        if (shortServiceLine > Mathf.Abs(player.transform.position.x))
         {
             if (shuttlecockHeight > netHeight)
             {
@@ -416,7 +415,6 @@ public class BadmintonPlayController : MonoBehaviour
 
     private void CreateBadmintonCourt()
     {
-        _badmintonCourt = GameObject.Find("BadmintonCourt").GetComponent<BadmintonGround>();
         _badmintonNet = GameObject.Find("BadmintonNet").GetComponent<BadmintonNet>();
     }
 
