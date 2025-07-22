@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+using UnityEngine;
 
 abstract class PlayerState
 {
@@ -45,6 +44,9 @@ class JumpState : PlayerState
 {
     public override void Update()
     {
+        if (_player.JumpCount > 0)
+            return;
+
         Rigidbody2D rigidbody = _player.GetComponent<Rigidbody2D>();
         if (rigidbody.linearVelocity.y < 0f)
         {
@@ -53,6 +55,7 @@ class JumpState : PlayerState
 
         rigidbody.AddForce(Vector2.up * _player.JumpVelocity);
 
+        ++_player.JumpCount;
         _player.JumpValue = false;
     }
 }
@@ -61,7 +64,7 @@ static class PlayerStateFactory
 {
     public static PlayerState Get(Player player, PlayerState playerState)
     {
-        if (player.JumpValue == true)
+        if (player.JumpValue == true && player.JumpCount == 0)
         {
             return new JumpState();
         }

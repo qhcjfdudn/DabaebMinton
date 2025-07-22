@@ -60,7 +60,10 @@ public class LocalPlayModeInputManager : MonoBehaviour
             return;
 
         if (context.performed)
-            Jump(_player1);
+            Jump(_player1, true);
+
+        if (context.canceled)
+            Jump(_player1, false);
 
     }
 
@@ -73,7 +76,10 @@ public class LocalPlayModeInputManager : MonoBehaviour
             return;
 
         if (context.performed)
-            Jump(_player2);
+            Jump(_player2, true);
+
+        if (context.canceled)
+            Jump(_player2, false);
     }
 
     public void OnPlayer1Swing(InputAction.CallbackContext context)
@@ -183,9 +189,9 @@ public class LocalPlayModeInputManager : MonoBehaviour
         player.MoveValue = moveValue;
     }
 
-    private void Jump(Player player)
+    private void Jump(Player player, bool value)
     {
-        player.JumpValue = true;
+        player.JumpValue = value;
     }
 
     private Player FindPlayer(string playerName)

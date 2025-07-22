@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     public Vector2 MoveValue { get; set; }
 
     public bool JumpValue { get; set; }
+    public int JumpCount { get; set; } = 0;
 
     private Rigidbody2D _rigidbody;
     private Animator _animator;
@@ -137,6 +138,14 @@ public class Player : MonoBehaviour
     private void Update()
     {
         UpdateState();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if ((collision.gameObject.CompareTag("Court") || collision.gameObject.CompareTag("PenaltyArea")) && JumpCount > 0)
+        {
+            JumpCount = 0;
+        }
     }
 }
 
