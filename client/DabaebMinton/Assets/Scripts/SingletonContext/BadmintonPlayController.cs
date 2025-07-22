@@ -328,13 +328,13 @@ public class BadmintonPlayController : MonoBehaviour
         {
             PauseGame(EPauseReason.ShuttlecockTouchTheGroundLeft);
             AddScoreTo(_player2);
-            CheckScore();
+            CheckGameEnd();
         }
         else if (groundType == EGroundType.Right)
         {
             PauseGame(EPauseReason.ShuttlecockTouchTheGroundRight);
             AddScoreTo(_player1);
-            CheckScore();
+            CheckGameEnd();
         }
         else
         {
@@ -363,7 +363,7 @@ public class BadmintonPlayController : MonoBehaviour
 
         PauseGame(EPauseReason.ShuttlecockTouchThePenaltyArea);
         AddScoreTo(winPlayer);
-        CheckScore();
+        CheckGameEnd();
     }
 
     private void AddScoreTo(Player player)
@@ -380,7 +380,7 @@ public class BadmintonPlayController : MonoBehaviour
         }
     }
 
-    private async void CheckScore()
+    private async void CheckGameEnd()
     {
         // 누군가 endScore 점수 달성시 게임 종료 및 메인 페이지로 이동
         if (_player1Score >= _endScore || _player2Score >= _endScore)
