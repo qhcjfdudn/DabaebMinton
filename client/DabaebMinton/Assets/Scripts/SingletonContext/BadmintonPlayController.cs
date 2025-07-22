@@ -1,13 +1,15 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static ShuttlecockMovementStrategyFactory;
 
-public class GameManager : MonoBehaviour
+public class BadmintonPlayController : MonoBehaviour
 {
     public EPlayMode PlayMode { get; private set; }
 
     public BadmintonCourtConfig _badmintonCourtConfig;
     BadmintonNet _badmintonNet;
+    BadmintonGround _badmintonCourt;
     Shuttlecock _shuttlecock;
 
     Player _player1, _player2;
@@ -15,10 +17,9 @@ public class GameManager : MonoBehaviour
     
     Player _lastTouchedPlayer;
 
-    private UIScore _uiScore;
-
     private EGamePlayState _gamePlayState;
 
+    private int _player1Score, _player2Score;
     private int _endScore;
 
     private BadmintonPlayUIController _badmintonPlayUIController;
@@ -276,13 +277,25 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning("[PauseGame] Pause reason is None.");
                 break;
 
-            case EPauseReason.ShuttlecockTouchTheCourt:
-                Debug.Log("[PauseGame] Shuttlecock touched the ground.");
+            case EPauseReason.ShuttlecockTouchTheGroundLeft:
+                Debug.Log("[PauseGame] Shuttlecock touched the left ground.");
 
                 _gamePlayState = EGamePlayState.Paused;
 
-                CalculateScore();
+                return true;
 
+            case EPauseReason.ShuttlecockTouchTheGroundRight:
+                Debug.Log("[PauseGame] Shuttlecock touched the right ground.");
+
+                _gamePlayState = EGamePlayState.Paused;
+
+                return true;
+
+            case EPauseReason.ShuttlecockTouchThePenaltyArea:
+                Debug.Log("[PauseGame] Shuttlecock touched the penalty area.");
+                
+                _gamePlayState = EGamePlayState.Paused;
+                
                 return true;
 
             default:
@@ -305,44 +318,75 @@ public class GameManager : MonoBehaviour
         _gamePlayState = EGamePlayState.Playing;
     }
 
-    private async void CalculateScore()
+    public void TouchTheGround(EGroundType groundType)
     {
-        float shuttlecockX = _shuttlecock.transform.position.x;
-        float netX = _badmintonNet.transform.position.x;
-        float leftBoundary = -_badmintonCourtConfig.courtWidth / 2;
-        float rightBoundary = _badmintonCourtConfig.courtWidth / 2;
-
-        if (_lastTouchedPlayer == _player1)
+        if (IsGamePaused())
         {
-            if (netX < shuttlecockX && shuttlecockX < rightBoundary)
-            {
-                Debug.Log("[AddScore] Player 1 scores.");
-                _uiScore.AddScore(1);
-            }
-            else
-            {
-                Debug.Log("[AddScore] Player 2 scores.");
-                _uiScore.AddScore(2);
-            }
+            return;
+        }
+
+        if (groundType == EGroundType.Left)
+        {
+            PauseGame(EPauseReason.ShuttlecockTouchTheGroundLeft);
+            AddScoreTo(_player2);
+            CheckScore();
+        }
+        else if (groundType == EGroundType.Right)
+        {
+            PauseGame(EPauseReason.ShuttlecockTouchTheGroundRight);
+            AddScoreTo(_player1);
+            CheckScore();
         }
         else
         {
-            if (leftBoundary < shuttlecockX && shuttlecockX < netX )
-            {
-                Debug.Log("[AddScore] Player 2 scores.");
-                _uiScore.AddScore(2);
-            }
-            else
-            {
-                Debug.Log("[AddScore] Player 1 scores.");
-                _uiScore.AddScore(1);
-            }
+            Debug.LogWarning("[TouchTheGround] Unknown ground type.");
+        }
+    }
+
+    public void TouchThePenaltyArea()
+    {
+        if (IsGamePaused())
+        {
+            return;
         }
 
-        // 누군가 endScore 점수 달성시 게임 종료 및 메인 페이지로 이동
-        if (_uiScore.Player1Score >= _endScore || _uiScore.Player2Score >= _endScore)
+        Player winPlayer = null;
+
+        if (_lastTouchedPlayer == _player1)
+            winPlayer = _player2;
+        else if (_lastTouchedPlayer == _player2)
+            winPlayer = _player1;
+        else
         {
-            string winner = _uiScore.Player1Score >= _endScore ? _player1.name : _player2.name;
+            Debug.LogWarning("[TouchThePenaltyArea] Last touched player is null.");
+            return;
+        }
+
+        PauseGame(EPauseReason.ShuttlecockTouchThePenaltyArea);
+        AddScoreTo(winPlayer);
+        CheckScore();
+    }
+
+    private void AddScoreTo(Player player)
+    {
+        if (player == _player1)
+        {
+            _player1Score++;
+            _badmintonPlayUIController.SetScore(1, _player1Score);
+        }
+        else if (player == _player2)
+        {
+            _player2Score++;
+            _badmintonPlayUIController.SetScore(2, _player2Score);
+        }
+    }
+
+    private async void CheckScore()
+    {
+        // 누군가 endScore 점수 달성시 게임 종료 및 메인 페이지로 이동
+        if (_player1Score >= _endScore || _player2Score >= _endScore)
+        {
+            string winner = _player1Score >= _endScore ? _player1.name : _player2.name;
 
             _badmintonPlayUIController.ShowWinnerText(winner);
             QuitGame();
@@ -372,6 +416,7 @@ public class GameManager : MonoBehaviour
 
     private void CreateBadmintonCourt()
     {
+        _badmintonCourt = GameObject.Find("BadmintonCourt").GetComponent<BadmintonGround>();
         _badmintonNet = GameObject.Find("BadmintonNet").GetComponent<BadmintonNet>();
     }
 
@@ -435,8 +480,6 @@ public class GameManager : MonoBehaviour
         
         CreatePlayer();
 
-        _uiScore = FindFirstObjectByType<UIScore>();
-
         _endScore = PlayerPrefs.GetInt("score");
         int difficulty = PlayerPrefs.GetInt("difficulty");
         SetShuttlecockMovementStrategy((EShuttlecockSpeed)difficulty);
@@ -462,6 +505,8 @@ public enum EGamePlayState
 public enum EPauseReason
 {
     None,
-    ShuttlecockTouchTheCourt,
+    ShuttlecockTouchTheGroundLeft,
+    ShuttlecockTouchTheGroundRight,
+    ShuttlecockTouchThePenaltyArea,
     MAX
 }

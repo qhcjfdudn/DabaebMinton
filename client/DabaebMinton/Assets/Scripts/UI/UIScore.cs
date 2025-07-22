@@ -15,16 +15,16 @@ public class UIScore : MonoBehaviour
     private float _player1Score, _player2Score;
     TMP_Text _player1ScoreText, _player2ScoreText;
 
-    public void AddScore(int player)
+    public void SetScore(int player, int score)
     {
         if (player == 1)
         {
-            _player1Score++;
+            _player1Score = score;
             _player1ScoreText.text = _player1Score.ToString();
         }
         else if (player == 2)
         {
-            _player2Score++;
+            _player2Score = score;
             _player2ScoreText.text = _player2Score.ToString();
         }
     }

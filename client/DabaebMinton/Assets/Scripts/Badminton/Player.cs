@@ -142,7 +142,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if ((collision.gameObject.CompareTag("Court") || collision.gameObject.CompareTag("PenaltyArea")) && JumpCount > 0)
+        if ((collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("PenaltyArea")) && JumpCount > 0)
         {
             JumpCount = 0;
         }

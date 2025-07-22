@@ -3,12 +3,12 @@ using UnityEngine.InputSystem;
 
 public class OnlinePlayModeInputManager : MonoBehaviour
 {
-    GameManager _gameManager;
+    BadmintonPlayController _badmintonPlayController;
     Player _player;
 
     private void Start()
     {
-        _gameManager = FindFirstObjectByType<GameManager>().GetComponent<GameManager>();
+        _badmintonPlayController = FindFirstObjectByType<BadmintonPlayController>().GetComponent<BadmintonPlayController>();
         //_player = FindPlayer("Player2");
     }
 
@@ -28,7 +28,7 @@ public class OnlinePlayModeInputManager : MonoBehaviour
     {
         Debug.Log($"OnlinePlayModeInputManager - player: {player}, moveValue: {moveValue}");
 
-        // RPC ¿¸º€
+        // RPC Ï†ÑÏÜ°
     }
 
     public void OnPlayerJump(InputAction.CallbackContext context)
@@ -48,7 +48,7 @@ public class OnlinePlayModeInputManager : MonoBehaviour
     {
         Debug.Log($"OnlinePlayModeInputManager - Jump player: {player}");
 
-        // online¿Ã∏È RPC ¿¸º€
+        // onlineÏù¥Î©¥ RPC Ï†ÑÏÜ°
     }
 
     private Player FindPlayer(string playerName)

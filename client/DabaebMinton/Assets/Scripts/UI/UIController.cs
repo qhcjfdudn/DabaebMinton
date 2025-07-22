@@ -55,7 +55,7 @@ public class UIController : MonoBehaviour
         Debug.Log($"output.Count: {output.Count}");
         _networkManager.OutBuffer.WriteBits(output.StreamBuffer, output.Count);
 
-        // ÆíÀÇ»ó ¹ß½ÅÇØº¸ÀÚ. ÃßÈÄ NetworkManager°¡ ÀÚµ¿À¸·Î ¹ß½ÅÇÏ´Â ÄÚµå·Î º¯°æ
+        // í¸ì˜ìƒ ë°œì‹ í•´ë³´ì. ì¶”í›„ NetworkManagerê°€ ìë™ìœ¼ë¡œ ë°œì‹ í•˜ëŠ” ì½”ë“œë¡œ ë³€ê²½
         //_networkManagerUI.SendPacketsToServer();
     }
 
@@ -69,7 +69,7 @@ public class UIController : MonoBehaviour
 
     public void OnClickToggleNetworkModeButton()
     {
-        GameManager gameManager = FindFirstObjectByType<GameManager>().GetComponent<GameManager>();
+        BadmintonPlayController gameManager = FindFirstObjectByType<BadmintonPlayController>().GetComponent<BadmintonPlayController>();
         gameManager.TogglePlayMode();
     }
 }

@@ -5,8 +5,8 @@ TagManager:
   serializedVersion: 3
   tags:
   - Shuttlecock
-  - Court
   - PenaltyArea
+  - Ground
   layers:
   - Default
   - TransparentFX
