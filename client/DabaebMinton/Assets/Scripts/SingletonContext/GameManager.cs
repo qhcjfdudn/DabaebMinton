@@ -276,7 +276,7 @@ public class GameManager : MonoBehaviour
                 Debug.LogWarning("[PauseGame] Pause reason is None.");
                 break;
 
-            case EPauseReason.ShuttlecockTouchTheGround:
+            case EPauseReason.ShuttlecockTouchTheCourt:
                 Debug.Log("[PauseGame] Shuttlecock touched the ground.");
 
                 _gamePlayState = EGamePlayState.Paused;
@@ -291,6 +291,11 @@ public class GameManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    public bool IsGamePaused()
+    {
+        return _gamePlayState == EGamePlayState.Paused;
     }
 
     public void StartNewGame()
@@ -425,8 +430,8 @@ public class GameManager : MonoBehaviour
     {
         CreateLevel();
 
-        _player1InitPos = new Vector2(-_badmintonCourtConfig.courtWidth / 2 + 2f, 5);
-        _player2InitPos = new Vector2(_badmintonCourtConfig.courtWidth / 2 - 2f, 5);
+        _player1InitPos = new Vector2(-3f, 3);
+        _player2InitPos = new Vector2(3f, 3);
         
         CreatePlayer();
 
@@ -457,6 +462,6 @@ public enum EGamePlayState
 public enum EPauseReason
 {
     None,
-    ShuttlecockTouchTheGround,
+    ShuttlecockTouchTheCourt,
     MAX
 }

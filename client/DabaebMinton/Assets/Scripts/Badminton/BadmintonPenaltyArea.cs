@@ -19,7 +19,7 @@ public class BadmintonPenaltyArea : MonoBehaviour
         {
             Debug.Log($"[Collision] {gameObject.name}");
 
-            _gameManager.PauseGame(EPauseReason.ShuttlecockTouchTheGround);
+            _gameManager.PauseGame(EPauseReason.ShuttlecockTouchTheCourt);
 
             return;
         }
