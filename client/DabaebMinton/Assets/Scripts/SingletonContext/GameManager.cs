@@ -21,8 +21,7 @@ public class GameManager : MonoBehaviour
 
     private int _endScore;
 
-    public RectTransform _showingPlayResultPanel;
-    public TMPro.TMP_Text _winPlayerText;
+    private BadmintonPlayUIController _badmintonPlayUIController;
 
     public void TogglePlayMode()
     {
@@ -340,7 +339,7 @@ public class GameManager : MonoBehaviour
         {
             string winner = _uiScore.Player1Score >= _endScore ? _player1.name : _player2.name;
 
-            ShowWinnerText(winner);
+            _badmintonPlayUIController.ShowWinnerText(winner);
             QuitGame();
             return;
         }
@@ -348,12 +347,6 @@ public class GameManager : MonoBehaviour
         await Awaitable.WaitForSecondsAsync(1f);
 
         StartNewGame();
-    }
-
-    private void ShowWinnerText(string winner)
-    {
-        _winPlayerText.text = winner;
-        _showingPlayResultPanel.gameObject.SetActive(true);
     }
 
     private async void QuitGame()
@@ -445,7 +438,7 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"Score: {_endScore}, Difficulty: {difficulty}");
 
-        _showingPlayResultPanel.gameObject.SetActive(false);
+        _badmintonPlayUIController = FindFirstObjectByType<BadmintonPlayUIController>();
 
         Debug.Log("End of GameManager Start()");
     }
