@@ -276,21 +276,21 @@ public class BadmintonPlayController : MonoBehaviour
                 Debug.LogWarning("[PauseGame] Pause reason is None.");
                 break;
 
-            case EPauseReason.ShuttlecockTouchTheGroundLeft:
+            case EPauseReason.ShuttlecockTouchGroundLeft:
                 Debug.Log("[PauseGame] Shuttlecock touched the left ground.");
 
                 _gamePlayState = EGamePlayState.Paused;
 
                 return true;
 
-            case EPauseReason.ShuttlecockTouchTheGroundRight:
+            case EPauseReason.ShuttlecockTouchGroundRight:
                 Debug.Log("[PauseGame] Shuttlecock touched the right ground.");
 
                 _gamePlayState = EGamePlayState.Paused;
 
                 return true;
 
-            case EPauseReason.ShuttlecockTouchThePenaltyArea:
+            case EPauseReason.ShuttlecockTouchPenaltyArea:
                 Debug.Log("[PauseGame] Shuttlecock touched the penalty area.");
                 
                 _gamePlayState = EGamePlayState.Paused;
@@ -317,7 +317,7 @@ public class BadmintonPlayController : MonoBehaviour
         _gamePlayState = EGamePlayState.Playing;
     }
 
-    public void TouchTheGround(EGroundType groundType)
+    public void TouchGround(EGroundType groundType)
     {
         if (IsGamePaused())
         {
@@ -326,13 +326,13 @@ public class BadmintonPlayController : MonoBehaviour
 
         if (groundType == EGroundType.Left)
         {
-            PauseGame(EPauseReason.ShuttlecockTouchTheGroundLeft);
+            PauseGame(EPauseReason.ShuttlecockTouchGroundLeft);
             AddScoreTo(_player2);
             CheckGameEnd();
         }
         else if (groundType == EGroundType.Right)
         {
-            PauseGame(EPauseReason.ShuttlecockTouchTheGroundRight);
+            PauseGame(EPauseReason.ShuttlecockTouchGroundRight);
             AddScoreTo(_player1);
             CheckGameEnd();
         }
@@ -342,7 +342,7 @@ public class BadmintonPlayController : MonoBehaviour
         }
     }
 
-    public void TouchThePenaltyArea()
+    public void TouchPenaltyArea()
     {
         if (IsGamePaused())
         {
@@ -361,7 +361,7 @@ public class BadmintonPlayController : MonoBehaviour
             return;
         }
 
-        PauseGame(EPauseReason.ShuttlecockTouchThePenaltyArea);
+        PauseGame(EPauseReason.ShuttlecockTouchPenaltyArea);
         AddScoreTo(winPlayer);
         CheckGameEnd();
     }
@@ -490,7 +490,11 @@ public class BadmintonPlayController : MonoBehaviour
     }
 }
 
-public enum EPlayMode { None, isLocal, isOnline, MAX }
+public enum EPlayMode { 
+    None, 
+    isLocal, 
+    isOnline, 
+    MAX }
 
 public enum EGamePlayState
 {
@@ -503,8 +507,8 @@ public enum EGamePlayState
 public enum EPauseReason
 {
     None,
-    ShuttlecockTouchTheGroundLeft,
-    ShuttlecockTouchTheGroundRight,
-    ShuttlecockTouchThePenaltyArea,
+    ShuttlecockTouchGroundLeft,
+    ShuttlecockTouchGroundRight,
+    ShuttlecockTouchPenaltyArea,
     MAX
 }

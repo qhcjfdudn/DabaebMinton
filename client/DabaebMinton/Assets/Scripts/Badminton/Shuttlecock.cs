@@ -85,7 +85,7 @@ public class Shuttlecock : MonoBehaviour
         if (collision.collider.CompareTag("Ground"))
         {
             BadmintonGround ground = collision.collider.GetComponent<BadmintonGround>();
-            _badmintonPlayController.TouchTheGround(ground._groundType);
+            _badmintonPlayController.TouchGround(ground._groundType);
 
             return;
         }
@@ -93,7 +93,7 @@ public class Shuttlecock : MonoBehaviour
         if (collision.collider.CompareTag("PenaltyArea"))
         {
             BadmintonPenaltyArea penaltyArea = collision.collider.GetComponent<BadmintonPenaltyArea>();
-            _badmintonPlayController.TouchThePenaltyArea();
+            _badmintonPlayController.TouchPenaltyArea();
             
             return;
         }
