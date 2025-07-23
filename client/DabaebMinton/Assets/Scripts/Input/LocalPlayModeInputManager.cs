@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class LocalPlayModeInputManager : MonoBehaviour
 {
-    private BadmintonPlayController _badmintonPlayController;
+    private BadmintonController _badmintonController;
     private Player _player1, _player2;
 
     public void OnPlayer1Move(InputAction.CallbackContext context)
@@ -100,7 +100,7 @@ public class LocalPlayModeInputManager : MonoBehaviour
         {
             if (charger.StopCharging(ESwingChargerState.Swing))
             {
-                _badmintonPlayController.SwingShuttlecock(_player1);
+                _badmintonController.SwingShuttlecock(_player1);
                 charger.Release();
             }
 
@@ -125,7 +125,7 @@ public class LocalPlayModeInputManager : MonoBehaviour
         {
             if (charger.StopCharging(ESwingChargerState.Swing))
             {
-                _badmintonPlayController.SwingShuttlecock(_player2);
+                _badmintonController.SwingShuttlecock(_player2);
                 charger.Release();
             }
 
@@ -150,7 +150,7 @@ public class LocalPlayModeInputManager : MonoBehaviour
         {
             if (charger.StopCharging(ESwingChargerState.ActionSwing))
             {
-                _badmintonPlayController.ActionSwingShuttlecock(_player1);
+                _badmintonController.ActionSwingShuttlecock(_player1);
                 charger.Release();
             }
 
@@ -176,7 +176,7 @@ public class LocalPlayModeInputManager : MonoBehaviour
         {
             if (charger.StopCharging(ESwingChargerState.ActionSwing))
             {
-                _badmintonPlayController.ActionSwingShuttlecock(_player2);
+                _badmintonController.ActionSwingShuttlecock(_player2);
                 charger.Release();
             }
 
@@ -215,8 +215,8 @@ public class LocalPlayModeInputManager : MonoBehaviour
 
     private void Start()
     {
-        _badmintonPlayController = 
-            FindFirstObjectByType<BadmintonPlayController>()
-            .GetComponent<BadmintonPlayController>();
+        _badmintonController = 
+            FindFirstObjectByType<BadmintonController>()
+            .GetComponent<BadmintonController>();
     }
 }

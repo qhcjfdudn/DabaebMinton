@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 5289560862825213621}
   - component: {fileID: 5530536611991768702}
   m_Layer: 0
-  m_Name: BadmintonPlayController
+  m_Name: BadmintonController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,10 +75,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6094672342581639501}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd28fece8adc09e40b12a70f946d5f53, type: 3}
+  m_Script: {fileID: 11500000, guid: c2d338bc185516f448e6f65000554699, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _badmintonCourtConfig: {fileID: 11400000, guid: 06c55d332e39e8b448edad0db0dca29c, type: 2}
 --- !u!1001 &2310672505134541802
 PrefabInstance:
   m_ObjectHideFlags: 0

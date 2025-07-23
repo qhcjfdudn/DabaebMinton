@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static ShuttlecockMovementStrategyFactory;
 
-public class BadmintonPlayController : MonoBehaviour
+public class BadmintonController : MonoBehaviour
 {
     public EPlayMode PlayMode { get; private set; }
 

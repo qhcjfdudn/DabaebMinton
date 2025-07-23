@@ -39,8 +39,6 @@ public class UIController : MonoBehaviour
         Debug.Log($"UsernameInputField: {username}");
 
         SetUsernameRPC(username);
-
-        
     }
 
     public void SetUsernameRPC(string username)
@@ -69,7 +67,7 @@ public class UIController : MonoBehaviour
 
     public void OnClickToggleNetworkModeButton()
     {
-        BadmintonPlayController gameManager = FindFirstObjectByType<BadmintonPlayController>().GetComponent<BadmintonPlayController>();
-        gameManager.TogglePlayMode();
+        BadmintonController badmintonController = FindFirstObjectByType<BadmintonController>().GetComponent<BadmintonController>();
+        badmintonController.TogglePlayMode();
     }
 }

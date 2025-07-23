@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Shuttlecock : MonoBehaviour
 {
-    public BadmintonPlayController _badmintonPlayController;
+    public BadmintonController _badmintonController;
     public NetAction _netAction;
 
     private ShuttlecockMovementStrategy _movementStrategy;
@@ -85,7 +85,7 @@ public class Shuttlecock : MonoBehaviour
         if (collision.collider.CompareTag("Ground"))
         {
             BadmintonGround ground = collision.collider.GetComponent<BadmintonGround>();
-            _badmintonPlayController.TouchGround(ground._groundType);
+            _badmintonController.TouchGround(ground._groundType);
 
             return;
         }
@@ -93,7 +93,7 @@ public class Shuttlecock : MonoBehaviour
         if (collision.collider.CompareTag("PenaltyArea"))
         {
             BadmintonPenaltyArea penaltyArea = collision.collider.GetComponent<BadmintonPenaltyArea>();
-            _badmintonPlayController.TouchPenaltyArea();
+            _badmintonController.TouchPenaltyArea();
             
             return;
         }

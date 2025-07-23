@@ -3,12 +3,12 @@ using UnityEngine.InputSystem;
 
 public class OnlinePlayModeInputManager : MonoBehaviour
 {
-    BadmintonPlayController _badmintonPlayController;
+    BadmintonController _badmintonController;
     Player _player;
 
     private void Start()
     {
-        _badmintonPlayController = FindFirstObjectByType<BadmintonPlayController>().GetComponent<BadmintonPlayController>();
+        _badmintonController = FindFirstObjectByType<BadmintonController>().GetComponent<BadmintonController>();
         //_player = FindPlayer("Player2");
     }
 
