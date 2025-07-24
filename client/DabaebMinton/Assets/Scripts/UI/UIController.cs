@@ -67,7 +67,9 @@ public class UIController : MonoBehaviour
 
     public void OnClickToggleNetworkModeButton()
     {
-        BadmintonController badmintonController = FindFirstObjectByType<BadmintonController>().GetComponent<BadmintonController>();
-        badmintonController.TogglePlayMode();
+        BadmintonControllerComponent badmintonControllerComponent =
+            FindFirstObjectByType<BadmintonControllerComponent>()
+            .GetComponent<BadmintonControllerComponent>();
+        badmintonControllerComponent.TogglePlayMode();
     }
 }

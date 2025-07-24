@@ -1,51 +1,20 @@
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using static ShuttlecockMovementStrategyFactory;
 
-public class BadmintonController : MonoBehaviour
+public class BadmintonController
 {
-    public EPlayMode PlayMode { get; private set; }
+    protected Player _player1, _player2;
+    protected Player _lastTouchedPlayer;
 
-    BadmintonNet _badmintonNet;
-    float shortServiceLine = 1.98f;
-    Shuttlecock _shuttlecock;
-
-    Player _player1, _player2;
-    Vector2 _player1InitPos, _player2InitPos;
-    
-    Player _lastTouchedPlayer;
+    private BadmintonNet _badmintonNet;
+    private float _shortServiceLine = 1.98f;
+    private Shuttlecock _shuttlecock;
 
     private EGamePlayState _gamePlayState;
 
-    private int _player1Score, _player2Score;
-    private int _endScore;
-
-    private BadmintonPlayUIController _badmintonPlayUIController;
-
-    public void TogglePlayMode()
+    public virtual void Initialize()
     {
-        switch (PlayMode)
-        {
-            case EPlayMode.None:
-                PlayMode = EPlayMode.isLocal;
-                break;
-            case EPlayMode.isLocal:
-                PlayMode = EPlayMode.isOnline;
-                break;
-            case EPlayMode.isOnline:
-                PlayMode = EPlayMode.isLocal;
-                break;
-            default:
-                PlayMode = EPlayMode.isLocal;
-                break;
-        }
 
-        InputManager inputManagerController =
-            FindFirstObjectByType<InputManager>()
-            .GetComponent<InputManager>();
-
-        inputManagerController.SetActionMapBy(PlayMode);
     }
 
     public void SwingShuttlecock(Player player)
@@ -99,7 +68,7 @@ public class BadmintonController : MonoBehaviour
         SwingCharger charger = player.GetComponentInChildren<SwingCharger>();
         float chargeRatio = (charger.ChargeGauge - SwingCharger.MIN_CHARGE_VALUE) / (SwingCharger.MAX_CHARGE_VALUE - SwingCharger.MIN_CHARGE_VALUE);
 
-        if (shortServiceLine > Mathf.Abs(player.transform.position.x))
+        if (_shortServiceLine > Mathf.Abs(player.transform.position.x))
         {
             if (shuttlecockHeight > netHeight)
             {
@@ -237,30 +206,6 @@ public class BadmintonController : MonoBehaviour
         }
     }
 
-    public void PlaceInitPosition(Player player)
-    {
-        if (player == null)
-        {
-            Debug.LogError("Player is null.");
-            return;
-        }
-
-        if (player == _player1)
-        {
-            player.transform.position = _player1InitPos;
-        }
-        else if (player == _player2)
-        {
-            player.transform.position = _player2InitPos;
-        }
-        else
-        {
-            Debug.LogError("Unknown player.");
-        }
-
-        player.GetComponent<Rigidbody2D>().linearVelocity = Vector3.zero;
-    }
-
     public bool PauseGame(EPauseReason pauseReason)
     {
         if (_gamePlayState == EGamePlayState.Paused)
@@ -317,184 +262,29 @@ public class BadmintonController : MonoBehaviour
         _gamePlayState = EGamePlayState.Playing;
     }
 
-    public void TouchGround(EGroundType groundType)
+    public virtual void TouchGround(EGroundType groundType)
     {
-        if (IsGamePaused())
-        {
-            return;
-        }
-
-        if (groundType == EGroundType.Left)
-        {
-            PauseGame(EPauseReason.ShuttlecockTouchGroundLeft);
-            AddScoreTo(_player2);
-            CheckGameEnd();
-        }
-        else if (groundType == EGroundType.Right)
-        {
-            PauseGame(EPauseReason.ShuttlecockTouchGroundRight);
-            AddScoreTo(_player1);
-            CheckGameEnd();
-        }
-        else
-        {
-            Debug.LogWarning("[TouchTheGround] Unknown ground type.");
-        }
-    }
-
-    public void TouchPenaltyArea()
-    {
-        if (IsGamePaused())
-        {
-            return;
-        }
-
-        Player winPlayer = null;
-
-        if (_lastTouchedPlayer == _player1)
-            winPlayer = _player2;
-        else if (_lastTouchedPlayer == _player2)
-            winPlayer = _player1;
-        else
-        {
-            Debug.LogWarning("[TouchThePenaltyArea] Last touched player is null.");
-            return;
-        }
-
-        PauseGame(EPauseReason.ShuttlecockTouchPenaltyArea);
-        AddScoreTo(winPlayer);
-        CheckGameEnd();
-    }
-
-    private void AddScoreTo(Player player)
-    {
-        if (player == _player1)
-        {
-            _player1Score++;
-            _badmintonPlayUIController.SetScore(1, _player1Score);
-        }
-        else if (player == _player2)
-        {
-            _player2Score++;
-            _badmintonPlayUIController.SetScore(2, _player2Score);
-        }
-    }
-
-    private async void CheckGameEnd()
-    {
-        // 누군가 endScore 점수 달성시 게임 종료 및 메인 페이지로 이동
-        if (_player1Score >= _endScore || _player2Score >= _endScore)
-        {
-            string winner = _player1Score >= _endScore ? _player1.name : _player2.name;
-
-            _badmintonPlayUIController.ShowWinnerText(winner);
-            QuitGame();
-            return;
-        }
-
-        await Awaitable.WaitForSecondsAsync(1f);
-
         StartNewGame();
     }
 
-    private async void QuitGame()
+    public virtual void TouchPenaltyArea()
     {
-        Debug.Log($"[GameEnd] A player reached {_endScore} points. Ending game...");
-        Debug.Log("[QuitGame] Game is ending...");
-
-        await Awaitable.WaitForSecondsAsync(3f);
-
-        SceneManager.LoadScene("MainMenuScene");
+        StartNewGame();
     }
 
-    private void CreateLevel()
+    public void SetLevel(BadmintonNet badmintonNet, Shuttlecock shuttlecock, float shortServiceLine)
     {
-        CreateBadmintonCourt();
-        CreateShuttlecock();
+        _badmintonNet = badmintonNet;
+        _shuttlecock = shuttlecock;
+        _shortServiceLine = shortServiceLine;
     }
 
-    private void CreateBadmintonCourt()
+    public void SetPlayer(Player player1, Player player2)
     {
-        _badmintonNet = GameObject.Find("BadmintonNet").GetComponent<BadmintonNet>();
-    }
-
-    private void CreateShuttlecock()
-    {
-        GameObject go = GameObject.FindGameObjectWithTag("Shuttlecock");
-
-        if (go == null)
-        {
-            Debug.Log("[Error] Shuttlecock is null.");
-            return;
-        }
-
-        _shuttlecock = go.GetComponent<Shuttlecock>();
-    }
-
-    private void CreatePlayer()
-    {
-        _player1 = InstantiatePlayer("Prefabs/Player1", "Player1", _player1InitPos);
-        _player1.InitializeStat(GetInitialData(_player1.GetComponent<Player>().CharacterID));
-
-        _player2 = InstantiatePlayer("Prefabs/Player2", "Player2", _player2InitPos);
-        _player2.InitializeStat(GetInitialData(_player2.GetComponent<Player>().CharacterID));
-    }
-
-    private Player InstantiatePlayer(string path, string name, Vector2 position)
-    {
-        GameObject playerPrefab = Resources.Load<GameObject>(path);
-        GameObject player = Instantiate(playerPrefab);
-        player.name = name;
-        player.transform.position = position;
-
-        return player.GetComponent<Player>();
-    }
-
-    private CharacterInitialData GetInitialData(ECharacterID characterID)
-    {
-        switch (characterID)
-        {
-            case ECharacterID.Daramgee:
-                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/DaramgeeInitialData");
-            case ECharacterID.Baebsae:
-                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/BaebsaeInitialData");
-        }
-
-        return null;
-    }
-
-    private void Awake()
-    {
-        PlayMode = EPlayMode.isLocal;
-    }
-
-    // Start is called before the first frame update
-    private void Start()
-    {
-        CreateLevel();
-
-        _player1InitPos = new Vector2(-3f, 3);
-        _player2InitPos = new Vector2(3f, 3);
-        
-        CreatePlayer();
-
-        _endScore = PlayerPrefs.GetInt("score");
-        int difficulty = PlayerPrefs.GetInt("difficulty");
-        SetShuttlecockMovementStrategy((EShuttlecockSpeed)difficulty);
-
-        Debug.Log($"Score: {_endScore}, Difficulty: {difficulty}");
-
-        _badmintonPlayUIController = FindFirstObjectByType<BadmintonPlayUIController>();
-
-        Debug.Log("End of GameManager Start()");
+        _player1 = player1;
+        _player2 = player2;
     }
 }
-
-public enum EPlayMode { 
-    None, 
-    isLocal, 
-    isOnline, 
-    MAX }
 
 public enum EGamePlayState
 {

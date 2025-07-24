@@ -8,7 +8,11 @@ public class OnlinePlayModeInputManager : MonoBehaviour
 
     private void Start()
     {
-        _badmintonController = FindFirstObjectByType<BadmintonController>().GetComponent<BadmintonController>();
+        _badmintonController =
+            FindFirstObjectByType<BadmintonControllerComponent>()
+            .GetComponent<BadmintonControllerComponent>()
+            .BadmintonController;
+        
         //_player = FindPlayer("Player2");
     }
 
