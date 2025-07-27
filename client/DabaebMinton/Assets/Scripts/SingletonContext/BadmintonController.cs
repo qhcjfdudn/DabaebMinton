@@ -9,6 +9,7 @@ public class BadmintonController
     private BadmintonNet _badmintonNet;
     private float _shortServiceLine = 1.98f;
     private Shuttlecock _shuttlecock;
+    private Vector2 _shuttlecockInitialPosition = new Vector2(-5f, 6f);
 
     private EGamePlayState _gamePlayState;
 
@@ -184,7 +185,7 @@ public class BadmintonController
 
     public void MoveShuttlecockInitialPosition()
     {
-        _shuttlecock.Move(new Vector2(-5f, 6f));
+        _shuttlecock.Move(_shuttlecockInitialPosition);
     }
 
     public void SetShuttlecockMovementStrategy(EShuttlecockSpeed difficultyType)
