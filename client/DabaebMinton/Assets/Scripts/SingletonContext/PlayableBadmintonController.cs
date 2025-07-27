@@ -19,11 +19,12 @@ public class PlayableBadmintonController : BadmintonController
         _player1Score = 0;
         _player2Score = 0;
         _endScore = PlayerPrefs.GetInt("score");
+        Debug.Log($"Score: {_endScore}");
 
         _badmintonPlayUIController.SetScore(1, _player1Score);
         _badmintonPlayUIController.SetScore(2, _player2Score);
 
-        Debug.Log($"Score: {_endScore}");
+        _badmintonPlayUIController.Initialize();
 
         Debug.Log("[PlayableBadmintonController] Initialized with BadmintonPlayUIController.");
     }

@@ -14,11 +14,11 @@ public class InputManager : MonoBehaviour
     {
         switch (playMode)
         {
-            case EPlayMode.isLocal:
+            case EPlayMode.Local:
                 _playerInput.SwitchCurrentActionMap("LocalPlayMode");
                 Debug.Log("InputManagerController - Local Play Mode");
                 break;
-            case EPlayMode.isOnline:
+            case EPlayMode.Online:
                 _playerInput.SwitchCurrentActionMap("OnlinePlayMode");
                 Debug.Log("InputManagerController - Online Play Mode");
                 break;

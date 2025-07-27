@@ -6,6 +6,12 @@ public class BadmintonPlayUIController : MonoBehaviour
     public TMPro.TMP_Text _winPlayerText;
     public UIScore _uiScore;
 
+    public void Initialize()
+    {
+        _showingPlayResultPanel.gameObject.SetActive(false);
+        _uiScore.gameObject.SetActive(true);
+    }
+
     public void SetScore(int playerIndex, int score)
     {
         _uiScore.SetScore(playerIndex, score);
@@ -15,10 +21,5 @@ public class BadmintonPlayUIController : MonoBehaviour
     {
         _winPlayerText.text = winner;
         _showingPlayResultPanel.gameObject.SetActive(true);
-    }
-
-    private void Start()
-    {
-        _showingPlayResultPanel.gameObject.SetActive(false);
     }
 }

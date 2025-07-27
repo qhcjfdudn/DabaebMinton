@@ -12,16 +12,16 @@ public class BadmintonControllerComponent : MonoBehaviour
         switch (PlayMode)
         {
             case EPlayMode.None:
-                PlayMode = EPlayMode.isLocal;
+                PlayMode = EPlayMode.Local;
                 break;
-            case EPlayMode.isLocal:
-                PlayMode = EPlayMode.isOnline;
+            case EPlayMode.Local:
+                PlayMode = EPlayMode.Online;
                 break;
-            case EPlayMode.isOnline:
-                PlayMode = EPlayMode.isLocal;
+            case EPlayMode.Online:
+                PlayMode = EPlayMode.Local;
                 break;
             default:
-                PlayMode = EPlayMode.isLocal;
+                PlayMode = EPlayMode.Local;
                 break;
         }
 
@@ -100,18 +100,37 @@ public class BadmintonControllerComponent : MonoBehaviour
 
     private void Awake()
     {
-        BadmintonPlayUIController badmintonPlayUIController =
-            FindFirstObjectByType<BadmintonPlayUIController>().GetComponent<BadmintonPlayUIController>();
-
-        if (badmintonPlayUIController == null)
-        {
-            Debug.LogError("[BadmintonControllerComponent] BadmintonPlayUIController not found!");
-        }
-
-        BadmintonController = new PlayableBadmintonController(badmintonPlayUIController);
-
         _inputManager = FindFirstObjectByType<InputManager>()
             .GetComponent<InputManager>();
+
+        // 현재 게임 PlayMode라면 UI까지 포함해 초기화. Model 학습이라면 PlayController만 초기화.
+        int playMode = PlayerPrefs.GetInt("PlayMode", (int)EPlayMode.None);
+
+        Debug.Log($"[BadmintonControllerComponent] PlayMode: {(EPlayMode)playMode}");
+
+        if (playMode == (int)EPlayMode.Local)
+        {
+            BadmintonPlayUIController badmintonPlayUIController =
+                FindFirstObjectByType<BadmintonPlayUIController>().GetComponent<BadmintonPlayUIController>();
+
+            if (badmintonPlayUIController == null)
+            {
+                Debug.LogError("[BadmintonControllerComponent] BadmintonPlayUIController not found!");
+            }
+
+            BadmintonController = new PlayableBadmintonController(badmintonPlayUIController);
+        }
+        else if (playMode == (int)EPlayMode.Online)
+        {
+            
+        }
+        else
+        {
+            // 학습 모드일 경우
+
+
+            BadmintonController = new BadmintonController();
+        }
 
         Debug.Log("[BadmintonControllerComponent] Initialized with BadmintonPlayUIController.");
     }
@@ -125,7 +144,7 @@ public class BadmintonControllerComponent : MonoBehaviour
 public enum EPlayMode
 {
     None,
-    isLocal,
-    isOnline,
+    Local,
+    Online,
     MAX
 }
