@@ -1,9 +1,10 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BadmintonControllerComponent : MonoBehaviour
 {
     public EPlayMode PlayMode { get; private set; }
-    public BadmintonController BadmintonController { get; private set; }
+    public BadmintonController Controller { get; private set; }
 
     private InputManager _inputManager;
 
@@ -37,16 +38,16 @@ public class BadmintonControllerComponent : MonoBehaviour
         Player player1 = CreatePlayer("Player1", new Vector2(-3f, 3));
         Player player2 = CreatePlayer("Player2", new Vector2(3f, 3));
 
-        BadmintonController.SetLevel(
+        Controller.SetLevel(
             badmintonNet,
             shuttlecock,
             shortServiceLine);
-        BadmintonController.SetPlayer(player1, player2);
+        Controller.SetPlayer(player1, player2);
 
         int difficulty = PlayerPrefs.GetInt("difficulty");
-        BadmintonController.SetShuttlecockMovementStrategy((EShuttlecockSpeed)difficulty);
+        Controller.SetShuttlecockMovementStrategy((EShuttlecockSpeed)difficulty);
 
-        BadmintonController.Initialize();
+        Controller.Initialize();
     }
 
     private BadmintonNet CreateBadmintonNet()
@@ -100,36 +101,39 @@ public class BadmintonControllerComponent : MonoBehaviour
 
     private void Awake()
     {
+        
+
         _inputManager = FindFirstObjectByType<InputManager>()
             .GetComponent<InputManager>();
 
-        // 현재 게임 PlayMode라면 UI까지 포함해 초기화. Model 학습이라면 PlayController만 초기화.
-        int playMode = PlayerPrefs.GetInt("PlayMode", (int)EPlayMode.None);
+        EPlayMode playMode = (EPlayMode)PlayerPrefs.GetInt("PlayMode", (int)EPlayMode.None);
+        PlayerPrefs.DeleteKey("PlayMode");
 
-        Debug.Log($"[BadmintonControllerComponent] PlayMode: {(EPlayMode)playMode}");
+        Debug.Log($"[BadmintonControllerComponent] PlayMode: {playMode}");
 
-        if (playMode == (int)EPlayMode.Local)
+        if (playMode == EPlayMode.Local)
         {
-            BadmintonPlayUIController badmintonPlayUIController =
+            BadmintonPlayUIController uiController =
                 FindFirstObjectByType<BadmintonPlayUIController>().GetComponent<BadmintonPlayUIController>();
 
-            if (badmintonPlayUIController == null)
+            if (uiController == null)
             {
                 Debug.LogError("[BadmintonControllerComponent] BadmintonPlayUIController not found!");
             }
 
-            BadmintonController = new PlayableBadmintonController(badmintonPlayUIController);
-        }
-        else if (playMode == (int)EPlayMode.Online)
-        {
+            Controller = BadmintonControllerFactory.GetPlayableBadmintonController(uiController);
             
+        }
+        else if (playMode == EPlayMode.Online)
+        {
+
         }
         else
         {
             // 학습 모드일 경우
 
 
-            BadmintonController = new BadmintonController();
+            Controller = BadmintonControllerFactory.GetDefaultBadmintonController();
         }
 
         Debug.Log("[BadmintonControllerComponent] Initialized with BadmintonPlayUIController.");
@@ -147,4 +151,16 @@ public enum EPlayMode
     Local,
     Online,
     MAX
+}
+
+public static class BadmintonControllerFactory
+{
+    public static BadmintonController GetDefaultBadmintonController()
+    {
+        return new BadmintonController();
+    }
+    public static BadmintonController GetPlayableBadmintonController(BadmintonPlayUIController badmintonPlayUIController)
+    {
+        return new PlayableBadmintonController(badmintonPlayUIController);
+    }
 }

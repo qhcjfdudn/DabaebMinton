@@ -24,6 +24,8 @@ public class MainMenuSceneController : MonoBehaviour
 
     public void onClickLocalPlayButton()
     {
+        PlayerPrefs.SetInt("PlayMode", (int)EPlayMode.Local);
+
         _mainMenuPanel.gameObject.SetActive(false);
         _levelSettingsPanel.gameObject.SetActive(true);
     }

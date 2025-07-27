@@ -218,6 +218,6 @@ public class LocalPlayModeInputManager : MonoBehaviour
         _badmintonController =
             FindFirstObjectByType<BadmintonControllerComponent>()
             .GetComponent<BadmintonControllerComponent>()
-            .BadmintonController;
+            .Controller;
     }
 }
