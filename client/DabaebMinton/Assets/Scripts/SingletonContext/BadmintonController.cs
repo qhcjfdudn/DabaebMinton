@@ -5,10 +5,10 @@ public class BadmintonController
 {
     protected Player _player1, _player2;
     protected Player _lastTouchedPlayer;
+    protected Shuttlecock _shuttlecock;
 
     private BadmintonNet _badmintonNet;
     private float _shortServiceLine = 1.98f;
-    private Shuttlecock _shuttlecock;
     private Vector2 _shuttlecockInitialPosition = new Vector2(-5f, 6f);
 
     private EGamePlayState _gamePlayState;

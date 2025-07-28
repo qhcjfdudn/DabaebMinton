@@ -164,7 +164,7 @@ public class BadmintonControllerComponent : MonoBehaviour
             // UI 없음. Input은 Action으로 자체 발생 시키므로 없음.
             // Training Mode의 Controller가 필요하다면 생성하여 여기서 할당 가능.
 
-            return BadmintonControllerFactory.GetDefaultBadmintonController();
+            return BadmintonControllerFactory.GetTrainingController();
         }
 
         return BadmintonControllerFactory.GetDefaultBadmintonController();
@@ -201,5 +201,9 @@ public static class BadmintonControllerFactory
     public static BadmintonController GetPlayableBadmintonController(BadmintonPlayUIController badmintonPlayUIController)
     {
         return new PlayableBadmintonController(badmintonPlayUIController);
+    }
+    public static BadmintonController GetTrainingController()
+    {
+        return new TrainingController();
     }
 }

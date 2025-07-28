@@ -1,11 +1,8 @@
 using UnityEngine;
 
-public class TrainingController : MonoBehaviour
+public class TrainingController : BadmintonController
 {
     public int maxSteps = 10_000;
-
-    public Player _player1, _player2;
-    public Shuttlecock _shuttlecock;
 
     public Vector2 _player1StartPosition = new Vector2(-3.5f, 2f);
     public Vector2 _player2StartPosition = new Vector2(3.5f, 2f);
@@ -13,8 +10,26 @@ public class TrainingController : MonoBehaviour
 
     private int _trainingTimer;
 
-    
+    public override void Initialize()
+    {
+        base.Initialize();
 
+        ResetScene();
+    }
+
+    public override void TouchGround(EGroundType groundType)
+    {
+        base.TouchGround(groundType);
+        
+        // reward: 1
+    }
+
+    public override void TouchPenaltyArea()
+    {
+        base.TouchPenaltyArea();
+        
+        // reward: -1
+    }
 
     private void ResetScene()
     {
@@ -26,10 +41,5 @@ public class TrainingController : MonoBehaviour
 
     }
 
-    private void Start()
-    {
-
-
-        ResetScene();
-    }
+    // Update가 없으면 timer를 쓸 수가 없네?
 }
