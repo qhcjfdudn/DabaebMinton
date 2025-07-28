@@ -1,8 +1,9 @@
-using Unity.VisualScripting;
+using Unity.MLAgents;
 using UnityEngine;
 
 public class BadmintonControllerComponent : MonoBehaviour
 {
+    [field: SerializeField]
     public EPlayMode PlayMode { get; private set; }
     public BadmintonController Controller { get; private set; }
 
@@ -35,6 +36,7 @@ public class BadmintonControllerComponent : MonoBehaviour
         Shuttlecock shuttlecock = CreateShuttlecock();
         float shortServiceLine = 1.98f;
 
+        // Local Play에서는 Player를 생성하고, 학습모드에서는 PlayerAgent가 포함된 Player를 생성.
         Player player1 = CreatePlayer("Player1", new Vector2(-3f, 3));
         Player player2 = CreatePlayer("Player2", new Vector2(3f, 3));
 
@@ -52,27 +54,38 @@ public class BadmintonControllerComponent : MonoBehaviour
 
     private BadmintonNet CreateBadmintonNet()
     {
-        return GameObject.Find("BadmintonNet").GetComponent<BadmintonNet>();
+        return transform.parent.GetComponentInChildren<BadmintonNet>();
     }
 
     private Shuttlecock CreateShuttlecock()
     {
-        GameObject go = GameObject.FindGameObjectWithTag("Shuttlecock");
+        Shuttlecock shuttlecock = transform.parent.GetComponentInChildren<Shuttlecock>();
 
-        if (go == null)
+        if (shuttlecock == null)
         {
-            Debug.Log("[Error] Shuttlecock is null.");
+            Debug.LogError("[BadmintonControllerComponent] Shuttlecock not found in the scene.");
             return null;
         }
 
-        return go.GetComponent<Shuttlecock>();
+        return shuttlecock;
     }
 
+    // 학습일 경우 Agent Prefab으로 생성해야 한다.
     private Player CreatePlayer(string name, Vector2 initPos)
     {
+        if (PlayMode == EPlayMode.Training)
+            return CreatePlayerAgent(name, initPos);
+
         Player player = InstantiatePlayer($"Prefabs/{name}", name, initPos);
         player.InitializeStat(GetInitialData(player.GetComponent<Player>().CharacterID));
 
+        return player;
+    }
+
+    private Player CreatePlayerAgent(string name, Vector2 initPos)
+    {
+        Player player = InstantiatePlayer($"Prefabs/ML/{name}Agent", name, initPos);
+        player.InitializeStat(GetInitialData(player.GetComponent<Player>().CharacterID));
         return player;
     }
 
@@ -81,7 +94,8 @@ public class BadmintonControllerComponent : MonoBehaviour
         GameObject playerPrefab = Resources.Load<GameObject>(path);
         GameObject player = Instantiate(playerPrefab);
         player.name = name;
-        player.transform.position = position;
+        player.transform.parent = transform.parent;
+        player.transform.localPosition = position;
 
         return player.GetComponent<Player>();
     }
@@ -99,44 +113,68 @@ public class BadmintonControllerComponent : MonoBehaviour
         return null;
     }
 
-    private void Awake()
+    private void InitSetting()
     {
-        
-
-        _inputManager = FindFirstObjectByType<InputManager>()
-            .GetComponent<InputManager>();
-
-        EPlayMode playMode = (EPlayMode)PlayerPrefs.GetInt("PlayMode", (int)EPlayMode.None);
-        PlayerPrefs.DeleteKey("PlayMode");
-
-        Debug.Log($"[BadmintonControllerComponent] PlayMode: {playMode}");
-
-        if (playMode == EPlayMode.Local)
+        if (FindFirstObjectByType<InputManager>() != null)
         {
+            _inputManager =
+                FindFirstObjectByType<InputManager>()
+                .GetComponent<InputManager>();
+        }
+
+        if (PlayMode == EPlayMode.None)
+        {
+            PlayMode = (EPlayMode)PlayerPrefs.GetInt("PlayMode", (int)EPlayMode.None);
+            PlayerPrefs.DeleteKey("PlayMode");
+        }
+
+        Debug.Log($"[BadmintonControllerComponent] PlayMode: {PlayMode}");
+    }
+
+    private BadmintonController GetController()
+    {
+        if (PlayMode == EPlayMode.Local)
+        {
+            // 추후 1P, 2P 모드로 확장 예정. 현재는 2P 모드로 고정.
+
             BadmintonPlayUIController uiController =
-                FindFirstObjectByType<BadmintonPlayUIController>().GetComponent<BadmintonPlayUIController>();
+                FindFirstObjectByType<BadmintonPlayUIController>()
+                .GetComponent<BadmintonPlayUIController>();
 
             if (uiController == null)
             {
                 Debug.LogError("[BadmintonControllerComponent] BadmintonPlayUIController not found!");
             }
 
-            Controller = BadmintonControllerFactory.GetPlayableBadmintonController(uiController);
-            
+            var controller = BadmintonControllerFactory.GetPlayableBadmintonController(uiController);
+
+            Debug.Log("[BadmintonControllerComponent] Initialized with BadmintonPlayUIController.");
+
+            return controller;
         }
-        else if (playMode == EPlayMode.Online)
+        
+        if (PlayMode == EPlayMode.Online)
         {
-
+            return BadmintonControllerFactory.GetDefaultBadmintonController();
         }
-        else
+
+        // 학습 모드
+        if (PlayMode == EPlayMode.Training)
         {
-            // 학습 모드일 경우
+            // UI 없음. Input은 Action으로 자체 발생 시키므로 없음.
+            // Training Mode의 Controller가 필요하다면 생성하여 여기서 할당 가능.
 
-
-            Controller = BadmintonControllerFactory.GetDefaultBadmintonController();
+            return BadmintonControllerFactory.GetDefaultBadmintonController();
         }
 
-        Debug.Log("[BadmintonControllerComponent] Initialized with BadmintonPlayUIController.");
+        return BadmintonControllerFactory.GetDefaultBadmintonController();
+    }
+
+    private void Awake()
+    {
+        InitSetting();
+        
+        Controller = GetController();
     }
 
     private void Start()
@@ -150,6 +188,7 @@ public enum EPlayMode
     None,
     Local,
     Online,
+    Training,
     MAX
 }
 

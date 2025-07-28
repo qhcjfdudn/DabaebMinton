@@ -23,7 +23,7 @@ public class Shuttlecock : MonoBehaviour
     public void Move(Vector2 newPosition)
     {
         _rigidbody.linearVelocity = Vector2.zero;
-        transform.SetPositionAndRotation(
+        transform.SetLocalPositionAndRotation(
             newPosition,
             Quaternion.AngleAxis(0f, Vector2.zero));
     }
