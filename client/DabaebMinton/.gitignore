@@ -46,4 +46,6 @@ fabric.properties
 # Custom
 .plastic/
 UserSettings/
+[Aa]ssets/ML-Agents*
+
 ![Aa]ssets/**/[Rr]esources
