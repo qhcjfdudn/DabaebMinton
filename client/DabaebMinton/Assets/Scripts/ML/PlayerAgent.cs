@@ -5,8 +5,9 @@ using UnityEngine;
 
 public class PlayerAgent : Agent
 {
-    private BadmintonController _badmintonController;
     private Player _player;
+    private BadmintonController _badmintonController;
+    private Shuttlecock _shuttlecock;
 
     public void MoveAgent(ActionSegment<int> act)
     {
@@ -38,8 +39,16 @@ public class PlayerAgent : Agent
 
     public override void Initialize()
     {
+        // 학습 환경 설정 위한 호출
         _player = GetComponent<Player>();
-        _badmintonController = FindFirstObjectByType<BadmintonControllerComponent>().Controller;
+        _badmintonController = transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller;
+        _shuttlecock = _badmintonController.GetShuttlecock();
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        sensor.AddObservation(_shuttlecock.transform.localPosition.x);
+        sensor.AddObservation(_shuttlecock.transform.localPosition.y);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -49,6 +58,6 @@ public class PlayerAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        _badmintonController.StartNewGame();
+        
     }
 }

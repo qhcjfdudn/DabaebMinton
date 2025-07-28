@@ -92,9 +92,8 @@ public class BadmintonControllerComponent : MonoBehaviour
     private Player InstantiatePlayer(string path, string name, Vector2 position)
     {
         GameObject playerPrefab = Resources.Load<GameObject>(path);
-        GameObject player = Instantiate(playerPrefab);
+        GameObject player = Instantiate(playerPrefab, transform.parent);
         player.name = name;
-        player.transform.parent = transform.parent;
         player.transform.localPosition = position;
 
         return player.GetComponent<Player>();

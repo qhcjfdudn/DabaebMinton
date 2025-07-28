@@ -18,6 +18,21 @@ public class BadmintonController
 
     }
 
+    public void SetLevel(BadmintonNet badmintonNet, Shuttlecock shuttlecock, float shortServiceLine)
+    {
+        _badmintonNet = badmintonNet;
+        _shuttlecock = shuttlecock;
+        _shortServiceLine = shortServiceLine;
+    }
+
+    public void SetPlayer(Player player1, Player player2)
+    {
+        _player1 = player1;
+        _player2 = player2;
+    }
+
+    public Shuttlecock GetShuttlecock() { return _shuttlecock; }
+
     public void SwingShuttlecock(Player player)
     {
         Debug.Log("[SwingShuttlecock] called.");
@@ -271,19 +286,6 @@ public class BadmintonController
     public virtual void TouchPenaltyArea()
     {
         StartNewGame();
-    }
-
-    public void SetLevel(BadmintonNet badmintonNet, Shuttlecock shuttlecock, float shortServiceLine)
-    {
-        _badmintonNet = badmintonNet;
-        _shuttlecock = shuttlecock;
-        _shortServiceLine = shortServiceLine;
-    }
-
-    public void SetPlayer(Player player1, Player player2)
-    {
-        _player1 = player1;
-        _player2 = player2;
     }
 }
 

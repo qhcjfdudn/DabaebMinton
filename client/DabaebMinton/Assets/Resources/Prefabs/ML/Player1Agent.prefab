@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3512169640475401217, guid: 4e93fb20bcc4fe744b065547516c5b17, type: 3}
       propertyPath: m_Name
-      value: Player1Agent Variant
+      value: Player1Agent
       objectReference: {fileID: 0}
     - target: {fileID: 3682436335810233095, guid: 4e93fb20bcc4fe744b065547516c5b17, type: 3}
       propertyPath: m_LocalPosition.x
@@ -81,7 +81,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 1
+    VectorObservationSize: 2
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0

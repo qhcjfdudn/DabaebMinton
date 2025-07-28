@@ -56,6 +56,28 @@ public class PlayableBadmintonController : BadmintonController
         }
     }
 
+    public override void TouchPenaltyArea()
+    {
+        if (IsGamePaused())
+            return;
+
+        Player winPlayer = null;
+
+        if (_lastTouchedPlayer == _player1)
+            winPlayer = _player2;
+        else if (_lastTouchedPlayer == _player2)
+            winPlayer = _player1;
+        else
+        {
+            Debug.LogWarning("[TouchThePenaltyArea] Last touched player is null.");
+            return;
+        }
+
+        PauseGame(EPauseReason.ShuttlecockTouchPenaltyArea);
+        AddScoreTo(winPlayer);
+        CheckGameEnd();
+    }
+
     private void AddScoreTo(Player player)
     {
         if (player == _player1)
@@ -95,27 +117,5 @@ public class PlayableBadmintonController : BadmintonController
         await Awaitable.WaitForSecondsAsync(3f);
 
         SceneManager.LoadScene("MainMenuScene");
-    }
-
-    public override void TouchPenaltyArea()
-    {
-        if (IsGamePaused())
-            return;
-
-        Player winPlayer = null;
-
-        if (_lastTouchedPlayer == _player1)
-            winPlayer = _player2;
-        else if (_lastTouchedPlayer == _player2)
-            winPlayer = _player1;
-        else
-        {
-            Debug.LogWarning("[TouchThePenaltyArea] Last touched player is null.");
-            return;
-        }
-
-        PauseGame(EPauseReason.ShuttlecockTouchPenaltyArea);
-        AddScoreTo(winPlayer);
-        CheckGameEnd();
     }
 }
