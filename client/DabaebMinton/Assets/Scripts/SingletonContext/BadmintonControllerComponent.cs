@@ -32,18 +32,17 @@ public class BadmintonControllerComponent : MonoBehaviour
 
     private void Initialize()
     {
-        BadmintonNet badmintonNet = CreateBadmintonNet();
-        Shuttlecock shuttlecock = CreateShuttlecock();
         float shortServiceLine = 1.98f;
+
+        Controller.SetLevel(
+            CreateBadmintonNet(),
+            CreateShuttlecock(),
+            shortServiceLine);
 
         // Local Play에서는 Player를 생성하고, 학습모드에서는 PlayerAgent가 포함된 Player를 생성.
         Player player1 = CreatePlayer("Player1", new Vector2(-3f, 3));
         Player player2 = CreatePlayer("Player2", new Vector2(3f, 3));
 
-        Controller.SetLevel(
-            badmintonNet,
-            shuttlecock,
-            shortServiceLine);
         Controller.SetPlayer(player1, player2);
 
         int difficulty = PlayerPrefs.GetInt("difficulty");
