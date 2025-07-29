@@ -1,3 +1,4 @@
+using System;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -9,10 +10,32 @@ public class PlayerAgent : Agent
     private BadmintonController _badmintonController;
     private Shuttlecock _shuttlecock;
 
-    public void MoveAgent(ActionSegment<int> act)
+    public override void Initialize()
     {
-        var dirPushed = act[0];
-        var jumpPushed = act[1];
+        _player = GetComponent<Player>();
+        _badmintonController = transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller;
+        _shuttlecock = _badmintonController.GetShuttlecock();
+    }
+
+    public override void CollectObservations(VectorSensor sensor)
+    {
+        sensor.AddObservation(_shuttlecock.transform.localPosition.x);
+        sensor.AddObservation(_shuttlecock.transform.localPosition.y);
+    }
+
+    public override void OnActionReceived(ActionBuffers actions)
+    {
+        ArraySegment<int> moves = new ArraySegment<int>(actions.DiscreteActions.Array, 0, 2);
+        ArraySegment<int> swings = new ArraySegment<int>(actions.DiscreteActions.Array, 2, 2);
+
+        MoveAgent(moves);
+        SwingAgent(swings);
+    }
+
+    private void MoveAgent(ArraySegment<int> moves)
+    {
+        int dirPushed = moves[0];
+        int jumpPushed = moves[1];
 
         switch (dirPushed)
         {
@@ -37,27 +60,27 @@ public class PlayerAgent : Agent
         }
     }
 
-    public override void Initialize()
+    private void SwingAgent(ArraySegment<int> swings)
     {
-        // 학습 환경 설정 위한 호출
-        _player = GetComponent<Player>();
-        _badmintonController = transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller;
-        _shuttlecock = _badmintonController.GetShuttlecock();
-    }
+        int swing = swings[0];
+        int actionSwing = swings[1];
 
-    public override void CollectObservations(VectorSensor sensor)
-    {
-        sensor.AddObservation(_shuttlecock.transform.localPosition.x);
-        sensor.AddObservation(_shuttlecock.transform.localPosition.y);
-    }
+        if (swing == 0)
+        {
+            _player.StartCharging(ESwingChargerState.Swing);
+        }
+        else if (swing == 1)
+        {
+            _player.StopCharging(ESwingChargerState.Swing);
+        }
 
-    public override void OnActionReceived(ActionBuffers actions)
-    {
-        MoveAgent(actions.DiscreteActions);
-    }
-
-    public override void OnEpisodeBegin()
-    {
-        
+        if (actionSwing == 0)
+        {
+            _player.StartCharging(ESwingChargerState.ActionSwing);
+        }
+        else if (actionSwing == 1)
+        {
+            _player.StopCharging(ESwingChargerState.ActionSwing);
+        }
     }
 }

@@ -33,7 +33,7 @@ public class BadmintonController
 
     public Shuttlecock GetShuttlecock() { return _shuttlecock; }
 
-    public void SwingShuttlecock(Player player)
+    public virtual bool SwingShuttlecock(Player player)
     {
         Debug.Log("[SwingShuttlecock] called.");
 
@@ -41,7 +41,7 @@ public class BadmintonController
         {
             Debug.Log("[Error] Shuttlecock is null.");
 
-            return;
+            return false;
         }
 
         BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
@@ -50,15 +50,17 @@ public class BadmintonController
         {
             Debug.Log("[Fail] Too long for hit the cock.");
 
-            return;
+            return false;
         }
 
         ClearShuttlecock(player);
         
         _lastTouchedPlayer = player;
+
+        return true;
     }
 
-    public void ActionSwingShuttlecock(Player player)
+    public virtual bool ActionSwingShuttlecock(Player player)
     {
         Debug.Log("[ActionSwingShuttlecock] called.");
 
@@ -69,7 +71,7 @@ public class BadmintonController
         {
             Debug.Log("[Fail] Too long for hit the cock.");
 
-            return;
+            return false;
         }
 
         _lastTouchedPlayer = player;
@@ -90,24 +92,24 @@ public class BadmintonController
             {
                 Debug.Log("[Push] call!");
                 PushShuttlecock(player);
-                return;
+                return true;
             }
 
             if (shuttlecockHeight <= netHeight)
             {
                 Debug.Log("[Hairpin] call!");
                 HairpinShuttlecock(player);
-                return;
+                return true;
             }
 
-            return;
+            return false;
         }
 
         if (shuttlecockHeight > netHeight && chargeRatio > 0.8)
         {
             Debug.Log("[Smash] call!");
             SmashShuttlecock(player);
-            return;
+            return true;
         }
 
         if (shuttlecockHeight > netHeight * 2 / 3 && chargeRatio > 0.8)
@@ -115,15 +117,17 @@ public class BadmintonController
             Debug.Log("[Drive] call!");
             DriveShuttlecock(player);
 
-            return;
+            return  true;
         }
         
         if (shuttlecockHeight > netHeight * 2 / 3)
         {
             Debug.Log("[Dropshot] call!");
             DropshotShuttlecock(player);
-            return;
+            return true;
         }
+
+        return false;
     }
 
     public void ClearShuttlecock(Player player)
@@ -154,48 +158,6 @@ public class BadmintonController
     public void HairpinShuttlecock(Player player)
     {
         _shuttlecock.Hit(GetSwingForce(player, 70f, 50f, 90f));
-    }
-
-    public Vector2 GetSwingForce(Player player, float baseAngle, float minAngle, float maxAngle) // 좌우 방향을 한 방향으로 계산 가능하도록 forwardDir 통해
-                                                                                                // 좌표와 방향 수정한 뒤 비행 각도 계산.
-                                                                                                // 이후 방향을 다시 맞춰준다.
-    {
-        BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
-        AccuracyPoint accuracyPoint = hitBox.GetComponentInChildren<AccuracyPoint>();
-
-        Vector2 hitBoxPos = hitBox.transform.position;
-        Vector2 accuracyPointPos = accuracyPoint.transform.position;
-        Vector2 shuttlecockPos = _shuttlecock.transform.position;
-
-        float forwardDir = _badmintonNet.transform.position.x - player.transform.position.x > 0 ? 1 : -1;
-
-        accuracyPointPos.x *= forwardDir;
-        shuttlecockPos.x *= forwardDir;
-        hitBoxPos.x *= forwardDir;
-
-        float degree = baseAngle;
-
-        if (shuttlecockPos.x < accuracyPointPos.x)
-        {
-            float pivot = hitBoxPos.x - hitBox.transform.lossyScale.x / 2;
-            float ratio = (accuracyPointPos.x - shuttlecockPos.x) / (accuracyPointPos.x - pivot);
-            degree += ratio * (maxAngle - degree);
-        }
-        else
-        {
-            float pivot = hitBoxPos.x + hitBox.transform.lossyScale.x / 2;
-            float ratio = (shuttlecockPos.x - accuracyPointPos.x) / (pivot - accuracyPointPos.x);
-            degree -= ratio * (degree - minAngle);
-        }
-
-        float radian = degree * Mathf.Deg2Rad; // degree를 radian으로 변환
-        Vector2 direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
-        direction.x *= forwardDir;
-
-        SwingCharger charger = player.GetComponentInChildren<SwingCharger>();
-        Vector2 force = direction * player.Power * charger.ChargeGauge;
-
-        return force;
     }
 
     public void MoveShuttlecockInitialPosition()
@@ -287,6 +249,49 @@ public class BadmintonController
     {
         StartNewGame();
     }
+
+    private Vector2 GetSwingForce(Player player, float baseAngle, float minAngle, float maxAngle) // 좌우 방향을 한 방향으로 계산 가능하도록 forwardDir 통해
+                                                                                                  // 좌표와 방향 수정한 뒤 비행 각도 계산.
+                                                                                                  // 이후 방향을 다시 맞춰준다.
+    {
+        BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
+        AccuracyPoint accuracyPoint = hitBox.GetComponentInChildren<AccuracyPoint>();
+
+        Vector2 hitBoxPos = hitBox.transform.position;
+        Vector2 accuracyPointPos = accuracyPoint.transform.position;
+        Vector2 shuttlecockPos = _shuttlecock.transform.position;
+
+        float forwardDir = _badmintonNet.transform.position.x - player.transform.position.x > 0 ? 1 : -1;
+
+        accuracyPointPos.x *= forwardDir;
+        shuttlecockPos.x *= forwardDir;
+        hitBoxPos.x *= forwardDir;
+
+        float degree = baseAngle;
+
+        if (shuttlecockPos.x < accuracyPointPos.x)
+        {
+            float pivot = hitBoxPos.x - hitBox.transform.lossyScale.x / 2;
+            float ratio = (accuracyPointPos.x - shuttlecockPos.x) / (accuracyPointPos.x - pivot);
+            degree += ratio * (maxAngle - degree);
+        }
+        else
+        {
+            float pivot = hitBoxPos.x + hitBox.transform.lossyScale.x / 2;
+            float ratio = (shuttlecockPos.x - accuracyPointPos.x) / (pivot - accuracyPointPos.x);
+            degree -= ratio * (degree - minAngle);
+        }
+
+        float radian = degree * Mathf.Deg2Rad; // degree를 radian으로 변환
+        Vector2 direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
+        direction.x *= forwardDir;
+
+        SwingCharger charger = player.GetComponentInChildren<SwingCharger>();
+        Vector2 force = direction * player.Power * charger.ChargeGauge;
+
+        return force;
+    }
+
 }
 
 public enum EGamePlayState

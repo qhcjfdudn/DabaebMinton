@@ -61,6 +61,9 @@ PrefabInstance:
       addedObject: {fileID: 6788520665005770184}
     - targetCorrespondingSourceObject: {fileID: 5522634861435829231, guid: 7d6777fc838fed048b5c9bc980697151, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 5485209541086000635}
+    - targetCorrespondingSourceObject: {fileID: 5522634861435829231, guid: 7d6777fc838fed048b5c9bc980697151, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1695381890577524173}
   m_SourcePrefab: {fileID: 100100000, guid: 7d6777fc838fed048b5c9bc980697151, type: 3}
 --- !u!1 &562498750487727483 stripped
@@ -85,20 +88,35 @@ MonoBehaviour:
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 0
-      BranchSizes: 0300000002000000
-    VectorActionSize: 0300000002000000
+      BranchSizes: 03000000020000000200000002000000
+    VectorActionSize: 03000000020000000200000002000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 0
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: c5cf745ece19798498f7f06b9591d718, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
-  m_BehaviorName: My Behavior
+  m_BehaviorName: BamintonSlow
   TeamId: 0
   m_UseChildSensors: 1
   m_UseChildActuators: 1
   m_DeterministicInference: 0
   m_ObservableAttributeHandling: 0
+--- !u!114 &5485209541086000635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562498750487727483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  DecisionStep: 0
+  TakeActionsBetweenDecisions: 1
 --- !u!114 &1695381890577524173
 MonoBehaviour:
   m_ObjectHideFlags: 0
