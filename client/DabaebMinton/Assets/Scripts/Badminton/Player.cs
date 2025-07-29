@@ -75,6 +75,20 @@ public class Player : MonoBehaviour
         _rigidbody.linearVelocityX *= 0.2f;
     }
 
+    public void StartCharging(ESwingChargerState state)
+    {
+        _swingCharger.StartCharging(state);
+    }
+
+    public void StopCharging(ESwingChargerState state)
+    {
+        if (_swingCharger.StopCharging(state))
+        {
+            transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller.ActionSwingShuttlecock(this);
+            _swingCharger.Release();
+        }
+    }
+
     private enum EAnimationMoveState
     {
         Standing, Move
@@ -126,10 +140,10 @@ public class Player : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody2D>();
         _animator = GetComponent<Animator>();
-        _swingCharger = GetComponent<SwingCharger>();
         
         _playerHand = GetComponentInChildren<PlayerHand>();
         _hitBox = GetComponentInChildren<BadmintonHitBox>();
+        _swingCharger = GetComponentInChildren<SwingCharger>();
 
         _state = new StandingState();
     }

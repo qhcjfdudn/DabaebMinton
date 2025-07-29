@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -91,19 +89,14 @@ public class LocalPlayModeInputManager : MonoBehaviour
 
         if (context.started)
         {
-            charger.StartCharging(ESwingChargerState.Swing);
+            _player1.StartCharging(ESwingChargerState.Swing);
             return;
         }
 
         // charge 세기에 따라 때린다.
         if (context.canceled)
         {
-            if (charger.StopCharging(ESwingChargerState.Swing))
-            {
-                _badmintonController.SwingShuttlecock(_player1);
-                charger.Release();
-            }
-
+            _player1.StopCharging(ESwingChargerState.Swing);
             return;
         }
     }
@@ -117,18 +110,13 @@ public class LocalPlayModeInputManager : MonoBehaviour
 
         if (context.started)
         {
-            charger.StartCharging(ESwingChargerState.Swing);
+            _player2.StartCharging(ESwingChargerState.Swing);
             return;
         }
 
         if (context.canceled)
         {
-            if (charger.StopCharging(ESwingChargerState.Swing))
-            {
-                _badmintonController.SwingShuttlecock(_player2);
-                charger.Release();
-            }
-
+            _player2.StopCharging(ESwingChargerState.Swing);
             return;
         }
     }
@@ -142,18 +130,13 @@ public class LocalPlayModeInputManager : MonoBehaviour
 
         if (context.started)
         {
-            charger.StartCharging(ESwingChargerState.ActionSwing);
+            _player1.StartCharging(ESwingChargerState.ActionSwing);
             return;
         }
 
         if (context.canceled)
         {
-            if (charger.StopCharging(ESwingChargerState.ActionSwing))
-            {
-                _badmintonController.ActionSwingShuttlecock(_player1);
-                charger.Release();
-            }
-
+            _player1.StopCharging(ESwingChargerState.ActionSwing);
             return;
         }
     }
@@ -167,19 +150,14 @@ public class LocalPlayModeInputManager : MonoBehaviour
 
         if (context.started)
         {
-            charger.StartCharging(ESwingChargerState.ActionSwing);
+            _player2.StartCharging(ESwingChargerState.ActionSwing);
             return;
         }
 
 
         if (context.canceled)
         {
-            if (charger.StopCharging(ESwingChargerState.ActionSwing))
-            {
-                _badmintonController.ActionSwingShuttlecock(_player2);
-                charger.Release();
-            }
-
+            _player2.StopCharging(ESwingChargerState.ActionSwing);
             return;
         }
     }
