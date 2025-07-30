@@ -47,5 +47,6 @@ fabric.properties
 .plastic/
 UserSettings/
 [Aa]ssets/ML-Agents*
+[Aa]ssets/[Rr]esources/Prefabs/ML/AIModels
 
 ![Aa]ssets/**/[Rr]esources
