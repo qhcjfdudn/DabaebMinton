@@ -9,6 +9,8 @@ public class PlayerAgent : Agent
     private Player _player;
     private BadmintonController _badmintonController;
     private Shuttlecock _shuttlecock;
+    
+    private int _lastSwingInput, _lastActionSwingInput;
 
     public override void Initialize()
     {
@@ -30,6 +32,11 @@ public class PlayerAgent : Agent
 
         MoveAgent(moves);
         SwingAgent(swings);
+    }
+
+    public override void OnEpisodeBegin()
+    {
+        _lastSwingInput = _lastActionSwingInput = 0;
     }
 
     private void MoveAgent(ArraySegment<int> moves)
@@ -62,25 +69,27 @@ public class PlayerAgent : Agent
 
     private void SwingAgent(ArraySegment<int> swings)
     {
-        int swing = swings[0];
-        int actionSwing = swings[1];
+        int swingInput = swings[0];
+        int actionSwingInput = swings[1];
 
-        if (swing == 0)
-        {
-            _player.StartCharging(ESwingChargerState.Swing);
-        }
-        else if (swing == 1)
+        if (_lastSwingInput == 1 && swingInput == 0)
         {
             _player.StopCharging(ESwingChargerState.Swing);
         }
-
-        if (actionSwing == 0)
+        else if (_lastSwingInput == 0 && swingInput == 1)
         {
-            _player.StartCharging(ESwingChargerState.ActionSwing);
+            _player.StartCharging(ESwingChargerState.Swing);
         }
-        else if (actionSwing == 1)
+        _lastSwingInput = swingInput;
+
+        if (_lastActionSwingInput == 1 && actionSwingInput == 0)
         {
             _player.StopCharging(ESwingChargerState.ActionSwing);
         }
+        else if (_lastActionSwingInput == 0 && actionSwingInput == 1)
+        {
+            _player.StartCharging(ESwingChargerState.ActionSwing);
+        }
+        _lastActionSwingInput = actionSwingInput;
     }
 }

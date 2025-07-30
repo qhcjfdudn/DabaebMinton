@@ -85,8 +85,6 @@ public class LocalPlayModeInputManager : MonoBehaviour
         if (_player1 == null)
             _player1 = FindPlayer("Player1");
 
-        SwingCharger charger = _player1.GetComponentInChildren<SwingCharger>();
-
         if (context.started)
         {
             _player1.StartCharging(ESwingChargerState.Swing);
@@ -106,8 +104,6 @@ public class LocalPlayModeInputManager : MonoBehaviour
         if (_player2 == null)
             _player2 = FindPlayer("Player2");
 
-        SwingCharger charger = _player2.GetComponentInChildren<SwingCharger>();
-
         if (context.started)
         {
             _player2.StartCharging(ESwingChargerState.Swing);
@@ -126,8 +122,6 @@ public class LocalPlayModeInputManager : MonoBehaviour
         if (_player1 == null)
             _player1 = FindPlayer("Player1");
 
-        SwingCharger charger = _player1.GetComponentInChildren<SwingCharger>();
-
         if (context.started)
         {
             _player1.StartCharging(ESwingChargerState.ActionSwing);
@@ -145,8 +139,6 @@ public class LocalPlayModeInputManager : MonoBehaviour
     {
         if (_player2 == null)
             _player2 = FindPlayer("Player2");
-
-        SwingCharger charger = _player2.GetComponentInChildren<SwingCharger>();
 
         if (context.started)
         {

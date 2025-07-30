@@ -26,9 +26,6 @@ public class SwingCharger : MonoBehaviour
 
     public void StartCharging(ESwingChargerState state)
     {
-        if ((selectedSwingStateBits & (int)state) > 0)
-            return;
-
         selectedSwingStateBits |= (int)state;
         _currentState = state;
 
