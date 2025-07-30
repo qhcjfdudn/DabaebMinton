@@ -84,7 +84,19 @@ public class Player : MonoBehaviour
     {
         if (_swingCharger.StopCharging(state))
         {
-            transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller.ActionSwingShuttlecock(this);
+            BadmintonController controller = transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller;
+
+            switch (state)
+            {
+                case ESwingChargerState.Swing:
+                    controller.SwingShuttlecock(this);
+                    break;
+
+                case ESwingChargerState.ActionSwing:
+                    controller.ActionSwingShuttlecock(this);
+                    break;
+            }
+
             _swingCharger.Release();
         }
     }
