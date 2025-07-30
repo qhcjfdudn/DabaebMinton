@@ -130,6 +130,16 @@ public class BadmintonController
         return false;
     }
 
+    public virtual void TouchGround(EGroundType groundType)
+    {
+        StartNewGame();
+    }
+
+    public virtual void TouchPenaltyArea()
+    {
+        StartNewGame();
+    }
+
     public void ClearShuttlecock(Player player)
     {
         _shuttlecock.Hit(GetSwingForce(player, 45f, 30f, 90f));
@@ -238,16 +248,6 @@ public class BadmintonController
         MoveShuttlecockInitialPosition();
 
         _gamePlayState = EGamePlayState.Playing;
-    }
-
-    public virtual void TouchGround(EGroundType groundType)
-    {
-        StartNewGame();
-    }
-
-    public virtual void TouchPenaltyArea()
-    {
-        StartNewGame();
     }
 
     private Vector2 GetSwingForce(Player player, float baseAngle, float minAngle, float maxAngle) // 좌우 방향을 한 방향으로 계산 가능하도록 forwardDir 통해

@@ -14,27 +14,22 @@ public class TrainingController : BadmintonController
 
     public override bool ActionSwingShuttlecock(Player player)
     {
-        float r = 0.015f;
-        bool ret = base.ActionSwingShuttlecock(player);
+        bool isSwingSuccess = base.ActionSwingShuttlecock(player);
 
-        if (ret == false)
-            r *= -1;
+        if (isSwingSuccess)
+            player.GetComponent<PlayerAgent>().AddReward(0.1f);
 
-        player.GetComponent<PlayerAgent>().AddReward(r);
-
-        return ret;
+        return isSwingSuccess;
     }
 
     public override bool SwingShuttlecock(Player player)
     {
-        float r = 0.01f;
-        bool ret = base.SwingShuttlecock(player);
-        if (ret == false)
-            r *= -1;
+        bool isSwingSuccess = base.SwingShuttlecock(player);
 
-        player.GetComponent<PlayerAgent>().AddReward(r);
+        if (isSwingSuccess)
+            player.GetComponent<PlayerAgent>().AddReward(0.1f);
 
-        return ret;
+        return isSwingSuccess;
     }
 
     public override void Initialize()
@@ -92,8 +87,7 @@ public class TrainingController : BadmintonController
 
         _player1.transform.localPosition = _player1StartPosition;
         _player2.transform.localPosition = _player2StartPosition;
-        _shuttlecock.transform.localPosition = _shuttlecockStartPosition;
-    }
 
-    // Update가 없으면 timer를 쓸 수가 없네?
+        _shuttlecock.Move(_shuttlecockStartPosition);
+    }
 }
