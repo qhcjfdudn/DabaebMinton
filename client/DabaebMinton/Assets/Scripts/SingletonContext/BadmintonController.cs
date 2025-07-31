@@ -6,10 +6,10 @@ public class BadmintonController
     protected Player _player1, _player2;
     protected Player _lastTouchedPlayer;
     protected Shuttlecock _shuttlecock;
+    protected BadmintonNet _badmintonNet;
+    protected float _shortServiceLine = 1.98f;
 
-    private BadmintonNet _badmintonNet;
-    private float _shortServiceLine = 1.98f;
-    private Vector2 _shuttlecockInitialPosition = new Vector2(-5f, 6f);
+    protected Vector2 _shuttlecockInitialPosition = new Vector2(-5f, 6f);
 
     private EGamePlayState _gamePlayState;
 
@@ -33,16 +33,17 @@ public class BadmintonController
 
     public Shuttlecock GetShuttlecock() { return _shuttlecock; }
 
+    public bool IsLastTouchedPlayer(Player player)
+    {
+        return _lastTouchedPlayer == player;
+    }
+
     public virtual bool SwingShuttlecock(Player player)
     {
         Debug.Log("[SwingShuttlecock] called.");
 
-        if (_shuttlecock == null)
-        {
-            Debug.Log("[Error] Shuttlecock is null.");
-
+        if (_lastTouchedPlayer == player)
             return false;
-        }
 
         BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
 
@@ -63,6 +64,9 @@ public class BadmintonController
     public virtual bool ActionSwingShuttlecock(Player player)
     {
         Debug.Log("[ActionSwingShuttlecock] called.");
+
+        if (_lastTouchedPlayer == player)
+            return false;
 
         // hitPoint -> accuracy box로 개선 필요
         BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
@@ -246,7 +250,7 @@ public class BadmintonController
     public void StartNewGame()
     {
         MoveShuttlecockInitialPosition();
-
+        _lastTouchedPlayer = null;
         _gamePlayState = EGamePlayState.Playing;
     }
 

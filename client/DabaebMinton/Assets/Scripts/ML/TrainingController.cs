@@ -2,22 +2,14 @@ using UnityEngine;
 
 public class TrainingController : BadmintonController
 {
-    public int maxSteps = 10_000;
-
     private PlayerAgent _player1Agent, _player2Agent;
-
-    private Vector2 _player1StartPosition = new Vector2(-3.5f, 2f);
-    private Vector2 _player2StartPosition = new Vector2(3.5f, 2f);
-    private Vector2 _shuttlecockStartPosition = new Vector2(-2f, 4f);
-
-    //private int _trainingTimer;
 
     public override bool ActionSwingShuttlecock(Player player)
     {
         bool isSwingSuccess = base.ActionSwingShuttlecock(player);
 
         if (isSwingSuccess)
-            player.GetComponent<PlayerAgent>().AddReward(0.1f);
+            player.GetComponent<PlayerAgent>().AddReward(0.5f);
 
         return isSwingSuccess;
     }
@@ -27,7 +19,7 @@ public class TrainingController : BadmintonController
         bool isSwingSuccess = base.SwingShuttlecock(player);
 
         if (isSwingSuccess)
-            player.GetComponent<PlayerAgent>().AddReward(0.1f);
+            player.GetComponent<PlayerAgent>().AddReward(0.3f);
 
         return isSwingSuccess;
     }
@@ -83,11 +75,17 @@ public class TrainingController : BadmintonController
 
     private void ResetScene()
     {
-        //_trainingTimer = 0;
+        _player1.transform.localPosition = new Vector2((_shortServiceLine + Random.Range(0f, 3f)) * -1f, 1.25f);
+        _player1.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        _player1.MoveValue = Vector2.zero;
+        
+        _player2.transform.localPosition = new Vector2(_shortServiceLine + Random.Range(0f, 3f), 1.25f);
+        _player2.GetComponent<Rigidbody2D>().linearVelocity = Vector2.zero;
+        _player2.MoveValue = Vector2.zero;
 
-        _player1.transform.localPosition = _player1StartPosition;
-        _player2.transform.localPosition = _player2StartPosition;
+        float randomizedShuttlecockStartPosition = (_shortServiceLine + Random.Range(0f, 3f)) * (Random.Range(0f, 1f) < 0.5f ? 1 : -1);
+        _shuttlecock.Move(new Vector2(randomizedShuttlecockStartPosition, 6));
 
-        _shuttlecock.Move(_shuttlecockStartPosition);
+        _lastTouchedPlayer = null;
     }
 }

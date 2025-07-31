@@ -34,6 +34,11 @@ public class Shuttlecock : MonoBehaviour
         _rigidbody.AddForce(force);
     }
 
+    public Vector2 GetDistanceFrom(Vector2 position)
+    {
+        return new Vector2(transform.position.x - position.x, transform.position.y - position.y);
+    }
+
     public void Read(InputMemoryBitStream inStream)
     {
         float x = inStream.ReadFloat();

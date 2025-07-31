@@ -6,29 +6,44 @@ using UnityEngine;
 
 public class PlayerAgent : Agent
 {
-    private Player _player;
     private BadmintonController _badmintonController;
     private Shuttlecock _shuttlecock;
+    private Player _player;
+    private AccuracyPoint _accuracyPoint;
     
     private int _lastSwingInput, _lastActionSwingInput;
 
     public override void Initialize()
     {
-        _player = GetComponent<Player>();
         _badmintonController = transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller;
         _shuttlecock = _badmintonController.GetShuttlecock();
+        _player = GetComponent<Player>();
+        _accuracyPoint = _player.GetComponentInChildren<BadmintonHitBox>().GetComponentInChildren<AccuracyPoint>();
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        // Shuttlecock: 4
         sensor.AddObservation(_shuttlecock.transform.localPosition.x);
         sensor.AddObservation(_shuttlecock.transform.localPosition.y);
+        sensor.AddObservation(_shuttlecock.GetComponent<Rigidbody2D>().linearVelocity);
+
+        // Player Position: 2
+        sensor.AddObservation(transform.localPosition.x);
+        sensor.AddObservation(transform.localPosition.y);
+
+        // Player Stat: 3
+        sensor.AddObservation(_player.MoveVelocity);
+        sensor.AddObservation(_player.JumpVelocity);
+        sensor.AddObservation(_player.Power);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        ArraySegment<int> moves = new ArraySegment<int>(actions.DiscreteActions.Array, 0, 2);
-        ArraySegment<int> swings = new ArraySegment<int>(actions.DiscreteActions.Array, 2, 2);
+        CalcReward();
+
+        ArraySegment<int> moves = new (actions.DiscreteActions.Array, 0, 2);
+        ArraySegment<int> swings = new (actions.DiscreteActions.Array, 2, 2);
 
         MoveAgent(moves);
         SwingAgent(swings);
@@ -37,6 +52,18 @@ public class PlayerAgent : Agent
     public override void OnEpisodeBegin()
     {
         _lastSwingInput = _lastActionSwingInput = 0;
+    }
+
+    private void CalcReward()
+    {
+        // dist의 x 값이 [0, 5]일 때 [0.2, 0.0]점을 linear하게 받는다.
+        Vector2 dist = _shuttlecock.GetDistanceFrom(_accuracyPoint.transform.position);
+        float x = Mathf.Clamp(Mathf.Abs(dist.x), 0, 5);
+        AddReward(-0.04f * x + 0.2f);
+
+        // 마지막으로 콕을 친 사람이 나라면 조금씩 점수를 잃는다.
+        if (_badmintonController.IsLastTouchedPlayer(_player))
+            AddReward(-0.01f);
     }
 
     private void MoveAgent(ArraySegment<int> moves)
@@ -92,4 +119,5 @@ public class PlayerAgent : Agent
         }
         _lastActionSwingInput = actionSwingInput;
     }
+
 }

@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterID: 2
   moveVelocity: 6
-  jumpVelocity: 250
+  jumpVelocity: 200
   power: 1200

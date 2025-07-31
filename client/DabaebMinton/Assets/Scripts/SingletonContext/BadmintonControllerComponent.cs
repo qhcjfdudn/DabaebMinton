@@ -69,7 +69,6 @@ public class BadmintonControllerComponent : MonoBehaviour
         return shuttlecock;
     }
 
-    // 학습일 경우 Agent Prefab으로 생성해야 한다.
     private Player CreatePlayer(string name, Vector2 initPos)
     {
         if (PlayMode == EPlayMode.Training)
