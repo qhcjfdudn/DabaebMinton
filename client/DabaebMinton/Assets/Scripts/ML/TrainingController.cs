@@ -1,15 +1,16 @@
 using UnityEngine;
+using Unity.MLAgents;
 
 public class TrainingController : BadmintonController
 {
-    private PlayerAgent _player1Agent, _player2Agent;
+    private SimpleMultiAgentGroup _team1, _team2;
 
     public override bool ActionSwingShuttlecock(Player player)
     {
         bool isSwingSuccess = base.ActionSwingShuttlecock(player);
 
         if (isSwingSuccess)
-            player.GetComponent<PlayerAgent>().AddReward(0.5f);
+            player.GetComponent<PlayerAgent>().AddReward(0.8f);
 
         return isSwingSuccess;
     }
@@ -19,7 +20,7 @@ public class TrainingController : BadmintonController
         bool isSwingSuccess = base.SwingShuttlecock(player);
 
         if (isSwingSuccess)
-            player.GetComponent<PlayerAgent>().AddReward(0.3f);
+            player.GetComponent<PlayerAgent>().AddReward(0.6f);
 
         return isSwingSuccess;
     }
@@ -28,8 +29,11 @@ public class TrainingController : BadmintonController
     {
         base.Initialize();
 
-        _player1Agent = _player1.GetComponent<PlayerAgent>();
-        _player2Agent = _player2.GetComponent<PlayerAgent>();
+        _team1 = new SimpleMultiAgentGroup();
+        _team2 = new SimpleMultiAgentGroup();
+
+        _team1.RegisterAgent(_player1.GetComponent<PlayerAgent>());
+        _team2.RegisterAgent(_player2.GetComponent<PlayerAgent>());
 
         ResetScene();
     }
@@ -39,17 +43,25 @@ public class TrainingController : BadmintonController
         switch (groundType)
         {
             case EGroundType.Left:
-                _player1Agent.SetReward(-1.0f);
-                _player2Agent.SetReward(1.0f);
+                _team1.SetGroupReward(-1.0f);
+
+                //var agents = _team2.GetRegisteredAgents();
+                //agents.
+                //for ()
+                //{
+
+                //}
+                //if (_lastTouchedPlayer )
+                _team2.SetGroupReward(1.0f);
                 break;
             case EGroundType.Right:
-                _player1Agent.SetReward(1.0f);
-                _player2Agent.SetReward(-1.0f);
+                _team1.SetGroupReward(1.0f);
+                _team2.SetGroupReward(-1.0f);
                 break;
         }
 
-        _player1Agent.EndEpisode();
-        _player2Agent.EndEpisode();
+        _team1.EndGroupEpisode();
+        _team2.EndGroupEpisode();
 
         ResetScene();
     }
@@ -58,17 +70,17 @@ public class TrainingController : BadmintonController
     {
         if (_lastTouchedPlayer == _player1)
         {
-            _player1Agent.SetReward(-1.0f);
-            _player2Agent.SetReward(1.0f);
+            _team1.SetGroupReward(-1.0f);
+            _team2.SetGroupReward(1.0f);
         }
         else if (_lastTouchedPlayer == _player2)
         {
-            _player2Agent.SetReward(-1.0f);
-            _player1Agent.SetReward(1.0f);
+            _team2.SetGroupReward(-1.0f);
+            _team1.SetGroupReward(1.0f);
         }
 
-        _player1Agent.EndEpisode();
-        _player2Agent.EndEpisode();
+        _team1.EndGroupEpisode();
+        _team2.EndGroupEpisode();
 
         ResetScene();
     }
