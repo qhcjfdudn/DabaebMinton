@@ -75,15 +75,12 @@ public class BadmintonControllerComponent : MonoBehaviour
             return CreatePlayerAgent(name, initPos);
 
         Player player = InstantiatePlayer($"Prefabs/{name}", name, initPos);
-        player.InitializeStat(GetInitialData(player.GetComponent<Player>().CharacterID));
-
         return player;
     }
 
     private Player CreatePlayerAgent(string name, Vector2 initPos)
     {
         Player player = InstantiatePlayer($"Prefabs/ML/{name}Agent", name, initPos);
-        player.InitializeStat(GetInitialData(player.GetComponent<Player>().CharacterID));
         return player;
     }
 
@@ -95,19 +92,6 @@ public class BadmintonControllerComponent : MonoBehaviour
         player.transform.localPosition = position;
 
         return player.GetComponent<Player>();
-    }
-
-    private CharacterInitialData GetInitialData(ECharacterID characterID)
-    {
-        switch (characterID)
-        {
-            case ECharacterID.Daramgee:
-                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/DaramgeeInitialData");
-            case ECharacterID.Baebsae:
-                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/BaebsaeInitialData");
-        }
-
-        return null;
     }
 
     private void InitSetting()

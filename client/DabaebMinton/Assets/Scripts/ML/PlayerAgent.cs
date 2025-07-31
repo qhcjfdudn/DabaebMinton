@@ -9,7 +9,6 @@ public class PlayerAgent : Agent
     private BadmintonController _badmintonController;
     private Shuttlecock _shuttlecock;
     private Player _player;
-    private AccuracyPoint _accuracyPoint;
     
     private int _lastSwingInput, _lastActionSwingInput;
 
@@ -17,16 +16,16 @@ public class PlayerAgent : Agent
     {
         _badmintonController = transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller;
         _shuttlecock = _badmintonController.GetShuttlecock();
+        
         _player = GetComponent<Player>();
-        _accuracyPoint = _player.GetComponentInChildren<BadmintonHitBox>().GetComponentInChildren<AccuracyPoint>();
     }
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Shuttlecock: 4
-        sensor.AddObservation(_shuttlecock.transform.localPosition.x);
-        sensor.AddObservation(_shuttlecock.transform.localPosition.y);
-        sensor.AddObservation(_shuttlecock.GetComponent<Rigidbody2D>().linearVelocity);
+        // Shuttlecock direction: 3
+        Vector2 relativePos = _shuttlecock.transform.position - transform.position;
+        sensor.AddObservation(relativePos.normalized);
+        sensor.AddObservation(relativePos.magnitude);
 
         // Player Position: 2
         sensor.AddObservation(transform.localPosition.x);
@@ -36,6 +35,17 @@ public class PlayerAgent : Agent
         sensor.AddObservation(_player.MoveVelocity);
         sensor.AddObservation(_player.JumpVelocity);
         sensor.AddObservation(_player.Power);
+
+        // lastTouched: 1
+        int lastTouchedIdx;
+        Player lastTouchedPlayer = _badmintonController.GetLastTouchedPlayer();
+        if (lastTouchedPlayer == null)
+            lastTouchedIdx = 0;
+        else if (lastTouchedPlayer == _player)
+            lastTouchedIdx = 1;
+        else lastTouchedIdx = 2;
+
+        sensor.AddObservation(lastTouchedIdx);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
@@ -56,14 +66,20 @@ public class PlayerAgent : Agent
 
     private void CalcReward()
     {
-        // dist의 x 값이 [0, 5]일 때 [0.2, 0.0]점을 linear하게 받는다.
-        Vector2 dist = _shuttlecock.GetDistanceFrom(_accuracyPoint.transform.position);
-        float x = Mathf.Clamp(Mathf.Abs(dist.x), 0, 5);
-        AddReward(-0.04f * x + 0.2f);
+        // dist의 x 값이 [0, 0.5]일 때 [0.2, 0.0]점을 linear하게 받는다.
+        Vector2 dist = _shuttlecock.GetDistanceFrom(_player.accuracyPoint.transform.position);
+        float x = Mathf.Clamp(Mathf.Abs(dist.x), 0, 0.5f);
+        AddReward(0.2f - 0.4f * x);
 
-        // 마지막으로 콕을 친 사람이 나라면 조금씩 점수를 잃는다.
-        if (_badmintonController.IsLastTouchedPlayer(_player))
-            AddReward(-0.01f);
+        if (_badmintonController.GetLastTouchedPlayer() == _player)
+        {
+            float xFromNetToMe = _badmintonController.GetDistanceFromBadmintonNetTo(transform.position).x;
+            float xFromNetToShuttlecock = _badmintonController.GetDistanceFromBadmintonNetTo(_shuttlecock.transform.position).x;
+            if (xFromNetToMe * xFromNetToShuttlecock < 0)
+            {
+                AddReward(0.1f);
+            }
+        }
     }
 
     private void MoveAgent(ArraySegment<int> moves)

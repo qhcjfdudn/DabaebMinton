@@ -31,7 +31,11 @@ public class BadmintonController
         _player2 = player2;
     }
 
+    public Player GetLastTouchedPlayer() { return _lastTouchedPlayer; }
+
     public Shuttlecock GetShuttlecock() { return _shuttlecock; }
+
+    public Vector2 GetDistanceFromBadmintonNetTo(Vector3 position) { return position - _badmintonNet.transform.position; }
 
     public bool IsLastTouchedPlayer(Player player)
     {

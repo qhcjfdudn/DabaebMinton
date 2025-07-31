@@ -20,6 +20,8 @@ public class Player : MonoBehaviour
     public bool JumpValue { get; set; }
     public int JumpCount { get; set; } = 0;
 
+    public AccuracyPoint accuracyPoint { get; private set; }
+
     private Rigidbody2D _rigidbody;
     private Animator _animator;
     private PlayerHand _playerHand;
@@ -101,6 +103,19 @@ public class Player : MonoBehaviour
         }
     }
 
+    private CharacterInitialData GetInitialData(ECharacterID characterID)
+    {
+        switch (characterID)
+        {
+            case ECharacterID.Daramgee:
+                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/DaramgeeInitialData");
+            case ECharacterID.Baebsae:
+                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/BaebsaeInitialData");
+        }
+
+        return null;
+    }
+
     private enum EAnimationMoveState
     {
         Standing, Move
@@ -154,10 +169,14 @@ public class Player : MonoBehaviour
         _animator = GetComponent<Animator>();
         
         _playerHand = GetComponentInChildren<PlayerHand>();
-        _hitBox = GetComponentInChildren<BadmintonHitBox>();
         _swingCharger = GetComponentInChildren<SwingCharger>();
-
+        
+        _hitBox = GetComponentInChildren<BadmintonHitBox>();
+        accuracyPoint = _hitBox.GetComponentInChildren<AccuracyPoint>();
+        
         _state = new StandingState();
+
+        InitializeStat(GetInitialData(CharacterID));
     }
 
     // Update is called once per frame
