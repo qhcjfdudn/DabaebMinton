@@ -31,55 +31,32 @@ public class PlayerAgent : Agent
         sensor.AddObservation(transform.localPosition.x);
         sensor.AddObservation(transform.localPosition.y);
 
-        // Player Stat: 3
-        sensor.AddObservation(_player.MoveVelocity);
-        sensor.AddObservation(_player.JumpVelocity);
+        // Player Stat: 4
+        sensor.AddObservation(_player.GetComponent<Rigidbody2D>().linearVelocity);
         sensor.AddObservation(_player.Power);
+        sensor.AddObservation(_player.GetSwingCharger().ChargeGauge);
 
         // lastTouched: 1
-        int lastTouchedIdx;
-        Player lastTouchedPlayer = _badmintonController.GetLastTouchedPlayer();
-        if (lastTouchedPlayer == null)
-            lastTouchedIdx = 0;
-        else if (lastTouchedPlayer == _player)
-            lastTouchedIdx = 1;
-        else lastTouchedIdx = 2;
+        sensor.AddObservation(_badmintonController.GetLastTouchedIndex());
 
-        sensor.AddObservation(lastTouchedIdx);
+        // Distance between BadmintonNet: 2
+        sensor.AddObservation(_badmintonController.GetDistanceFromBadmintonNetTo(_player.transform.position));
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        CalcReward();
-
         ArraySegment<int> moves = new (actions.DiscreteActions.Array, 0, 2);
         ArraySegment<int> swings = new (actions.DiscreteActions.Array, 2, 2);
 
         MoveAgent(moves);
         SwingAgent(swings);
+        
+        CalcReward();
     }
 
     public override void OnEpisodeBegin()
     {
         _lastSwingInput = _lastActionSwingInput = 0;
-    }
-
-    private void CalcReward()
-    {
-        // dist의 x 값이 [0, 0.5]일 때 [0.2, 0.0]점을 linear하게 받는다.
-        Vector2 dist = _shuttlecock.GetDistanceFrom(_player.accuracyPoint.transform.position);
-        float x = Mathf.Clamp(Mathf.Abs(dist.x), 0, 0.5f);
-        AddReward(0.2f - 0.4f * x);
-
-        if (_badmintonController.GetLastTouchedPlayer() == _player)
-        {
-            float xFromNetToMe = _badmintonController.GetDistanceFromBadmintonNetTo(transform.position).x;
-            float xFromNetToShuttlecock = _badmintonController.GetDistanceFromBadmintonNetTo(_shuttlecock.transform.position).x;
-            if (xFromNetToMe * xFromNetToShuttlecock < 0)
-            {
-                AddReward(0.1f);
-            }
-        }
     }
 
     private void MoveAgent(ArraySegment<int> moves)
@@ -136,4 +113,30 @@ public class PlayerAgent : Agent
         _lastActionSwingInput = actionSwingInput;
     }
 
+    private void CalcReward()
+    {
+        Player lastTouchedPlayer = _badmintonController.GetLastTouchedPlayer();
+
+        if (lastTouchedPlayer != _player)
+        {
+            float playerDirX = _player.GetComponent<Rigidbody2D>().linearVelocity.x;
+            float RelativeShuttlcockPosX = _shuttlecock.transform.position.x - _player.accuracyPoint.transform.position.x;
+            if (Mathf.Abs(RelativeShuttlcockPosX) < 0.3f) // shuttlecock을 accuracyPoint에 머물게 한다면
+            {
+                AddReward(0.1f);
+            }
+            else if (playerDirX * RelativeShuttlcockPosX > 0) // shuttlecock 방향으로 내가 이동 중이라면 reward
+                AddReward(0.05f);
+        }
+        else if (lastTouchedPlayer == _player)
+        {
+            // 상대방의 Ground를 구해서 그 위에 존재할 때 점수를 얻는 방식으로 변경 필요
+            float xFromNetToMe = _badmintonController.GetDistanceFromBadmintonNetTo(transform.position).x;
+            float xFromNetToShuttlecock = _badmintonController.GetDistanceFromBadmintonNetTo(_shuttlecock.transform.position).x;
+            if (xFromNetToMe * xFromNetToShuttlecock < 0)
+            {
+                AddReward(0.1f);
+            }
+        }
+    }
 }

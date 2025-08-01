@@ -37,9 +37,15 @@ public class BadmintonController
 
     public Vector2 GetDistanceFromBadmintonNetTo(Vector3 position) { return position - _badmintonNet.transform.position; }
 
-    public bool IsLastTouchedPlayer(Player player)
+    public int GetLastTouchedIndex()
     {
-        return _lastTouchedPlayer == player;
+        if (_lastTouchedPlayer == _player1)
+            return 0;
+
+        if (_lastTouchedPlayer == _player2)
+            return 1;
+
+        return -1;
     }
 
     public virtual bool SwingShuttlecock(Player player)
@@ -67,8 +73,6 @@ public class BadmintonController
 
     public virtual bool ActionSwingShuttlecock(Player player)
     {
-        Debug.Log("[ActionSwingShuttlecock] called.");
-
         if (_lastTouchedPlayer == player)
             return false;
 
@@ -147,6 +151,8 @@ public class BadmintonController
     {
         StartNewGame();
     }
+
+    public virtual void FixedUpdate() { }
 
     public void ClearShuttlecock(Player player)
     {
@@ -299,7 +305,6 @@ public class BadmintonController
 
         return force;
     }
-
 }
 
 public enum EGamePlayState

@@ -103,6 +103,8 @@ public class Player : MonoBehaviour
         }
     }
 
+    public SwingCharger GetSwingCharger() { return _swingCharger; }
+
     private CharacterInitialData GetInitialData(ECharacterID characterID)
     {
         switch (characterID)

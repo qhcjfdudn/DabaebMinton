@@ -162,6 +162,11 @@ public class BadmintonControllerComponent : MonoBehaviour
     {
         Initialize();
     }
+
+    private void FixedUpdate()
+    {
+        Controller.FixedUpdate();
+    }
 }
 
 public enum EPlayMode
