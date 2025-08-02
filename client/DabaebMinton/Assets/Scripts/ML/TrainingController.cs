@@ -32,11 +32,17 @@ public class TrainingController : BadmintonController
     {
         base.Initialize();
 
-        _team1 = new SimpleMultiAgentGroup();
-        _team2 = new SimpleMultiAgentGroup();
+        PlayerAgent player1Agent = _player1.GetComponent<PlayerAgent>();
+        player1Agent.SetOpponent(_player2);
 
-        _team1.RegisterAgent(_player1.GetComponent<PlayerAgent>());
-        _team2.RegisterAgent(_player2.GetComponent<PlayerAgent>());
+        PlayerAgent player2Agent = _player2.GetComponent<PlayerAgent>();
+        player2Agent.SetOpponent(_player1);
+
+        _team1 = new SimpleMultiAgentGroup();
+        _team1.RegisterAgent(player1Agent);
+
+        _team2 = new SimpleMultiAgentGroup();
+        _team2.RegisterAgent(player2Agent);
 
         MAX_STEP = 50f / Time.fixedDeltaTime;
 

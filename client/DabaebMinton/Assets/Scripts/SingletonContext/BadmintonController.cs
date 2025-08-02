@@ -55,6 +55,9 @@ public class BadmintonController
         if (_lastTouchedPlayer == player)
             return false;
 
+        if (IsOnSameGroundWithShuttlecock(player) == false)
+            return false;
+
         BadmintonHitBox hitBox = player.GetComponentInChildren<BadmintonHitBox>();
 
         if (hitBox.IncludesShuttlecock == false)
@@ -74,6 +77,9 @@ public class BadmintonController
     public virtual bool ActionSwingShuttlecock(Player player)
     {
         if (_lastTouchedPlayer == player)
+            return false;
+
+        if (IsOnSameGroundWithShuttlecock(player) == false)
             return false;
 
         // hitPoint -> accuracy box로 개선 필요
@@ -140,6 +146,12 @@ public class BadmintonController
         }
 
         return false;
+    }
+
+    public bool IsOnSameGroundWithShuttlecock(Player player)
+    {
+        return GetDistanceFromBadmintonNetTo(player.transform.position).x
+            * GetDistanceFromBadmintonNetTo(_shuttlecock.transform.position).x >= 0;
     }
 
     public virtual void TouchGround(EGroundType groundType)

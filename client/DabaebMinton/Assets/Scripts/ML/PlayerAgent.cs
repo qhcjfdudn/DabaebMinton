@@ -8,9 +8,14 @@ public class PlayerAgent : Agent
 {
     private BadmintonController _badmintonController;
     private Shuttlecock _shuttlecock;
-    private Player _player;
+    private Player _player, _opponent;
     
     private int _lastSwingInput, _lastActionSwingInput;
+
+    public void SetOpponent(Player opponent)
+    {
+        _opponent = opponent;
+    }
 
     public override void Initialize()
     {
@@ -22,10 +27,10 @@ public class PlayerAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Shuttlecock direction: 3
-        Vector2 relativePos = _shuttlecock.transform.position - transform.position;
-        sensor.AddObservation(relativePos.normalized);
-        sensor.AddObservation(relativePos.magnitude);
+        // Shuttlecock's Relative Position: 3
+        Vector2 shuttlecockRelativePos = _shuttlecock.transform.position - transform.position;
+        sensor.AddObservation(shuttlecockRelativePos.normalized);
+        sensor.AddObservation(shuttlecockRelativePos.magnitude);
 
         // Player Position: 2
         sensor.AddObservation(transform.localPosition.x);
@@ -40,7 +45,12 @@ public class PlayerAgent : Agent
         sensor.AddObservation(_badmintonController.GetLastTouchedIndex());
 
         // Distance between BadmintonNet: 2
-        sensor.AddObservation(_badmintonController.GetDistanceFromBadmintonNetTo(_player.transform.position));
+        sensor.AddObservation(-_badmintonController.GetDistanceFromBadmintonNetTo(_player.transform.position));
+
+        // Opponent's Relative Position: 3
+        Vector2 OpponentRelativePos = _opponent.transform.position - transform.position;
+        sensor.AddObservation(OpponentRelativePos.normalized);
+        sensor.AddObservation(OpponentRelativePos.magnitude);
     }
 
     public override void OnActionReceived(ActionBuffers actions)
