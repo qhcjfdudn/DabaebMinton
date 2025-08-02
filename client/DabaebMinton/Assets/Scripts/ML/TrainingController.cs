@@ -13,7 +13,7 @@ public class TrainingController : BadmintonController
         bool isSwingSuccess = base.ActionSwingShuttlecock(player);
 
         if (isSwingSuccess)
-            player.GetComponent<PlayerAgent>().AddReward(0.5f);
+            player.GetComponent<PlayerAgent>().AddReward(0.6f);
 
         return isSwingSuccess;
     }
@@ -38,7 +38,7 @@ public class TrainingController : BadmintonController
         _team1.RegisterAgent(_player1.GetComponent<PlayerAgent>());
         _team2.RegisterAgent(_player2.GetComponent<PlayerAgent>());
 
-        MAX_STEP = 30f / Time.fixedDeltaTime;
+        MAX_STEP = 50f / Time.fixedDeltaTime;
 
         ResetScene();
     }
@@ -48,23 +48,23 @@ public class TrainingController : BadmintonController
         switch (groundType)
         {
             case EGroundType.Left:
-                _team1.AddGroupReward(-1.0f);
+                _team1.SetGroupReward(-1.0f);
 
                 if (_lastTouchedPlayer == _player1)
-                    _team2.AddGroupReward(0.3f);
+                    _team2.SetGroupReward(0.8f);
 
                 else if (_lastTouchedPlayer == _player2)
-                    _team2.AddGroupReward(1.0f);
+                    _team2.SetGroupReward(1.0f);
 
                 break;
             case EGroundType.Right:
-                _team2.AddGroupReward(-1.0f);
+                _team2.SetGroupReward(-1.0f);
 
                 if (_lastTouchedPlayer == _player2)
-                    _team1.AddGroupReward(0.3f);
+                    _team1.SetGroupReward(0.8f);
 
                 else if (_lastTouchedPlayer == _player1)
-                    _team1.AddGroupReward(1.0f);
+                    _team1.SetGroupReward(1.0f);
 
                 break;
         }
@@ -79,13 +79,13 @@ public class TrainingController : BadmintonController
     {
         if (_lastTouchedPlayer == _player1)
         {
-            _team1.AddGroupReward(-1.0f);
-            _team2.AddGroupReward(0.1f);
+            _team1.SetGroupReward(-1.0f);
+            _team2.SetGroupReward(0.5f);
         }
         else if (_lastTouchedPlayer == _player2)
         {
-            _team2.AddGroupReward(-1.0f);
-            _team1.AddGroupReward(0.1f);
+            _team2.SetGroupReward(-1.0f);
+            _team1.SetGroupReward(0.5f);
         }
 
         _team1.EndGroupEpisode();
