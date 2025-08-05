@@ -13,7 +13,7 @@ public class TrainingController : BadmintonController
         bool isSwingSuccess = base.ActionSwingShuttlecock(player);
 
         if (isSwingSuccess)
-            player.GetComponent<PlayerAgent>().AddReward(0.6f);
+            player.GetComponent<PlayerAgent>().AddReward(0.5f);
 
         return isSwingSuccess;
     }
@@ -23,7 +23,7 @@ public class TrainingController : BadmintonController
         bool isSwingSuccess = base.SwingShuttlecock(player);
 
         if (isSwingSuccess)
-            player.GetComponent<PlayerAgent>().AddReward(0.5f);
+            player.GetComponent<PlayerAgent>().AddReward(0.3f);
 
         return isSwingSuccess;
     }
@@ -57,7 +57,7 @@ public class TrainingController : BadmintonController
                 _team1.SetGroupReward(-1.0f);
 
                 if (_lastTouchedPlayer == _player1)
-                    _team2.SetGroupReward(0.8f);
+                    _team2.SetGroupReward(0.5f);
 
                 else if (_lastTouchedPlayer == _player2)
                     _team2.SetGroupReward(1.0f);
@@ -67,7 +67,7 @@ public class TrainingController : BadmintonController
                 _team2.SetGroupReward(-1.0f);
 
                 if (_lastTouchedPlayer == _player2)
-                    _team1.SetGroupReward(0.8f);
+                    _team1.SetGroupReward(0.5f);
 
                 else if (_lastTouchedPlayer == _player1)
                     _team1.SetGroupReward(1.0f);
