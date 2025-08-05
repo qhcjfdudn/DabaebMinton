@@ -33,11 +33,11 @@
 
 # Custom
 .vs/
-ChatProject/Output
-ChatProject/Build
-ChatProject/Src/Server/Server.vcxproj.user
-ChatProject/Src/Client/Client.vcxproj.user
-ChatProject/Src/UtilProject
+server/Output
+server/Build
+server/Src/Server/Server.vcxproj.user
+server/Src/Client/Client.vcxproj.user
+server/Src/UtilProject
 
-ChatProject/ExternalLibrary
+server/ExternalLibrary
 resources/

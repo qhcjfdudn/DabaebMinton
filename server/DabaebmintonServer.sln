@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Src\Client\Client.vcxproj", "{6E612F85-AA5F-4B91-8608-A9CD0BDF6126}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Src\Server\Server.vcxproj", "{EC51C2E7-F41F-434F-AB5D-2A83E282CEBC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DabaebmintonServer", "Src\DabaebmintonServer\DabaebmintonServer.vcxproj", "{EC51C2E7-F41F-434F-AB5D-2A83E282CEBC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UtilProject", "Src\UtilProject\UtilProject.vcxproj", "{4E0DFF2A-692F-40D0-8887-8317A62A29A0}"
 EndProject
