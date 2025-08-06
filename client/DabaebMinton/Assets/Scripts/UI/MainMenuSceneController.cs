@@ -20,12 +20,39 @@ public class MainMenuSceneController : MonoBehaviour
     public Button _gameStartButton;
 
     public RectTransform _mainMenuPanel;
+    public RectTransform _mainButtonPanel;
+    public RectTransform _localPlayPanel;
+    public RectTransform _positionSelectingPanel;
     public RectTransform _levelSettingsPanel;
 
     public void onClickLocalPlayButton()
     {
         PlayerPrefs.SetInt("PlayMode", (int)EPlayMode.Local);
 
+        _mainButtonPanel.gameObject.SetActive(false);
+        _localPlayPanel.gameObject.SetActive(true);
+    }
+
+    public void OnSelect1PLocalPlayButton()
+    {
+        PlayerPrefs.SetInt("PlayerCount", 1);
+        
+        _localPlayPanel.gameObject.SetActive(false);
+        _positionSelectingPanel.gameObject.SetActive(true);
+    }
+
+    public void OnSelectPositionSelectingPanelButton(int selectedPosition)
+    {
+        PlayerPrefs.SetInt("PositionOf1P", selectedPosition);
+        
+        _mainMenuPanel.gameObject.SetActive(false);
+        _levelSettingsPanel.gameObject.SetActive(true);
+    }
+
+    public void OnSelect2PLocalPlayButton()
+    {
+        PlayerPrefs.SetInt("PlayerCount", 2);
+        
         _mainMenuPanel.gameObject.SetActive(false);
         _levelSettingsPanel.gameObject.SetActive(true);
     }
@@ -33,6 +60,9 @@ public class MainMenuSceneController : MonoBehaviour
     public void onClickOnlinePlayButton()
     {
         Debug.Log("Online Play button clicked");
+
+        PlayerPrefs.SetInt("PlayMode", (int)EPlayMode.Online);
+
         // Add logic to start online play
     }
 
