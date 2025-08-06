@@ -41,7 +41,7 @@ public class MainMenuSceneController : MonoBehaviour
         _positionSelectingPanel.gameObject.SetActive(true);
     }
 
-    public void OnSelectPositionSelectingPanelButton(int selectedPosition)
+    public void OnSelectPositionSelectingButton(int selectedPosition)
     {
         PlayerPrefs.SetInt("PositionOf1P", selectedPosition);
         
