@@ -25,7 +25,7 @@ public class MainMenuSceneController : MonoBehaviour
     public RectTransform _positionSelectingPanel;
     public RectTransform _levelSettingsPanel;
 
-    public void onClickLocalPlayButton()
+    public void OnSelectLocalPlayButton()
     {
         PlayerPrefs.SetInt("PlayMode", (int)EPlayMode.Local);
 
@@ -57,7 +57,7 @@ public class MainMenuSceneController : MonoBehaviour
         _levelSettingsPanel.gameObject.SetActive(true);
     }
 
-    public void onClickOnlinePlayButton()
+    public void OnSelectOnlinePlayButton()
     {
         Debug.Log("Online Play button clicked");
 
@@ -66,20 +66,20 @@ public class MainMenuSceneController : MonoBehaviour
         // Add logic to start online play
     }
 
-    public void onClickSettingsButton()
+    public void OnSelectSettingsButton()
     {
         Debug.Log("Settings button clicked");
         // Add logic to open settings
     }
 
-    public void onClickQuitButton()
+    public void OnSelectQuitButton()
     {
         Debug.Log("Quit button clicked");
         // Add logic to quit the game
         Application.Quit();
     }
 
-    public void OnClickAddScoreButton(int value)
+    public void OnSelectAddScoreButton(int value)
     {
         int nextScore = _score + value;
 
@@ -111,7 +111,7 @@ public class MainMenuSceneController : MonoBehaviour
         _difficultyButtons[difficultyType].interactable = false; // 선택한 난이도 버튼 비활성화
     }
 
-    public void OnClickGameStartButton()
+    public void OnSelectGameStartButton()
     {
         Debug.Log("Game Start button clicked");
 
