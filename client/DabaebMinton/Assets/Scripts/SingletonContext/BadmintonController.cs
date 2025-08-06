@@ -3,19 +3,21 @@ using static ShuttlecockMovementStrategyFactory;
 
 public class BadmintonController
 {
-    protected Player _player1, _player2;
-    protected Player _lastTouchedPlayer;
     protected Shuttlecock _shuttlecock;
     protected BadmintonNet _badmintonNet;
-    protected float _shortServiceLine = 1.98f;
+    protected float _shortServiceLine;
 
-    protected Vector2 _shuttlecockInitialPosition = new Vector2(-5f, 6f);
+    protected Vector2 _nextShuttlecockServePosition;
+    
+    protected Player _player1, _player2;
+    protected Player _lastTouchedPlayer;
+    protected Player _scoredPlayer;
 
     private EGamePlayState _gamePlayState;
 
     public virtual void Initialize()
     {
-
+        _nextShuttlecockServePosition = new Vector2(-_shortServiceLine, 7);
     }
 
     public void SetLevel(BadmintonNet badmintonNet, Shuttlecock shuttlecock, float shortServiceLine)
@@ -156,12 +158,35 @@ public class BadmintonController
 
     public virtual void TouchGround(EGroundType groundType)
     {
+        _scoredPlayer = GetScoredPlayer(groundType);
+
         StartNewGame();
     }
 
     public virtual void TouchPenaltyArea()
     {
+        _scoredPlayer = GetScoredPlayer();
+
         StartNewGame();
+    }
+
+    public Player GetScoredPlayer(EGroundType groundType = EGroundType.None)
+    {
+        switch (groundType)
+        {
+            case EGroundType.None:
+                if      (_lastTouchedPlayer == _player1)    return _player2;
+                else if (_lastTouchedPlayer == _player2)    return _player1;
+                break;
+
+            case EGroundType.Left:
+                return _player2;
+
+            case EGroundType.Right:
+                return _player1;
+        }
+
+        return null;
     }
 
     public virtual void FixedUpdate() { }
@@ -196,9 +221,10 @@ public class BadmintonController
         _shuttlecock.Hit(GetSwingForce(player, 70f, 50f, 90f));
     }
 
-    public void MoveShuttlecockInitialPosition()
+    public void MoveShuttlecockServePosition()
     {
-        _shuttlecock.Move(_shuttlecockInitialPosition);
+        _nextShuttlecockServePosition.x = _scoredPlayer == _player1 ? -_shortServiceLine : _shortServiceLine;
+        _shuttlecock.Move(_nextShuttlecockServePosition);
     }
 
     public void SetShuttlecockMovementStrategy(EShuttlecockSpeed difficultyType)
@@ -271,7 +297,7 @@ public class BadmintonController
 
     public void StartNewGame()
     {
-        MoveShuttlecockInitialPosition();
+        MoveShuttlecockServePosition();
         _lastTouchedPlayer = null;
         _gamePlayState = EGamePlayState.Playing;
     }

@@ -16,6 +16,8 @@ public class PlayableBadmintonController : BadmintonController
 
     public override void Initialize()
     {
+        base.Initialize();
+
         _player1Score = 0;
         _player2Score = 0;
         _endScore = PlayerPrefs.GetInt("score");
@@ -36,23 +38,23 @@ public class PlayableBadmintonController : BadmintonController
             return;
         }
 
+        _scoredPlayer = GetScoredPlayer(groundType);
+        AddScoreTo(_scoredPlayer);
+
         if (groundType == EGroundType.Left)
         {
-            Debug.Log("[TouchGround] Shuttlecock touched the left ground.");
             PauseGame(EPauseReason.ShuttlecockTouchGroundLeft);
-            AddScoreTo(_player2);
-            CheckGameEnd();
         }
         else if (groundType == EGroundType.Right)
         {
             PauseGame(EPauseReason.ShuttlecockTouchGroundRight);
-            AddScoreTo(_player1);
-            CheckGameEnd();
         }
         else
         {
             Debug.LogWarning("[TouchGround] Unknown ground type.");
         }
+
+        CheckGameEnd();
     }
 
     public override void TouchPenaltyArea()
@@ -60,20 +62,10 @@ public class PlayableBadmintonController : BadmintonController
         if (IsGamePaused())
             return;
 
-        Player winPlayer = null;
-
-        if (_lastTouchedPlayer == _player1)
-            winPlayer = _player2;
-        else if (_lastTouchedPlayer == _player2)
-            winPlayer = _player1;
-        else
-        {
-            Debug.LogWarning("[TouchThePenaltyArea] Last touched player is null.");
-            return;
-        }
+        _scoredPlayer = GetScoredPlayer();
 
         PauseGame(EPauseReason.ShuttlecockTouchPenaltyArea);
-        AddScoreTo(winPlayer);
+        AddScoreTo(_scoredPlayer);
         CheckGameEnd();
     }
 

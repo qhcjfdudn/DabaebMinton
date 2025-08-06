@@ -86,6 +86,15 @@ public class BadmintonControllerComponent : MonoBehaviour
             p2Agent.SetOpponent(player1);
         }
 
+        if (player1 == null)
+        {
+            player1 = CreatePlayer("Player1", new Vector2(-3f, 1.25f));
+        }
+        if (player2 == null)
+        {
+            player2 = CreatePlayer("Player2", new Vector2(3f, 1.25f));
+        }
+
         Controller.SetPlayer(player1, player2);
 
         int difficulty = PlayerPrefs.GetInt("difficulty");
