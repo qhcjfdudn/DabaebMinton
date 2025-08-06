@@ -1184,7 +1184,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1506654128}
         m_TargetAssemblyTypeName: MainMenuSceneController, Assembly-CSharp
-        m_MethodName: OnClickAddScoreButton
+        m_MethodName: OnSelectAddScoreButton
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2606,7 +2606,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1506654128}
         m_TargetAssemblyTypeName: MainMenuSceneController, Assembly-CSharp
-        m_MethodName: OnClickAddScoreButton
+        m_MethodName: OnSelectAddScoreButton
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
