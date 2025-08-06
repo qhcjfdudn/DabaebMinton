@@ -33,10 +33,10 @@ public class TrainingController : BadmintonController
         base.Initialize();
 
         PlayerAgent player1Agent = _player1.GetComponent<PlayerAgent>();
-        player1Agent.SetOpponent(_player2);
+        //player1Agent.SetOpponent(_player2);
 
         PlayerAgent player2Agent = _player2.GetComponent<PlayerAgent>();
-        player2Agent.SetOpponent(_player1);
+        //player2Agent.SetOpponent(_player1);
 
         _team1 = new SimpleMultiAgentGroup();
         _team1.RegisterAgent(player1Agent);

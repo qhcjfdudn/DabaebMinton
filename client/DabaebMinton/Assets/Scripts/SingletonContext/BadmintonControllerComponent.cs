@@ -9,6 +9,9 @@ public class BadmintonControllerComponent : MonoBehaviour
 
     private InputManager _inputManager;
 
+    private int _playerCount;
+    private int _positionOf1P;
+
     public void TogglePlayMode()
     {
         switch (PlayMode)
@@ -39,9 +42,49 @@ public class BadmintonControllerComponent : MonoBehaviour
             CreateShuttlecock(),
             shortServiceLine);
 
-        // Local Play에서는 Player를 생성하고, 학습모드에서는 PlayerAgent가 포함된 Player를 생성.
-        Player player1 = CreatePlayer("Player1", new Vector2(-3f, 3));
-        Player player2 = CreatePlayer("Player2", new Vector2(3f, 3));
+        Player player1 = null, player2 = null;
+
+        // PlayMode에 따른 Player or Agent 생성
+        if (PlayMode == EPlayMode.Local)
+        {
+            if (_playerCount == 1)
+            {
+                if (_positionOf1P == 0) // Left
+                {
+                    PlayerAgent agent = CreatePlayerAgent("Player2", new Vector2(3f, 1.25f));
+
+                    player1 = CreatePlayer("Player1", new Vector2(-3f, 1.25f));
+                    player2 = agent.GetComponent<Player>();
+
+                    agent.SetOpponent(player1);
+                }
+                else
+                {
+                    PlayerAgent agent = CreatePlayerAgent("Player1", new Vector2(-3f, 1.25f));
+
+                    player1 = agent.GetComponent<Player>();
+                    player2 = CreatePlayer("Player2", new Vector2(3f, 1.25f));
+
+                    agent.SetOpponent(player2);
+                }
+            }
+            else if (_playerCount == 2)
+            {
+                player1 = CreatePlayer("Player1", new Vector2(-3f, 1.25f));
+                player2 = CreatePlayer("Player2", new Vector2(3f, 1.25f));
+            }
+        }
+        else if (PlayMode == EPlayMode.Training)
+        {
+            PlayerAgent p1Agent = CreatePlayerAgent("Player1", new Vector2(-3f, 1.25f));
+            PlayerAgent p2Agent = CreatePlayerAgent("Player2", new Vector2(3f, 1.25f));
+            
+            player1 = p1Agent.GetComponent<Player>();
+            player2 = p2Agent.GetComponent<Player>();
+
+            p1Agent.SetOpponent(player2);
+            p2Agent.SetOpponent(player1);
+        }
 
         Controller.SetPlayer(player1, player2);
 
@@ -71,17 +114,14 @@ public class BadmintonControllerComponent : MonoBehaviour
 
     private Player CreatePlayer(string name, Vector2 initPos)
     {
-        if (PlayMode == EPlayMode.Training)
-            return CreatePlayerAgent(name, initPos);
-
         Player player = InstantiatePlayer($"Prefabs/{name}", name, initPos);
         return player;
     }
 
-    private Player CreatePlayerAgent(string name, Vector2 initPos)
+    private PlayerAgent CreatePlayerAgent(string name, Vector2 initPos)
     {
         Player player = InstantiatePlayer($"Prefabs/ML/{name}Agent", name, initPos);
-        return player;
+        return player.GetComponent<PlayerAgent>();
     }
 
     private Player InstantiatePlayer(string path, string name, Vector2 position)
@@ -109,6 +149,12 @@ public class BadmintonControllerComponent : MonoBehaviour
             PlayerPrefs.DeleteKey("PlayMode");
         }
 
+        _playerCount = PlayerPrefs.GetInt("PlayerCount", 1);
+        PlayerPrefs.DeleteKey("PlayerCount");
+
+        _positionOf1P = PlayerPrefs.GetInt("PositionOf1P", 0);
+        PlayerPrefs.DeleteKey("PositionOf1P");
+
         Debug.Log($"[BadmintonControllerComponent] PlayMode: {PlayMode}");
     }
 
@@ -133,7 +179,7 @@ public class BadmintonControllerComponent : MonoBehaviour
 
             return controller;
         }
-        
+
         if (PlayMode == EPlayMode.Online)
         {
             return BadmintonControllerFactory.GetDefaultBadmintonController();
@@ -154,7 +200,7 @@ public class BadmintonControllerComponent : MonoBehaviour
     private void Awake()
     {
         InitSetting();
-        
+
         Controller = GetController();
     }
 
