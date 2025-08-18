@@ -1,4 +1,4 @@
-#include "ServerPCH.h"
+ï»¿#include "ServerPCH.h"
 
 #include <csignal>
 
@@ -47,12 +47,12 @@ int main()
 		}
 		});
 
-	// fps ¾÷µ¥ÀÌÆ®¸¦ À§ÇØ º°µµ thread µ¿ÀÛ
-	// ¸®ÆÑÅÍ¸µ Àû¿ë ÇÊ¿ä
+	// fps ì—…ë°ì´íŠ¸ë¥¼ ìœ„í•´ ë³„ë„ thread ë™ì‘
+	// ë¦¬íŒ©í„°ë§ ì ìš© í•„ìš”
 	thread physXThread([&levels]() {
 		auto& engineInstance = Engine::GetInstance();
 
-		// thread ³»¿¡¼­ ÂüÁ¶ÇÏ´Â ¿ÜºÎ º¯¼ö. atomicÀ¸·Î º¯°æÇØ ÀáÀçÀû µ¿½Ã¼º ¿À·ù ÇØ°áÇÏÀÚ.
+		// thread ë‚´ì—ì„œ ì°¸ì¡°í•˜ëŠ” ì™¸ë¶€ ë³€ìˆ˜. atomicìœ¼ë¡œ ë³€ê²½í•´ ì ì¬ì  ë™ì‹œì„± ì˜¤ë¥˜ í•´ê²°í•˜ì.
 		while (engineInstance.isRunning)
 		{
 			for (auto& level : levels)
@@ -70,7 +70,7 @@ int main()
 		}
 		});
 
-	// Networking µ¿ÀÛ°ú world µ¿ÀÛÀ» º°°³ thread·Î ºĞ¸® ÇÊ¿ä
+	// Networking ë™ì‘ê³¼ world ë™ì‘ì„ ë³„ê°œ threadë¡œ ë¶„ë¦¬ í•„ìš”
 	while (engineInstance.isRunning) {
 		networkInstance.ProcessIOCPEvent();
 		

@@ -1,4 +1,4 @@
-#include "ServerPCH.h"
+ï»¿#include "ServerPCH.h"
 #include "Observer.h"
 
 void Observer::notify(const ObserverEvent& oe) const
@@ -6,7 +6,7 @@ void Observer::notify(const ObserverEvent& oe) const
 	switch (oe)
 	{
 	case ObserverEvent::EngineOff:
-		// µ¹°í ÀÖ´Â thread°¡ ÀÖ´Ù¸é ¿©±â¿¡ Ãß°¡ÇØ Á¾·á °¡´É
+		// ëŒê³  ìˆëŠ” threadê°€ ìˆë‹¤ë©´ ì—¬ê¸°ì— ì¶”ê°€í•´ ì¢…ë£Œ ê°€ëŠ¥
 		return;
 	}
 }
