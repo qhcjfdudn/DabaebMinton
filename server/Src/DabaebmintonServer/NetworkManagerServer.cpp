@@ -293,10 +293,10 @@ int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 	b.buf = clientSocket->m_sendBuffer;
 	b.len = static_cast<ULONG>(len);
 
-	WSASendTo(
+	int retCode = WSASendTo(
 		clientSocket->m_socket,
 		&b,
-		1, /* ??? */
+		1, /* lpBuffers 배열의 WSABUF 구조체 수. 이걸 여러 개 쓸 수가 있나? */
 		&clientSocket->m_numberOfBytesSent,
 		clientSocket->m_sendFlags,
 		reinterpret_cast<sockaddr*>(&clientSocket->m_remoteAddr),
@@ -305,11 +305,38 @@ int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 		nullptr
 	);
 
-	return 0;
+	if (retCode != 0) {
+		int errorCode = WSAGetLastError();
+
+		cout << "WSASendTo error: " << errorCode << endl;
+	}
+
+	return retCode;
 }
 int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 {
-	return 0;
+	sockaddr* lpFrom = nullptr;
+	int lpFromLen = sizeof(clientSocket->m_remoteAddr);
+
+	int retCode = WSARecvFrom(
+		clientSocket->m_socket,
+		reinterpret_cast<WSABUF*>(&clientSocket->m_receiveBuffer), // lpBuffers
+		1, // dwBufferCount
+		&clientSocket->m_numberOfBytesReceived, // lpNumberOfBytesRecvd
+		&clientSocket->m_readFlags, // lpFlags
+		lpFrom,
+		&lpFromLen, // lpFromLen
+		&clientSocket->m_readOverlappedStruct, // lpOverlapped
+		nullptr // lpCompletionRoutine
+	);
+
+	if (retCode != 0) {
+		int errorCode = WSAGetLastError();
+
+		cout << "WSARecvFrom error: " << errorCode << endl;
+	}
+
+	return retCode;
 }
 
 NetworkManagerServer::NetworkManagerServer()
