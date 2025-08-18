@@ -34,6 +34,7 @@ private:
 	~NetworkManagerServer();
 
 	void CreateListenSocket();
+	void CreateRUDPSocket();
 	
 	void GetLPFN();
 
@@ -49,4 +50,6 @@ private:
 
 	Socket m_listenSocket{};
 	Socket m_clientCandidateSocket{}; // accept target socket
+
+	Socket m_rudpSocket{};
 };

@@ -16,11 +16,11 @@ void NetworkManagerServer::InitIOCP() {
 		reinterpret_cast<ULONG_PTR>(nullptr), 
 		m_threadCount);
 
-	cout << "IOCP 생성 완료" << endl;
+	cout << "[InitIOCP] IOCP creation complete." << endl;
 
 	CreateListenSocket();
 
-	// AcceptEx, GetAcceptExSockAddrs 확장 함수 획득 위한 WSAIoctl 함수 호출
+	// listenSocket으로부터 AcceptEx, GetAcceptExSockAddrs 확장 함수 획득 위한 WSAIoctl 함수 호출
 	GetLPFN();
 
 	// IOCP에 listen socket 추가
@@ -29,18 +29,24 @@ void NetworkManagerServer::InitIOCP() {
 		mh_iocp, 
 		reinterpret_cast<ULONG_PTR>(nullptr), 
 		0) == nullptr) {
-		cout << "Add IOCP error: " << GetLastError() << endl;
+		cout << "[InitIOCP] Add IOCP error: " << GetLastError() << endl;
 		//cout << "Add IOCP error: " << WSAGetLastError() << endl;
 		return;
 	}
 
-	cout << "IOCP에 listenSocket 등록 완료" << endl;
+	cout << "[InitIOCP] listenSocket attach complete." << endl;
 
 	AcceptEx();
+
+	CreateRUDPSocket();
+	const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(&m_rudpSocket);
+	AddSocketIOCP(make_shared<Socket>(m_rudpSocket), completionKey);
+
+	cout << "[InitIOCP] RUDPSocket attach complete." << endl;
 }
 void NetworkManagerServer::AcceptEx()
 {
-	m_clientCandidateSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_RUDP);
+	m_clientCandidateSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_TCP);
 
 	bool acceptExStatus = m_AcceptEx(
 		m_listenSocket.m_socket,					// listenSocket
@@ -373,21 +379,32 @@ void NetworkManagerServer::CreateListenSocket()
 	// Overlapped IO 위한 listen socket 생성
 	m_listenSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_TCP);
 
-	cout << "listenSocket 생성 완료" << endl;
+	cout << "[CreateListenSocket] Socket creation complete." << endl;
 
 	if (m_listenSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
-		cout << "bind error: " << WSAGetLastError() << endl;
+		cout << "[CreateListenSocket] bind error: " << WSAGetLastError() << endl;
 		return;
 	}
 
-	cout << "bind 완료" << endl;
+	cout << "[CreateListenSocket] bind complete." << endl;
 
 	if (listen(m_listenSocket.m_socket, 10) == SOCKET_ERROR) {
 		cout << "listen error: " << WSAGetLastError() << endl;
 		return;
 	}
 
-	cout << "listen 완료" << endl;
+	cout << "[CreateListenSocket] Listen Start" << endl;
+}
+void NetworkManagerServer::CreateRUDPSocket()
+{
+	m_rudpSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_RUDP);
+	
+	cout << "[CreateRUDPSocket] RUDP Socket Creation Complete." << endl;
+	
+	if (m_rudpSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
+		cout << "[CreateRUDPSocket] bind error: " << WSAGetLastError() << endl;
+		return;
+	}
 }
 
 void NetworkManagerServer::GetLPFN()
