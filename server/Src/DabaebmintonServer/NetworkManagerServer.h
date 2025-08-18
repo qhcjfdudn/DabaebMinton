@@ -10,6 +10,7 @@ public:
 
 	void InitIOCP();
 	void AcceptEx();
+	void GetAcceptExSockAddrs(shared_ptr<Socket> client);
 	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
 	bool ProcessAcceptedClientSocketIOCP();
@@ -18,8 +19,11 @@ public:
 	int Recv(shared_ptr<Socket> clientSocket);
 	void SendPacketsIOCP();
 	int Send(shared_ptr<Socket> clientSocket, size_t len);
+	int SendTo(shared_ptr<Socket> clientSocket, size_t len);
+	int RecvFrom(shared_ptr<Socket> clientSocket);
 
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
+	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;
 
 	static const int MAX_IOCP_EVENT_COUNT = 1000;
 
@@ -28,6 +32,10 @@ public:
 private:
 	NetworkManagerServer();
 	~NetworkManagerServer();
+
+	void CreateListenSocket();
+	
+	void GetLPFN();
 
 	WSADATA m_wsa;
 	HANDLE mh_iocp = nullptr;
@@ -40,5 +48,5 @@ private:
 	DWORD m_timeoutMs{ 100 };
 
 	Socket m_listenSocket{};
-	Socket m_clientCandidateSocket{};
+	Socket m_clientCandidateSocket{}; // accept target socket
 };

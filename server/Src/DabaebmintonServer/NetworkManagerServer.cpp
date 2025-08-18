@@ -1,4 +1,4 @@
-#include "ServerPCH.h"
+ï»¿#include "ServerPCH.h"
 #include "NetworkManagerServer.h"
 
 #include "PacketQueue.h"
@@ -9,35 +9,21 @@ NetworkManagerServer& NetworkManagerServer::GetInstance() {
 }
 
 void NetworkManagerServer::InitIOCP() {
-	// Overlapped IO À§ÇÑ listen socket »ı¼º
-	m_listenSocket.m_socket = Socket::CreateWSASocket();
-	
-	cout << "listenSocket »ı¼º ¿Ï·á" << endl;
-
-	if (m_listenSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
-		cout << "bind error: " << WSAGetLastError() << endl;
-		return;
-	}
-
-	cout << "bind ¿Ï·á" << endl;
-
-	if (listen(m_listenSocket.m_socket, 10) == SOCKET_ERROR) {
-		cout << "listen error: " << WSAGetLastError() << endl;
-		return;
-	}
-
-	cout << "listen ¿Ï·á" << endl;
-
-	// IOCP »ı¼º
+	// IOCP ìƒì„±
 	mh_iocp = CreateIoCompletionPort(
 		INVALID_HANDLE_VALUE, 
 		nullptr, 
 		reinterpret_cast<ULONG_PTR>(nullptr), 
 		m_threadCount);
 
-	cout << "IOCP »ı¼º ¿Ï·á" << endl;
+	cout << "IOCP ìƒì„± ì™„ë£Œ" << endl;
 
-	// IOCP¿¡ listen socket Ãß°¡
+	CreateListenSocket();
+
+	// AcceptEx, GetAcceptExSockAddrs í™•ì¥ í•¨ìˆ˜ íšë“ ìœ„í•œ WSAIoctl í•¨ìˆ˜ í˜¸ì¶œ
+	GetLPFN();
+
+	// IOCPì— listen socket ì¶”ê°€
 	if (CreateIoCompletionPort(
 		reinterpret_cast<HANDLE>(m_listenSocket.m_socket),
 		mh_iocp, 
@@ -48,58 +34,32 @@ void NetworkManagerServer::InitIOCP() {
 		return;
 	}
 
-	cout << "IOCP¿¡ listenSocket µî·Ï ¿Ï·á" << endl;
-	
-	// WSAIoctl·ÎºÎÅÍ AcceptEx ÇÔ¼ö Æ÷ÀÎÅÍ ÇÒ´ç
-	GUID guidAcceptEx = WSAID_ACCEPTEX;
-	DWORD dwBytes;
-
-	if (WSAIoctl(
-		m_listenSocket.m_socket,			// ¼ÒÄÏ API¶ó ÇÊ¿äÇÑ argÀÎ °Í °°Àºµ¥... ¾ÆÁ÷ ¿Ö ÇÊ¿äÇÑÁö ¸ğ¸£°ÚÀ½.
-		SIO_GET_EXTENSION_FUNCTION_POINTER,	// AcceptEx ÇÔ¼ö Æ÷ÀÎÅÍ¸¦ ¾ò±â À§ÇÑ Á¦¾î ÄÚµå
-		&guidAcceptEx,						// ¾ò°íÀÚ ÇÏ´Â ÇÔ¼ö ÀÌ¸§ÀÇ ÁöÁ¤µÈ °ª(WSAID_ACCEPTEX) »ç¿ë.
-		sizeof(guidAcceptEx),
-		&m_AcceptEx,						// ¿äÃ»¿¡ ´ëÇÑ Ãâ·Â ¹öÆÛ. AcceptEx ÇÔ¼ö Æ÷ÀÎÅÍ Ãâ·Â.
-		sizeof(m_AcceptEx),
-		&dwBytes,							// Ãâ·Â¹öÆÛ·Î Ãâ·ÂµÈ °³¼ö. <- ¾Ö¸Å
-		nullptr,							// lpOverlapped: WSAOVERLAPPED ±¸Á¶Ã¼ Æ÷ÀÎÅÍ. Áö±İ ºÒÇÊ¿ä.
-		nullptr) == SOCKET_ERROR) {			// lpCompletionRoutine: ÀÛ¾÷ ¿Ï·á ÈÄ È£ÃâÇÒ ·çÆ¾ Àü´Ş °¡´É. // Áö±İ ºÒÇÊ¿ä.
-
-		cout << "WSAIoctl error: " << WSAGetLastError() << endl;
-		}
-
-	if (m_AcceptEx == nullptr) {
-		cout << "Getting AcceptEx ptr failed." << endl;
-
-		return;
-	}
-
-	cout << "WSAIoctl ¹İÈ¯ ¹× m_AcceptEx ÇÔ¼ö Æ÷ÀÎÅÍ È¹µæ ¿Ï·á" << endl;
+	cout << "IOCPì— listenSocket ë“±ë¡ ì™„ë£Œ" << endl;
 
 	AcceptEx();
 }
 void NetworkManagerServer::AcceptEx()
 {
-	m_clientCandidateSocket.m_socket = Socket::CreateWSASocket();
+	m_clientCandidateSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_RUDP);
 
 	bool acceptExStatus = m_AcceptEx(
 		m_listenSocket.m_socket,					// listenSocket
-		m_clientCandidateSocket.m_socket,			// Accept°¡ ÀÌ·ç¾îÁö¸é client socketÀ¸·Î º¯ÇÑ´Ù.
-		m_lpOutputBuf,								// Ã¹ ¹øÂ° µ¥ÀÌÅÍ ºí·Ï, ¼­¹ö ·ÎÄÃÁÖ¼Ò, Å¬¶ó ¿ø°İ ÁÖ¼Ò ¼ö½Å ¹öÆÛ.
-													// ÀÌ º¯¼ö¿Í ¾Æ·¡ 3°³ÀÇ ¹ÙÀÌÆ® ¼ö Á¤º¸ º¯¼ö´Â GetAcceptExSockaddrs() ÇÔ¼öÀÇ ÀÎÀÚ·Î
-													// ·ÎÄÃ/¿ø°İ sockaddr Á¤º¸¸¦ ÆÄ½ÌÇÒ ¶§¿¡ »ç¿ëµÉ ¼ö ÀÖ´Ù.
-		0,											// ¼ö½Å¿¡ »ç¿ëÇÒ µ¥ÀÌÅÍ ¹ÙÀÌÆ® ¼ö. 0ÀÌ¸é µ¥ÀÌÅÍ´Â ¹ŞÁö ¾Ê°í accept¸¸ ÇÏ°Ú´Ù´Â ÀÇ¹Ì.
-		sizeof(sockaddr_in) + 16,					// ·ÎÄÃ ÁÖ¼Ò Á¤º¸¸¦ À§ÇØ ¿¹¾àµÈ ¹ÙÀÌÆ® ¼ö. Àü¼Û ÇÁ·ÎÅäÄİÀÇ ÃÖ´ë ±æÀÌº¸´Ù 16¸¸Å­ Ä¿¾ß ÇÑ´Ù.
-		sizeof(sockaddr_in) + 16,					// ¿ø°İ ÁÖ¼Ò Á¤º¸¸¦ À§ÇØ ¿¹¾àµÈ ¹ÙÀÌÆ® ¼ö. À§¿Í µ¿ÀÏ.
-		&m_dwBytes,									// ¹ŞÀº ¹ÙÀÌÆ® ¼ö. ºÒÇÊ¿ä.
-		&m_listenSocket.m_readOverlappedStruct);	// lpOverlapped: ¿äÃ»À» Ã³¸®ÇÏ´Â µ¥ »ç¿ëµÇ´Â OVERLAPPED ±¸Á¶Ã¼. NULL ºÒ°¡!
-	// ¿¡·¯°¡ ¾ø´Ù¸é retÀº TRUEÀÌ´Ù.
+		m_clientCandidateSocket.m_socket,			// Acceptê°€ ì´ë£¨ì–´ì§€ë©´ client socketìœ¼ë¡œ ë³€í•œë‹¤.
+		m_lpOutputBuf,								// ì²« ë²ˆì§¸ ë°ì´í„° ë¸”ë¡, ì„œë²„ ë¡œì»¬ì£¼ì†Œ, í´ë¼ ì›ê²© ì£¼ì†Œ ìˆ˜ì‹  ë²„í¼.
+													// ì´ ë³€ìˆ˜ì™€ ì•„ë˜ 3ê°œì˜ ë°”ì´íŠ¸ ìˆ˜ ì •ë³´ ë³€ìˆ˜ëŠ” GetAcceptExSockaddrs() í•¨ìˆ˜ì˜ ì¸ìë¡œ
+													// ë¡œì»¬/ì›ê²© sockaddr ì •ë³´ë¥¼ íŒŒì‹±í•  ë•Œì— ì‚¬ìš©ë  ìˆ˜ ìˆë‹¤.
+		0,											// ìˆ˜ì‹ ì— ì‚¬ìš©í•  ë°ì´í„° ë°”ì´íŠ¸ ìˆ˜. 0ì´ë©´ ë°ì´í„°ëŠ” ë°›ì§€ ì•Šê³  acceptë§Œ í•˜ê² ë‹¤ëŠ” ì˜ë¯¸.
+		sizeof(sockaddr_in) + 16,					// ë¡œì»¬ ì£¼ì†Œ ì •ë³´ë¥¼ ìœ„í•´ ì˜ˆì•½ëœ ë°”ì´íŠ¸ ìˆ˜. ì „ì†¡ í”„ë¡œí† ì½œì˜ ìµœëŒ€ ê¸¸ì´ë³´ë‹¤ 16ë§Œí¼ ì»¤ì•¼ í•œë‹¤.
+		sizeof(sockaddr_in) + 16,					// ì›ê²© ì£¼ì†Œ ì •ë³´ë¥¼ ìœ„í•´ ì˜ˆì•½ëœ ë°”ì´íŠ¸ ìˆ˜. ìœ„ì™€ ë™ì¼.
+		&m_dwBytes,									// ë°›ì€ ë°”ì´íŠ¸ ìˆ˜. ë¶ˆí•„ìš”.
+		&m_listenSocket.m_readOverlappedStruct);	// lpOverlapped: ìš”ì²­ì„ ì²˜ë¦¬í•˜ëŠ” ë° ì‚¬ìš©ë˜ëŠ” OVERLAPPED êµ¬ì¡°ì²´. NULL ë¶ˆê°€!
+	// ì—ëŸ¬ê°€ ì—†ë‹¤ë©´ retì€ TRUEì´ë‹¤.
 
 	if (acceptExStatus == false)
 	{
 		int errorCode = WSAGetLastError();
 
-		if (errorCode == ERROR_IO_PENDING) // ¾ÆÁ÷ IO Ã³¸® Áß. Á¤»ó »óÅÂ
+		if (errorCode == ERROR_IO_PENDING) // ì•„ì§ IO ì²˜ë¦¬ ì¤‘. ì •ìƒ ìƒíƒœ
 		{
 		}
 		else
@@ -110,19 +70,39 @@ void NetworkManagerServer::AcceptEx()
 	}
 	else
 	{
-		cout << "m_AcceptEx ÇÔ¼ö ¼öÇà ¿Ï·á" << endl;
+		cout << "m_AcceptEx í•¨ìˆ˜ ìˆ˜í–‰ ì™„ë£Œ" << endl;
 	}
+}
+void NetworkManagerServer::GetAcceptExSockAddrs(shared_ptr<Socket> client)
+{
+	// UDP í†µì‹ ì„ í•˜ë ¤ë©´ remoteì˜ addr ì •ë³´ê°€ í•„ìš”í•˜ë‹¤. socketìœ¼ë¡œë¶€í„° ì–»ì.
+	sockaddr_in* localAddr = nullptr;
+	sockaddr_in* clientAddr = nullptr;
+	int localAddrLen, clientAddrLen;
+
+	m_GetAcceptExSockAddrs(
+		m_lpOutputBuf,
+		0,
+		sizeof(sockaddr_in) + 16,
+		sizeof(sockaddr_in) + 16,
+		reinterpret_cast<sockaddr**>(localAddr),
+		&localAddrLen,
+		reinterpret_cast<sockaddr**>(clientAddr),
+		&clientAddrLen
+	);
+
+	client->SetRemoteAddress(*clientAddr);
 }
 void NetworkManagerServer::ProcessIOCPEvent()
 {
 	GetCompletionStatus();
 
-	// ¹ŞÀº ÀÌº¥Æ® °¢°¢À» Ã³¸®ÇÕ´Ï´Ù.
+	// ë°›ì€ ì´ë²¤íŠ¸ ê°ê°ì„ ì²˜ë¦¬í•©ë‹ˆë‹¤.
 	for (int i = 0; i < m_iocpEvent.m_eventCount; i++)
 	{
 		auto& readEvent = m_iocpEvent.m_events[i];
 		ULONG_PTR completionKey = readEvent.lpCompletionKey;
-		if (completionKey == 0) // listenSocket. AcceptEx¿¡ ÀÇÇØ ½Å±Ô client Á¢¼Ó
+		if (completionKey == 0) // listenSocket. AcceptExì— ì˜í•´ ì‹ ê·œ client ì ‘ì†
 		{
 			if (ProcessAcceptedClientSocketIOCP() == false)
 				return;
@@ -131,14 +111,14 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		{
 			shared_ptr<Socket> p_clientSocket = m_clientsMap[completionKey];
 
-			// event°¡ WSASendÀÇ ¿Ï·á¿¡ ÀÇÇØ ¹ß»ıÇß´Ù¸é, ¹«½ÃÇÏÀÚ.
+			// eventê°€ WSASendì˜ ì™„ë£Œì— ì˜í•´ ë°œìƒí–ˆë‹¤ë©´, ë¬´ì‹œí•˜ì.
 			if (readEvent.lpOverlapped == &p_clientSocket->m_sendOverlappedStruct)
 			{
 				continue;
 			}
 
 			unsigned int receivedBytes = readEvent.dwNumberOfBytesTransferred;
-			if (receivedBytes == 0) // sendBytes == 0ÀÏ ¶§ clientSocket Á¦°Å ·ÎÁ÷ ÇÊ¿ä
+			if (receivedBytes == 0) // sendBytes == 0ì¼ ë•Œ clientSocket ì œê±° ë¡œì§ í•„ìš”
 			{
 				closesocket(p_clientSocket->m_socket);
 				m_clientsMap.erase(completionKey);
@@ -153,27 +133,27 @@ void NetworkManagerServer::ProcessIOCPEvent()
 bool NetworkManagerServer::GetCompletionStatus()
 {
 	bool ret = GetQueuedCompletionStatusEx(
-		mh_iocp,							// IOCP °´Ã¼
-		m_iocpEvent.m_events,					// Ã³¸®°¡ ¿Ï·áµÈ event¸¦ ¼ö½ÅÇÏ´Â ¹è¿­
-		MAX_IOCP_EVENT_COUNT,				// ÃÖ´ë event °³¼ö
-		(ULONG*)&m_iocpEvent.m_eventCount,	// ¼ö½ÅÇÑ event °³¼ö¸¦ ¹ŞÀ» º¯¼ö
-		m_timeoutMs,							// ´Ù½Ã ºĞ¼® ÇÊ¿ä
+		mh_iocp,							// IOCP ê°ì²´
+		m_iocpEvent.m_events,					// ì²˜ë¦¬ê°€ ì™„ë£Œëœ eventë¥¼ ìˆ˜ì‹ í•˜ëŠ” ë°°ì—´
+		MAX_IOCP_EVENT_COUNT,				// ìµœëŒ€ event ê°œìˆ˜
+		(ULONG*)&m_iocpEvent.m_eventCount,	// ìˆ˜ì‹ í•œ event ê°œìˆ˜ë¥¼ ë°›ì„ ë³€ìˆ˜
+		m_timeoutMs,							// ë‹¤ì‹œ ë¶„ì„ í•„ìš”
 		FALSE);								// fAlertable: ?????
 
-	if (ret == false)	// ½ÇÆĞ ½Ã
+	if (ret == false)	// ì‹¤íŒ¨ ì‹œ
 	{
 		int errorCode = WSAGetLastError();
 		
-		if (errorCode == WSA_WAIT_TIMEOUT)	// timeoutMs µ¿¾È event°¡ ¹ß»ıÇÏÁö ¾Ê¾Ò´Ù.
-											// º°µµ Ã³¸®ÇÒ ³»¿ë ¾øÀ½
+		if (errorCode == WSA_WAIT_TIMEOUT)	// timeoutMs ë™ì•ˆ eventê°€ ë°œìƒí•˜ì§€ ì•Šì•˜ë‹¤.
+											// ë³„ë„ ì²˜ë¦¬í•  ë‚´ìš© ì—†ìŒ
 		{}
 		else
 		{
-			cout << "GetQueuedCompletionStatusEx ½ÇÆĞ" << endl;
+			cout << "GetQueuedCompletionStatusEx ì‹¤íŒ¨" << endl;
 			cout << errorCode << endl;
 		}
 		
-		m_iocpEvent.m_eventCount = 0;			// ½ÇÆĞ ½Ã ¼öµ¿À¸·Î º¯°æ ÇÊ¿ä ÄÚµå
+		m_iocpEvent.m_eventCount = 0;			// ì‹¤íŒ¨ ì‹œ ìˆ˜ë™ìœ¼ë¡œ ë³€ê²½ í•„ìš” ì½”ë“œ
 	}
 
 	return ret;
@@ -182,8 +162,8 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 {
 	cout << "listen Socket!!!" << endl;
 
-	// m_clientCandidateSocket·ÎºÎÅÍ ½Å±Ô client socketÀ» iocp¿¡ Ãß°¡
-	// listenSocket°ú µ¿ÀÏÇÑ context·Î clientSocketÀ» ÃÖÀûÈ­
+	// m_clientCandidateSocketë¡œë¶€í„° ì‹ ê·œ client socketì„ iocpì— ì¶”ê°€
+	// listenSocketê³¼ ë™ì¼í•œ contextë¡œ clientSocketì„ ìµœì í™”
 	setsockopt(
 		m_clientCandidateSocket.m_socket,
 		SOL_SOCKET,
@@ -191,15 +171,17 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 		reinterpret_cast<const char*>(&m_listenSocket),
 		sizeof(m_listenSocket));
 
-	// SOCKET Å¸ÀÔÀº UINT_PTRÀÏ »ÓÀÌ´Ù. ¾Æ·¡¿Í °°ÀÌ °ªÀ» ´ëÀÔÇÏ°í
-	// ÀÌÈÄ¿¡ m_clientCandidateSocketÀ» ´Ù½Ã listen¿¡ »ç¿ëÇÏ´õ¶óµµ
-	// m_clientCandidateSocket º¯¼ö´Â »õ·Î¿î clientSocketÀÇ ÁÖ¼Ò¸¦ °¡Áö°í ÀÖÀ» °ÍÀÌ´Ù.
-	// // ac, 104, ... ÀÌ·± °ªÀ¸·Î Ãâ·Â.
-	// ¾îÂ·µç ¿¬°áµÉ ¶§¸¶´Ù ´Ù¸¥ °ªÀÌ´Ù.
+	GetAcceptExSockAddrs(make_shared<Socket>(m_clientCandidateSocket));
+	
+	// SOCKET íƒ€ì…ì€ UINT_PTRì¼ ë¿ì´ë‹¤. ì•„ë˜ì™€ ê°™ì´ ê°’ì„ ëŒ€ì…í•˜ê³ 
+	// ì´í›„ì— m_clientCandidateSocketì„ ë‹¤ì‹œ listenì— ì‚¬ìš©í•˜ë”ë¼ë„
+	// m_clientCandidateSocket ë³€ìˆ˜ëŠ” ìƒˆë¡œìš´ clientSocketì˜ ì£¼ì†Œë¥¼ ê°€ì§€ê³  ìˆì„ ê²ƒì´ë‹¤.
+	// // ac, 104, ... ì´ëŸ° ê°’ìœ¼ë¡œ ì¶œë ¥.
+	// ì–´ì¨Œë“  ì—°ê²°ë  ë•Œë§ˆë‹¤ ë‹¤ë¥¸ ê°’ì´ë‹¤.
 	shared_ptr<Socket> clientSocket = make_shared<Socket>();
 	clientSocket->m_socket = m_clientCandidateSocket.m_socket;
 
-	// ½Å±Ô client¸¦ IOCP¿¡ Ãß°¡
+	// ì‹ ê·œ clientë¥¼ IOCPì— ì¶”ê°€
 	const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(clientSocket.get());
 	cout << "completionKey: " << completionKey << endl;
 
@@ -208,14 +190,14 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 		return false;
 	}
 
-	// ÀÌÈÄ completionKey·Î clientSocket ÂüÁ¶ À§ÇØ map¿¡ ÀúÀåÇØµĞ´Ù.
+	// ì´í›„ completionKeyë¡œ clientSocket ì°¸ì¡° ìœ„í•´ mapì— ì €ì¥í•´ë‘”ë‹¤.
 	m_clientsMap.insert({ completionKey, clientSocket });
 
-	// ´Ù½Ã listenSocketÀ» accept·Î º¯°æ
-	// listenSocket.AcceptEx() ÇüÅÂ·Î ¾²´Â °Ô ÁÁÀ» °Í °°´Ù. ÃßÈÄ ¸®ÆÑÅÍ¸µ ÁøÇà.
+	// ë‹¤ì‹œ listenSocketì„ acceptë¡œ ë³€ê²½
+	// listenSocket.AcceptEx() í˜•íƒœë¡œ ì“°ëŠ” ê²Œ ì¢‹ì„ ê²ƒ ê°™ë‹¤. ì¶”í›„ ë¦¬íŒ©í„°ë§ ì§„í–‰.
 	AcceptEx();
 
-	// ¿¬°áÇÑ clientSocketÀ» recv·Î ÀüÈ¯
+	// ì—°ê²°í•œ clientSocketì„ recvë¡œ ì „í™˜
 	Recv(clientSocket);
 
 	return true;
@@ -227,37 +209,6 @@ HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket> clientSocket,
 		mh_iocp,
 		completionKey,
 		0);
-}
-void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket, unsigned int receivedBytes)
-{
-	Packet packet{ p_clientSocket->m_receiveBuffer, receivedBytes };
-	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
-	receiveQueue.PushCopy(packet);
-
-	// ´Ù½Ã ¼ö½Å ´ë±â
-	Recv(p_clientSocket);
-}
-int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
-{
-	WSABUF b;
-	b.buf = clientSocket->m_receiveBuffer;
-	b.len = clientSocket->MAX_RECEIVE_LENGTH;
-
-	DWORD& numberOfBytesReceived = clientSocket->m_numberOfBytesReceived;
-	
-	// overlapped I/O°¡ ÁøÇàµÇ´Â µ¿¾È ¿©±â °ªÀÌ Ã¤¿öÁı´Ï´Ù.
-	clientSocket->m_readFlags = 0;
-
-	int retCode = WSARecv(
-		clientSocket->m_socket,
-		&b,										// lpBuffers.
-		1,										// dwBufferCount. lpBuffers ¹è¿­ÀÇ ±¸Á¶Ã¼ °³¼ö.
-		&numberOfBytesReceived,					// lpNumberOfBytesRecvd. TCP°°Àº ¿¬°áÁöÇâÇü¿¡¼­
-		&clientSocket->m_readFlags,
-		&clientSocket->m_readOverlappedStruct,
-		NULL);									// lpCompletionRoutine. ¼ö½Å ÀÛ¾÷ ¿Ï·á ·çÆ¾¿¡ ´ëÇÑ Æ÷ÀÎÅÍ.
-
-	return retCode;
 }
 void NetworkManagerServer::SendPacketsIOCP()
 {
@@ -274,9 +225,28 @@ void NetworkManagerServer::SendPacketsIOCP()
 		{
 			auto clientSocket = clientSocketPair.second;
 			clientSocket->SetSendBuffer(data->GetBuffer(), sentBytes);
-			Send(clientSocket, sentBytes);
+
+			SocketProtocolType spt = clientSocket->GetProtocolType();
+			if (spt == SocketProtocolType::SPT_TCP)
+				Send(clientSocket, sentBytes);
+			else if (spt == SocketProtocolType::SPT_RUDP)
+				SendTo(clientSocket, sentBytes);
+			else
+			{
+				cout << "Invalid SocketProtocolType" << endl;
+				continue;
+			}
 		}
 	}
+}
+void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket, unsigned int receivedBytes)
+{
+	Packet packet{ p_clientSocket->m_receiveBuffer, receivedBytes };
+	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
+	receiveQueue.PushCopy(packet);
+
+	// ë‹¤ì‹œ ìˆ˜ì‹  ëŒ€ê¸°
+	Recv(p_clientSocket);
 }
 int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 {
@@ -295,6 +265,52 @@ int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 
 	return retCode;
 }
+int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
+{
+	WSABUF b;
+	b.buf = clientSocket->m_receiveBuffer;
+	b.len = clientSocket->MAX_RECEIVE_LENGTH;
+
+	DWORD& numberOfBytesReceived = clientSocket->m_numberOfBytesReceived;
+	
+	// overlapped I/Oê°€ ì§„í–‰ë˜ëŠ” ë™ì•ˆ ì—¬ê¸° ê°’ì´ ì±„ì›Œì§‘ë‹ˆë‹¤.
+	clientSocket->m_readFlags = 0;
+
+	int retCode = WSARecv(
+		clientSocket->m_socket,
+		&b,										// lpBuffers.
+		1,										// dwBufferCount. lpBuffers ë°°ì—´ì˜ êµ¬ì¡°ì²´ ê°œìˆ˜.
+		&numberOfBytesReceived,					// lpNumberOfBytesRecvd. TCPê°™ì€ ì—°ê²°ì§€í–¥í˜•ì—ì„œ
+		&clientSocket->m_readFlags,
+		&clientSocket->m_readOverlappedStruct,
+		NULL);									// lpCompletionRoutine. ìˆ˜ì‹  ì‘ì—… ì™„ë£Œ ë£¨í‹´ì— ëŒ€í•œ í¬ì¸í„°.
+
+	return retCode;
+}
+int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
+{
+	WSABUF b;
+	b.buf = clientSocket->m_sendBuffer;
+	b.len = static_cast<ULONG>(len);
+
+	WSASendTo(
+		clientSocket->m_socket,
+		&b,
+		1, /* ??? */
+		&clientSocket->m_numberOfBytesSent,
+		clientSocket->m_sendFlags,
+		reinterpret_cast<sockaddr*>(&clientSocket->m_remoteAddr),
+		sizeof(clientSocket->m_remoteAddr),
+		&clientSocket->m_readOverlappedStruct,
+		nullptr
+	);
+
+	return 0;
+}
+int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
+{
+	return 0;
+}
 
 NetworkManagerServer::NetworkManagerServer()
 {
@@ -309,4 +325,71 @@ NetworkManagerServer::NetworkManagerServer()
 NetworkManagerServer::~NetworkManagerServer() {
 	WSACleanup();
 	cout << "WSACleanup" << endl;
+}
+
+void NetworkManagerServer::CreateListenSocket()
+{
+	// Overlapped IO ìœ„í•œ listen socket ìƒì„±
+	m_listenSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_TCP);
+
+	cout << "listenSocket ìƒì„± ì™„ë£Œ" << endl;
+
+	if (m_listenSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
+		cout << "bind error: " << WSAGetLastError() << endl;
+		return;
+	}
+
+	cout << "bind ì™„ë£Œ" << endl;
+
+	if (listen(m_listenSocket.m_socket, 10) == SOCKET_ERROR) {
+		cout << "listen error: " << WSAGetLastError() << endl;
+		return;
+	}
+
+	cout << "listen ì™„ë£Œ" << endl;
+}
+
+void NetworkManagerServer::GetLPFN()
+{
+	GUID guidAcceptEx = WSAID_ACCEPTEX;
+	GUID guidGetAcceptExSockAddrs = WSAID_GETACCEPTEXSOCKADDRS;
+	DWORD dwBytes;
+
+	if (WSAIoctl(
+		m_listenSocket.m_socket,			// ì†Œì¼“ APIë¼ í•„ìš”í•œ argì¸ ê²ƒ ê°™ì€ë°... ì•„ì§ ì™œ í•„ìš”í•œì§€ ëª¨ë¥´ê² ìŒ.
+		SIO_GET_EXTENSION_FUNCTION_POINTER,	// AcceptEx í•¨ìˆ˜ í¬ì¸í„°ë¥¼ ì–»ê¸° ìœ„í•œ ì œì–´ ì½”ë“œ
+		&guidAcceptEx,						// ì–»ê³ ì í•˜ëŠ” í•¨ìˆ˜ ì´ë¦„ì˜ ì§€ì •ëœ ê°’(WSAID_ACCEPTEX) ì‚¬ìš©.
+		sizeof(guidAcceptEx),
+		&m_AcceptEx,						// ìš”ì²­ì— ëŒ€í•œ ì¶œë ¥ ë²„í¼. AcceptEx í•¨ìˆ˜ í¬ì¸í„° ì¶œë ¥.
+		sizeof(m_AcceptEx),
+		&dwBytes,							// ì¶œë ¥ë²„í¼ë¡œ ì¶œë ¥ëœ ê°œìˆ˜. <- ì• ë§¤
+		nullptr,							// lpOverlapped: WSAOVERLAPPED êµ¬ì¡°ì²´ í¬ì¸í„°. ì§€ê¸ˆ ë¶ˆí•„ìš”.
+		nullptr) == SOCKET_ERROR) {			// lpCompletionRoutine: ì‘ì—… ì™„ë£Œ í›„ í˜¸ì¶œí•  ë£¨í‹´ ì „ë‹¬ ê°€ëŠ¥. // ì§€ê¸ˆ ë¶ˆí•„ìš”.
+
+		cout << "WSAIoctl error: " << WSAGetLastError() << endl;
+	}
+
+	if (m_AcceptEx == nullptr) {
+		cout << "Getting AcceptEx ptr failed." << endl;
+
+		return;
+	}
+
+	cout << "m_AcceptEx í™•ì¥ í•¨ìˆ˜ íšë“ ì™„ë£Œ" << endl;
+
+	if (WSAIoctl(
+		m_listenSocket.m_socket,
+		SIO_GET_EXTENSION_FUNCTION_POINTER,
+		&guidGetAcceptExSockAddrs,
+		sizeof(guidGetAcceptExSockAddrs),
+		&m_GetAcceptExSockAddrs,
+		sizeof(m_GetAcceptExSockAddrs),
+		&dwBytes,
+		nullptr,
+		nullptr) == SOCKET_ERROR) {
+
+		cout << "WSAIoctl error: " << WSAGetLastError() << endl;
+	}
+
+	cout << "m_GetAcceptExSockAddrs í™•ì¥ í•¨ìˆ˜ íšë“ ì™„ë£Œ" << endl;
 }

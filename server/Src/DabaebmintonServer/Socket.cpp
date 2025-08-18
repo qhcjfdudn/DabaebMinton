@@ -1,11 +1,26 @@
 #include "ServerPCH.h"
 #include "Socket.h"
 
-SOCKET Socket::CreateWSASocket()
+SOCKET Socket::CreateWSASocketHandle(SocketProtocolType spt)
 {
+	int type = -1;
+
+	switch (spt)
+	{
+	case SocketProtocolType::SPT_TCP:
+		type = SOCK_STREAM;
+		break;
+	case SocketProtocolType::SPT_RUDP:
+		type = SOCK_DGRAM;
+		break;
+	default:
+		cout << "Invalid SocketProtocolType. Set WSASocket Type to default: RUDP" << endl;
+		type = SOCK_DGRAM;
+	}
+
 	return WSASocket(
 		AF_INET,
-		SOCK_STREAM,
+		type,
 		0,
 		nullptr,
 		0,
