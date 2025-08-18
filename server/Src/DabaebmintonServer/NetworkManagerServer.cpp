@@ -171,8 +171,6 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 		reinterpret_cast<const char*>(&m_listenSocket),
 		sizeof(m_listenSocket));
 
-	GetAcceptExSockAddrs(make_shared<Socket>(m_clientCandidateSocket));
-	
 	// SOCKET 타입은 UINT_PTR일 뿐이다. 아래와 같이 값을 대입하고
 	// 이후에 m_clientCandidateSocket을 다시 listen에 사용하더라도
 	// m_clientCandidateSocket 변수는 새로운 clientSocket의 주소를 가지고 있을 것이다.
@@ -180,6 +178,8 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 	// 어쨌든 연결될 때마다 다른 값이다.
 	shared_ptr<Socket> clientSocket = make_shared<Socket>();
 	clientSocket->m_socket = m_clientCandidateSocket.m_socket;
+
+	GetAcceptExSockAddrs(clientSocket);
 
 	// 신규 client를 IOCP에 추가
 	const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(clientSocket.get());
@@ -198,7 +198,16 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 	AcceptEx();
 
 	// 연결한 clientSocket을 recv로 전환
-	Recv(clientSocket);
+
+	if (clientSocket->GetProtocolType() == SocketProtocolType::SPT_TCP)
+		Recv(clientSocket);
+	else if (clientSocket->GetProtocolType() == SocketProtocolType::SPT_RUDP)
+		RecvFrom(clientSocket);
+	else
+	{
+		cout << "Invalid SocketProtocolType" << endl;
+		return false;
+	}
 
 	return true;
 }
@@ -246,7 +255,12 @@ void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSo
 	receiveQueue.PushCopy(packet);
 
 	// 다시 수신 대기
-	Recv(p_clientSocket);
+	if (p_clientSocket->GetProtocolType() == SocketProtocolType::SPT_TCP)
+		Recv(p_clientSocket);
+	else if (p_clientSocket->GetProtocolType() == SocketProtocolType::SPT_RUDP)
+		RecvFrom(p_clientSocket);
+	else
+		cout << "Invalid SocketProtocolType" << endl;
 }
 int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 {
