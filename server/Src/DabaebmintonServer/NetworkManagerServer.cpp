@@ -52,7 +52,7 @@ void NetworkManagerServer::AcceptEx()
 		sizeof(sockaddr_in) + 16,					// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
 		sizeof(sockaddr_in) + 16,					// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
 		&m_dwBytes,									// 받은 바이트 수. 불필요.
-		&m_listenSocket.m_readOverlappedStruct);	// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
+		&m_listenSocket.m_receiveOverlappedStruct);	// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
 	// 에러가 없다면 ret은 TRUE이다.
 
 	if (acceptExStatus == false)
@@ -274,15 +274,15 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 	DWORD& numberOfBytesReceived = clientSocket->m_numberOfBytesReceived;
 	
 	// overlapped I/O가 진행되는 동안 여기 값이 채워집니다.
-	clientSocket->m_readFlags = 0;
+	clientSocket->m_receiveFlags = 0;
 
 	int retCode = WSARecv(
 		clientSocket->m_socket,
 		&b,										// lpBuffers.
 		1,										// dwBufferCount. lpBuffers 배열의 구조체 개수.
 		&numberOfBytesReceived,					// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
-		&clientSocket->m_readFlags,
-		&clientSocket->m_readOverlappedStruct,
+		&clientSocket->m_receiveFlags,
+		&clientSocket->m_receiveOverlappedStruct,
 		NULL);									// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
 
 	return retCode;
@@ -301,7 +301,7 @@ int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 		clientSocket->m_sendFlags,
 		reinterpret_cast<sockaddr*>(&clientSocket->m_remoteAddr),
 		sizeof(clientSocket->m_remoteAddr),
-		&clientSocket->m_readOverlappedStruct,
+		&clientSocket->m_receiveOverlappedStruct,
 		nullptr
 	);
 
@@ -323,10 +323,10 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 		reinterpret_cast<WSABUF*>(&clientSocket->m_receiveBuffer), // lpBuffers
 		1, // dwBufferCount
 		&clientSocket->m_numberOfBytesReceived, // lpNumberOfBytesRecvd
-		&clientSocket->m_readFlags, // lpFlags
+		&clientSocket->m_receiveFlags, // lpFlags
 		lpFrom,
 		&lpFromLen, // lpFromLen
-		&clientSocket->m_readOverlappedStruct, // lpOverlapped
+		&clientSocket->m_receiveOverlappedStruct, // lpOverlapped
 		nullptr // lpCompletionRoutine
 	);
 

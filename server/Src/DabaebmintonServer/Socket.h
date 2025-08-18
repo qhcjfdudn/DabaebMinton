@@ -23,8 +23,8 @@ public:
 	
 	char m_receiveBuffer[MAX_RECEIVE_LENGTH + 1] = { 0, };
 	DWORD m_numberOfBytesReceived{};
-	DWORD m_readFlags{};
-	OVERLAPPED m_readOverlappedStruct{};
+	DWORD m_receiveFlags{};
+	OVERLAPPED m_receiveOverlappedStruct{};
 	
 	char m_sendBuffer[MAX_SEND_LENGTH + 1] = { 0, };
 	DWORD m_numberOfBytesSent{};
