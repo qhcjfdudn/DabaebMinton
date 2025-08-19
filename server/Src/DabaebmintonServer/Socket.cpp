@@ -4,24 +4,28 @@
 SOCKET Socket::CreateWSASocketHandle(SocketProtocolType spt)
 {
 	int type = -1;
+	int protocol = 0;
 
 	switch (spt)
 	{
 	case SocketProtocolType::SPT_TCP:
 		type = SOCK_STREAM;
+		protocol = IPPROTO_TCP;
 		break;
 	case SocketProtocolType::SPT_RUDP:
 		type = SOCK_DGRAM;
+		protocol = IPPROTO_UDP;
 		break;
 	default:
 		cout << "Invalid SocketProtocolType. Set WSASocket Type to default: RUDP" << endl;
 		type = SOCK_DGRAM;
+		protocol = IPPROTO_UDP;
 	}
 
 	return WSASocket(
 		AF_INET,
 		type,
-		0,
+		protocol,
 		nullptr,
 		0,
 		WSA_FLAG_OVERLAPPED);

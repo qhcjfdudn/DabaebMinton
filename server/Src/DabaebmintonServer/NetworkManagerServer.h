@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "IOCPEvent.h"
 #include "Socket.h"
@@ -14,7 +14,7 @@ public:
 	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
 	bool ProcessAcceptedClientSocketIOCP();
-	HANDLE AddSocketIOCP(std::shared_ptr<Socket> clientSocket, const ULONG_PTR completionKey);
+	HANDLE AddSocketIOCP(std::shared_ptr<Socket> socket, const ULONG_PTR completionKey);
 	void SendPacketsIOCP();
 	void ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket, unsigned int receivedBytes);
 	int Send(shared_ptr<Socket> clientSocket, size_t len);

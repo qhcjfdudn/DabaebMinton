@@ -52,3 +52,10 @@ void Packet::PrintInHex() const
 	cout.unsetf(std::ios::hex);
 	cout.unsetf(std::ios::uppercase);
 }
+void Packet::Print() const
+{
+	cout << "Packet Length: " << _len << endl;
+	_buffer[_len] = '\0';
+
+	cout << "Packet Data: " << _buffer << endl;
+}

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 enum class SocketProtocolType {
 	NONE,
@@ -20,7 +20,8 @@ public:
 	void SetSendBuffer(const char* str, size_t len);
 
 	SocketProtocolType GetProtocolType() const { return m_protocolType; }
-	
+	void SetProtocolType(SocketProtocolType protocolType) { m_protocolType = protocolType; }
+
 	char m_receiveBuffer[MAX_RECEIVE_LENGTH + 1] = { 0, };
 	DWORD m_numberOfBytesReceived{};
 	DWORD m_receiveFlags{};
@@ -34,6 +35,7 @@ public:
 	SOCKET m_socket{};
 
 	sockaddr_in m_remoteAddr;
+	int lpFromLen;
 
 	void SetRemoteAddress(const sockaddr_in& remoteAddr) {
 		m_remoteAddr = remoteAddr;

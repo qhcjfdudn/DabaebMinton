@@ -12,6 +12,7 @@ public:
 	unsigned int GetLength() const;
 
 	void PrintInHex() const;
+	void Print() const;
 
 private:
 	char* _buffer;
