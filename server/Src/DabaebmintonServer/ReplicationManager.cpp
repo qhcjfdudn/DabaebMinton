@@ -1,4 +1,4 @@
-﻿#include "ServerPCH.h"
+#include "ServerPCH.h"
 #include "ReplicationManager.h"
 
 #include "ReplicationHeader.h"

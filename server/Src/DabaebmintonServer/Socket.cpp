@@ -1,4 +1,4 @@
-﻿#include "ServerPCH.h"
+#include "ServerPCH.h"
 #include "Socket.h"
 
 SOCKET Socket::CreateWSASocketHandle(SocketProtocolType spt)
