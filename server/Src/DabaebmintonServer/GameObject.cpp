@@ -37,8 +37,8 @@ bool GameObject::FixedUpdate()
 
 void GameObject::SetCurrentTransform()
 {
-	// simulate Áß¿¡´Â getGlobalPose()¸¦ »ç¿ëÇÒ ¼ö ¾ø´Ù´Â ¿¡·¯ ¸Þ½ÃÁö ¹ß°ß
-	// ¹°¸® ¿£Áø¿¡ Á¢±ÙÇØ °ªÀ» ¾Ë¾Æ¿À°íÀÚ ÇÒ ¶§´Â lockRead()¸¦ °É¾î¾ß ÇÑ´Ù.
+	// simulate ì¤‘ì—ëŠ” getGlobalPose()ë¥¼ ì‚¬ìš©í•  ìˆ˜ ì—†ë‹¤ëŠ” ì—ëŸ¬ ë©”ì‹œì§€ ë°œê²¬
+	// ë¬¼ë¦¬ ì—”ì§„ì— ì ‘ê·¼í•´ ê°’ì„ ì•Œì•„ì˜¤ê³ ìž í•  ë•ŒëŠ” lockRead()ë¥¼ ê±¸ì–´ì•¼ í•œë‹¤.
 
 	PxVec3 curLocation{ _rigidbody->getGlobalPose().p };
 	PxVec3 curVelocity{ _rigidbody->getLinearVelocity() };

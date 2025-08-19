@@ -17,6 +17,7 @@ void signalHandler(int signum)
 
 int main()
 {
+	SetConsoleOutputCP(CP_UTF8);
 	signal(SIGINT, signalHandler);
 	
 	auto& engineInstance = Engine::GetInstance();

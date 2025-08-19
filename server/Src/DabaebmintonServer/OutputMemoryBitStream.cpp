@@ -1,4 +1,4 @@
-#include "ServerPCH.h"
+ï»¿#include "ServerPCH.h"
 #include "OutputMemoryBitStream.h"
 
 void OutputMemoryBitStream::ReallocBuffer(uint32_t newBitCapacity) {
@@ -16,7 +16,7 @@ void OutputMemoryBitStream::ReallocBuffer(uint32_t newBitCapacity) {
 
 void OutputMemoryBitStream::WriteBits(uint8_t inData, size_t inBitCount)
 {
-	// inBitCount¿Í ºñ±³ÇØ bufferÀÇ »çÀÌÁî¸¦ ´Ã·ÁÁÙÁö ÆÇ´Ü
+	// inBitCountì™€ ë¹„êµí•´ bufferì˜ ì‚¬ì´ì¦ˆë¥¼ ëŠ˜ë ¤ì¤„ì§€ íŒë‹¨
 	uint32_t nextBitHead = _bitHead + static_cast<uint32_t>(inBitCount);
 	if (nextBitHead > _bitCapacity) {
 		ReallocBuffer(max(_bitCapacity * 2, nextBitHead));
@@ -25,11 +25,11 @@ void OutputMemoryBitStream::WriteBits(uint8_t inData, size_t inBitCount)
 	uint32_t byteOffset = _bitHead >> 3;
 	uint32_t bitOffset = _bitHead & 7;
 
-	// ÇöÀç Ã³¸® Áß ¹ÙÀÌÆ®¿¡ inData Áß ¾µ ¼ö ÀÖ´Â ¸¸Å­ ¿ì¼± ¾²±â
+	// í˜„ì¬ ì²˜ë¦¬ ì¤‘ ë°”ì´íŠ¸ì— inData ì¤‘ ì“¸ ìˆ˜ ìˆëŠ” ë§Œí¼ ìš°ì„  ì“°ê¸°
 	uint8_t currentMask = ~(0xff << bitOffset);
 	_buffer[byteOffset] = (_buffer[byteOffset] & currentMask) | (inData << bitOffset);
 
-	// inDataÀÇ ¾²Áö ¸øÇÑ »óÀ§ ºÎºĞ ¾²±â
+	// inDataì˜ ì“°ì§€ ëª»í•œ ìƒìœ„ ë¶€ë¶„ ì“°ê¸°
 	uint32_t bitsFreeThisByte = 8 - bitOffset;
 	if (inBitCount > bitsFreeThisByte) {
 		_buffer[byteOffset + 1] = inData >> bitsFreeThisByte;

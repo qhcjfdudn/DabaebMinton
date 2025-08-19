@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Packet.h"
 
@@ -16,7 +16,7 @@ private:
 	PacketQueue() {}
 	~PacketQueue() {}
 
-	// NetworkManager¿Í WorldÀÇ ¼­·Î ´Ù¸¥ thread¿¡¼­ Á¢±ÙÇÒÅ×´Ï
-	// lock/unlock °í¹Î ÇÊ¿ä
+	// NetworkManagerì™€ Worldì˜ ì„œë¡œ ë‹¤ë¥¸ threadì—ì„œ ì ‘ê·¼í• í…Œë‹ˆ
+	// lock/unlock ê³ ë¯¼ í•„ìš”
 	std::queue<shared_ptr<Packet>> _bufferQueue;
 };

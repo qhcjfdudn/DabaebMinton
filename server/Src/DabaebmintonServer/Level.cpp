@@ -1,4 +1,4 @@
-#include "ServerPCH.h"
+Ôªø#include "ServerPCH.h"
 #include "Level.h"
 
 #include "Engine.h"
@@ -27,7 +27,7 @@ Level::Level()
 
 	if (pxScene == nullptr)
 	{
-		cout << "PxScene ª˝º∫ Ω«∆–" << endl;
+		cout << "PxScene ÏÉùÏÑ± Ïã§Ìå®" << endl;
 		return;
 	}
 
@@ -65,7 +65,7 @@ void Level::InitLevel()
 	pxScene->addActor(*shuttlecock->GetRigidbody());
 	gameObjects.push_back(shuttlecock);
 
-	// LinkingContextø° µÓ∑œ
+	// LinkingContextÏóê Îì±Î°ù
 	replicationManager.linkingContext.AddGameObject(shuttlecock);
 }
 
@@ -160,8 +160,8 @@ void Level::FixedUpdate()
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
 	cout << "[" << now << "] FixedUpdate" << endl;
 
-	// æ∆∑° ƒ⁄µÂ∞° æ»¡§º∫¿ª ∫∏¿Â«œ¥¬¡ˆ ∞À¡ı « ø‰
-	// ex) _gameObjects¿« ∫πªÁ ¡ﬂ _gameObjects¿« ø‰º“¿« √ﬂ∞°/∫Ø∞Ê/ªË¡¶∞° πﬂª˝«—¥Ÿ∏È?
+	// ÏïÑÎûò ÏΩîÎìúÍ∞Ä ÏïàÏ†ïÏÑ±ÏùÑ Î≥¥Ïû•ÌïòÎäîÏßÄ Í≤ÄÏ¶ù ÌïÑÏöî
+	// ex) _gameObjectsÏùò Î≥µÏÇ¨ Ï§ë _gameObjectsÏùò ÏöîÏÜåÏùò Ï∂îÍ∞Ä/Î≥ÄÍ≤Ω/ÏÇ≠Ï†úÍ∞Ä Î∞úÏÉùÌïúÎã§Î©¥?
 	auto gameObjectsCopied = gameObjects;
 	for (auto& gameObject : gameObjectsCopied)
 	{

@@ -1,4 +1,4 @@
-﻿#include "ServerPCH.h"
+#include "ServerPCH.h"
 #include "Observer.h"
 
 void Observer::notify(const ObserverEvent& oe) const
