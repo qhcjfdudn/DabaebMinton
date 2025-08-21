@@ -14,7 +14,7 @@ void Engine::TurnOff()
 	observer.notify(ObserverEvent::EngineOff);
 }
 
-void Engine::initPhysics()
+void Engine::InitPhysics()
 {
 	pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, pxAllocator, pxErrorCallback);
 
@@ -25,10 +25,10 @@ void Engine::initPhysics()
 	pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
 	pxDispatcher = PxDefaultCpuDispatcherCreate(2);
 
-	cout << "initPhysics done." << endl;
+	cout << "InitPhysics done." << endl;
 }
 
-void Engine::cleanupPhysics()
+void Engine::CleanupPhysics()
 {
 	PX_RELEASE(pxDispatcher);
 	PX_RELEASE(pxPhysics);
@@ -40,7 +40,7 @@ void Engine::cleanupPhysics()
 	}
 	PX_RELEASE(pxFoundation);
 
-	cout << "cleanupPhysics done." << endl;
+	cout << "CleanupPhysics done." << endl;
 }
 
 const PxTolerancesScale& Engine::GetTolerancesScale() const

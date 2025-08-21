@@ -10,8 +10,8 @@ public:
 
 	void TurnOff();
 
-	void initPhysics();
-	void cleanupPhysics();
+	void InitPhysics();
+	void CleanupPhysics();
 
 	const PxTolerancesScale& GetTolerancesScale() const;
 	PxCpuDispatcher* GetCpuDispatcher();
