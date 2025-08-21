@@ -41,6 +41,7 @@ int main()
 	vector<Level> levels(1);
 	levels[0].InitLevel();
 
+	// 서버 검증을 위한 커맨드 처리용 Thread
 	thread developerInputThread([&levels] {
 		auto& engineInstance = Engine::GetInstance();
 		string cmd;
