@@ -3,6 +3,8 @@
 #include "IOCPEvent.h"
 #include "Socket.h"
 
+class ReplicationManager;
+
 class NetworkManagerServer
 {
 public:
@@ -22,6 +24,10 @@ public:
 	int SendTo(shared_ptr<Socket> clientSocket, size_t len);
 	int RecvFrom(shared_ptr<Socket> clientSocket);
 
+	void SetReplicationManager(shared_ptr<ReplicationManager> replicationManager) {
+		p_replicationManager = replicationManager;
+	}
+
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;
 
@@ -30,6 +36,8 @@ public:
 	std::unordered_map<ULONG_PTR, shared_ptr<Socket>> m_clientsMap;
 
 private:
+	shared_ptr<ReplicationManager> p_replicationManager;
+
 	NetworkManagerServer();
 	~NetworkManagerServer();
 

@@ -21,15 +21,27 @@ int main()
 	signal(SIGINT, signalHandler);
 	
 	auto& engineInstance = Engine::GetInstance();
-	engineInstance.initPhysics();
+	engineInstance.InitPhysics();
 
-	auto& networkInstance = NetworkManagerServer::GetInstance();
-	networkInstance.InitIOCP();
+	thread networkThread([] {
+		auto& networkInstance = NetworkManagerServer::GetInstance();
+		networkInstance.InitIOCP();
+
+		shared_ptr<ReplicationManager> replicationManager = make_shared<ReplicationManager>();
+		networkInstance.SetReplicationManager(replicationManager);
+
+		auto& engineInstance = Engine::GetInstance();
+		while (engineInstance.isRunning)
+		{
+			networkInstance.ProcessIOCPEvent();
+			networkInstance.SendPacketsIOCP();
+		}
+		});
 
 	vector<Level> levels(1);
 	levels[0].InitLevel();
 
-	thread userInputThread([&levels] {
+	thread developerInputThread([&levels] {
 		auto& engineInstance = Engine::GetInstance();
 		string cmd;
 		while (engineInstance.isRunning)
@@ -48,8 +60,6 @@ int main()
 		}
 		});
 
-	// fps 업데이트를 위해 별도 thread 동작
-	// 리팩터링 적용 필요
 	thread physXThread([&levels]() {
 		auto& engineInstance = Engine::GetInstance();
 
@@ -71,26 +81,26 @@ int main()
 		}
 		});
 
-	// Networking 동작과 world 동작을 별개 thread로 분리 필요
-	while (engineInstance.isRunning) {
-		networkInstance.ProcessIOCPEvent();
-		
-		for (auto& level : levels) {
-			level.Update();
-			level.FixedUpdate();
-			level.WriteWorldStateToStream();
+	thread levelPlayThread([&levels] {
+		auto& engineInstance = Engine::GetInstance();
+
+		while (engineInstance.isRunning) {
+			for (auto& level : levels) {
+				level.FixedUpdate();
+				level.WriteWorldStateToStream();
+			}
 		}
 
-		networkInstance.SendPacketsIOCP();
-	}
+		for (auto& level : levels)
+			level.Release();
+		});
 
+	levelPlayThread.join();
 	physXThread.join();
-	userInputThread.join();
+	developerInputThread.join();
+	networkThread.join();
 
-	for (auto& level : levels)
-		level.Release();
-	
-	engineInstance.cleanupPhysics();
+	engineInstance.CleanupPhysics();
 	
 	cout << "Server Main done." << endl;
 }

@@ -1,4 +1,4 @@
-﻿#include "ServerPCH.h"
+#include "ServerPCH.h"
 #include "Level.h"
 
 #include "Engine.h"
@@ -141,10 +141,6 @@ void Level::RemoveAllStaticGameObjects()
 		swap(go, staticGameObjects.back());
 		staticGameObjects.pop_back();
 	}
-}
-
-void Level::Update()
-{
 }
 
 void Level::FixedUpdate()

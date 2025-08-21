@@ -30,7 +30,6 @@ public:
 
 	void RemoveAllStaticGameObjects();
 
-	void Update();
 	void FixedUpdate();
 	void WriteWorldStateToStream();
 
