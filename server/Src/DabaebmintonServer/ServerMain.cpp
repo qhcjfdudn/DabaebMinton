@@ -4,6 +4,7 @@
 
 #include "Engine.h"
 #include "NetworkManagerServer.h"
+#include "ReplicationManager.h"
 
 #include "Constant.h"
 #include "Level.h"
@@ -23,23 +24,32 @@ int main()
 	auto& engineInstance = Engine::GetInstance();
 	engineInstance.InitPhysics();
 
-	thread networkThread([] {
-		auto& networkInstance = NetworkManagerServer::GetInstance();
-		networkInstance.InitIOCP();
+	shared_ptr<ReplicationManager> replicationManager = make_shared<ReplicationManager>();
+	auto& networkInstance = NetworkManagerServer::GetInstance();
+	networkInstance.SetReplicationManager(replicationManager);
+	networkInstance.InitIOCP();
 
-		shared_ptr<ReplicationManager> replicationManager = make_shared<ReplicationManager>();
-		networkInstance.SetReplicationManager(replicationManager);
+	vector<Level> levels(1);
+	levels[0].InitLevel();
 
+	thread networkThread([&networkInstance, &levels] {
 		auto& engineInstance = Engine::GetInstance();
 		while (engineInstance.isRunning)
 		{
 			networkInstance.ProcessIOCPEvent();
-			networkInstance.SendPacketsIOCP();
-		}
-		});
 
-	vector<Level> levels(1);
-	levels[0].InitLevel();
+			if (networkInstance.HasElapsedPacketInterval())
+			{
+				networkInstance.ReplicateAllGameObjects();
+
+				// 채널 별로 interval이 필요한 것인가.
+				networkInstance.ResetPacketTimer();
+			}
+		}
+
+		networkInstance.RemoveAllGameObjectsForReplication();
+
+		});
 
 	// 서버 검증을 위한 커맨드 처리용 Thread
 	thread developerInputThread([&levels] {
@@ -70,12 +80,12 @@ int main()
 			for (auto& level : levels)
 			{
 				system_clock::time_point currentTime = system_clock::now();
-				std::chrono::duration<double> elapsedTime = currentTime - level.lastPhysxFixedUpdateTime;
+				std::chrono::duration<double> elapsedTime = currentTime - engineInstance.lastPhysxFixedUpdateTime;
 
 				if (elapsedTime.count() < Constant::PHYSX_FIXED_UPDATE_TIMESTEP)
 					continue;
 
-				level.lastPhysxFixedUpdateTime = currentTime;
+				engineInstance.lastPhysxFixedUpdateTime = currentTime;
 
 				level.StepPhysics();
 			}
@@ -88,7 +98,7 @@ int main()
 		while (engineInstance.isRunning) {
 			for (auto& level : levels) {
 				level.FixedUpdate();
-				level.WriteWorldStateToStream();
+				//level.WriteWorldStateToStream();
 			}
 		}
 
@@ -96,10 +106,10 @@ int main()
 			level.Release();
 		});
 
-	levelPlayThread.join();
-	physXThread.join();
 	developerInputThread.join();
+	levelPlayThread.join();
 	networkThread.join();
+	physXThread.join();
 
 	engineInstance.CleanupPhysics();
 	

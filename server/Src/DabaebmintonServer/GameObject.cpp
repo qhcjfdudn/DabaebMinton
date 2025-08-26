@@ -13,11 +13,6 @@ GameObject::~GameObject()
 		_rigidbody->release();
 }
 
-void GameObject::SetDirtyFlag(ReplicationFlag flag)
-{
-	replicationFlag |= flag;
-}
-
 void GameObject::SetVelocity(PxVec2 velocity)
 {
 	_velocity = velocity;

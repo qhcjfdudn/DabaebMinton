@@ -1,11 +1,21 @@
 #include "ServerPCH.h"
 #include "NetworkManagerServer.h"
 
+#include "ReplicationManager.h"
+#include "OutputMemoryBitStream.h"
 #include "PacketQueue.h"
+
+#include "Constant.h"
+#include "GetRequiredBits.h"
 
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
 	return sInstance;
+}
+
+void NetworkManagerServer::SetReplicationManager(shared_ptr<ReplicationManager> replicationManager)
+{
+	p_replicationManager = replicationManager;
 }
 
 void NetworkManagerServer::InitIOCP() {
@@ -397,6 +407,7 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 }
 
 NetworkManagerServer::NetworkManagerServer()
+	: lastPacketUpdateTime{ system_clock::now() }
 {
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
 	{
@@ -489,4 +500,73 @@ void NetworkManagerServer::GetLPFN()
 	}
 
 	cout << "[GetLPFN] Init GetAcceptExSockAddrs function complete." << endl;
+}
+
+bool NetworkManagerServer::HasElapsedPacketInterval()
+{
+	system_clock::time_point currentTime = system_clock::now();
+	std::chrono::duration<double> elapsedTime = currentTime - lastPacketUpdateTime;
+
+	return elapsedTime.count() >= Constant::PACKET_PERIOD;
+}
+
+void NetworkManagerServer::ResetPacketTimer()
+{
+	lastPacketUpdateTime = system_clock::now();
+}
+
+int NetworkManagerServer::ReplicateAllGameObjects()
+{
+	if (_gameObjectsForReplication.size() == 0)
+		return 0;
+
+	OutputMemoryBitStream stream;
+	// 0채널로 broadcast 예정
+
+	stream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
+		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
+
+	p_replicationManager->ReplicateUpdate(stream, _gameObjectsForReplication);
+	int cnt = static_cast<int>(_gameObjectsForReplication.size());
+
+ 	cout << "outStream.GetBitLength(): " << stream.GetBitLength() << endl;
+	cout << "outStream.GetByteLength(): " << stream.GetByteLength() << endl;
+
+	Packet packet{ stream.GetBufferPtr(), stream.GetByteLength() };
+
+	packet.PrintInHex();
+
+	PacketQueue::GetSendStaticInstance()
+		.PushCopy(packet);
+
+	SendPacketsIOCP();
+
+	return cnt;
+}
+
+void NetworkManagerServer::AddGameObjectForReplication(shared_ptr<GameObject> gameObject)
+{
+	_gameObjectsForReplication.push_back(gameObject);
+	p_replicationManager->linkingContext.AddGameObject(gameObject);
+	_pendingCreatedGameObjectsForReplication.push(gameObject);
+}
+
+void NetworkManagerServer::RemoveGameObjectForReplication(shared_ptr<GameObject> gameObject)
+{
+	_gameObjectsForReplication.erase(
+		std::remove(
+			_gameObjectsForReplication.begin(),
+			_gameObjectsForReplication.end(),
+			gameObject),
+		_gameObjectsForReplication.end());
+
+	p_replicationManager->linkingContext.RemoveGameObject(gameObject);
+	_pendingDeletedGameObjectsForReplication.push(gameObject);
+}
+
+void NetworkManagerServer::RemoveAllGameObjectsForReplication()
+{
+	for (auto go : _gameObjectsForReplication) {
+		RemoveGameObjectForReplication(go);
+	}
 }

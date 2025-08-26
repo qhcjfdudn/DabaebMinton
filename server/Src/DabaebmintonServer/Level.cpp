@@ -8,7 +8,7 @@
 #include "PacketQueue.h"
 #include "OutputMemoryBitStream.h"
 #include "GetRequiredBits.h"
-#include "ReplicationManager.h"
+#include "NetworkManagerServer.h"
 
 #include "Shuttlecock.h"
 #include "BadmintonBottom.h"
@@ -39,7 +39,7 @@ Level::Level()
 		pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
 
-	lastFixedUpdateTime = lastPacketUpdateTime = lastPhysxFixedUpdateTime = system_clock::now();
+	lastFixedUpdateTime = system_clock::now();
 }
 
 Level::~Level()
@@ -65,18 +65,13 @@ void Level::InitLevel()
 	pxScene->addActor(*shuttlecock->GetRigidbody());
 	gameObjects.push_back(shuttlecock);
 
-	// LinkingContext에 등록
-	replicationManager.linkingContext.AddGameObject(shuttlecock);
+	NetworkManagerServer::GetInstance().AddGameObjectForReplication(shuttlecock);
 }
 
 void Level::ClearLevel()
 {
 	RemoveAllGameObjects();
 	RemoveAllStaticGameObjects();
-
-	_pendingSerializationQueue = queue<shared_ptr<GameObject>>{};
-
-	replicationManager.linkingContext.Clear();
 }
 
 void Level::Release()
@@ -103,10 +98,7 @@ void Level::RemoveGameObject(size_t idx)
 {
 	auto& go = gameObjects[idx];
 
-	if (hasFlag(go->replicationFlag, ReplicationFlag::DF_ALL) == false)
-		_pendingSerializationQueue.push(go);
-
-	go->SetDirtyFlag(ReplicationFlag::DF_DELETE);
+	NetworkManagerServer::GetInstance().RemoveGameObjectForReplication(go);
 
 	auto& engineInstance = Engine::GetInstance();
 	Remove(go->GetRigidbody());
@@ -166,82 +158,5 @@ void Level::FixedUpdate()
 		pxScene->lockRead();
 		bool isChanged = gameObject->FixedUpdate();
 		pxScene->unlockRead();
-
-		if (isChanged == false)
-			continue;
-
-		ReplicationFlag& replicationFlag = gameObject->replicationFlag;
-
-		if (hasFlag(replicationFlag, (ReplicationFlag::DF_UPDATE | ReplicationFlag::DF_DELETE)))
-			continue;
-
-		gameObject->SetDirtyFlag(ReplicationFlag::DF_UPDATE);
-		_pendingSerializationQueue.push(gameObject);
 	}
-}
-
-void Level::WriteWorldStateToStream()
-{
-	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - lastPacketUpdateTime;
-
-	if (elapsedTime.count() < Constant::PACKET_PERIOD)
-		return;
-
-	lastPacketUpdateTime = currentTime;
-
-	if (_pendingSerializationQueue.empty())
-		return;
-
-	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
-	cout << "[" << now << "] WriteWorldStateToStream" << endl;
-	cout << "pendingSize: " << _pendingSerializationQueue.size() << endl;
-
-	OutputMemoryBitStream outStream;
-	outStream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
-		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-
-	int replicatedObjectCount = WriteByReplication(outStream);
-
-	if (replicatedObjectCount <= 0)
-		return;
-
-	cout << "outStream.GetBitLength(): " << outStream.GetBitLength() << endl;
-	cout << "outStream.GetByteLength(): " << outStream.GetByteLength() << endl;
-
-	Packet packet{ outStream.GetBufferPtr(), outStream.GetByteLength() };
-
-	packet.PrintInHex();
-
-	PacketQueue::GetSendStaticInstance()
-		.PushCopy(packet);
-}
-
-int Level::WriteByReplication(OutputMemoryBitStream& outStream)
-{
-	int pendingSerializationCount = static_cast<int>(_pendingSerializationQueue.size());
-
-	for (int i = 0; i < pendingSerializationCount; ++i) {
-		shared_ptr<GameObject> go = _pendingSerializationQueue.front();
-		_pendingSerializationQueue.pop();
-
-		ReplicationFlag& replicationFlag = go->replicationFlag;
-
-		if (hasFlag(replicationFlag, ReplicationFlag::DF_DELETE)) {
-			cout << "DF_DELETE" << endl;
-			replicationManager.ReplicateDelete(outStream, go);
-			replicationManager.linkingContext.RemoveGameObject(go);
-		}
-		else if (hasFlag(replicationFlag, ReplicationFlag::DF_UPDATE)) {
-			replicationManager.ReplicateUpdate(outStream, go);
-		}
-		else if (hasFlag(replicationFlag, ReplicationFlag::DF_CREATE)) {
-			//replicationManager.ReplicateCreate(outStream, go);
-			//_linkingContext.AddGameObject(go);
-		}
-
-		replicationFlag = ReplicationFlag::DF_NONE;
-	}
-
-	return pendingSerializationCount;
 }

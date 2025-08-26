@@ -5,6 +5,15 @@
 #include "LinkingContext.h"
 #include "GameObject.h"
 
+#include "Constant.h"
+
+ReplicationManager::ReplicationManager() :
+	linkingContext{},
+	_replicationInterval{ Constant::PACKET_PERIOD }, 
+	_timeSinceLastReplication{ system_clock::now() }
+{
+}
+
 void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, shared_ptr<GameObject> inGameObject)
 {
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Update,
@@ -13,6 +22,12 @@ void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, shared
 
 	rh.Write(inStream);
 	inGameObject->Write(inStream);
+}
+
+void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, vector<shared_ptr<GameObject>> inGameObjects)
+{
+	for (const auto& go : inGameObjects)
+		ReplicateUpdate(inStream, go);
 }
 
 void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& inStream, const shared_ptr<GameObject> inGameObject)
@@ -24,6 +39,10 @@ void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& inStream, const 
 	inGameObject->Write(inStream);
 }
 
-ReplicationManager::ReplicationManager() :
-	linkingContext{} {
+bool ReplicationManager::HasElapsedReplicationInterval() const
+{
+	system_clock::time_point currentTime = system_clock::now();
+	std::chrono::duration<double> elapsedTime = currentTime - _timeSinceLastReplication;
+
+	return elapsedTime.count() >= _replicationInterval;
 }

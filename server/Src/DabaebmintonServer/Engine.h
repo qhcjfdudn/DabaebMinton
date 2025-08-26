@@ -29,6 +29,8 @@ public:
 		const PxGeometry& geometry,
 		const PxVec3& velocity = PxVec3(0));
 
+	system_clock::time_point lastPhysxFixedUpdateTime;
+
 private:
 	Engine() = default;
 	~Engine() {}

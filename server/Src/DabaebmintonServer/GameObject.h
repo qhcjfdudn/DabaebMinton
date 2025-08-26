@@ -1,18 +1,12 @@
 #pragma once
 
-#include "ReplicationFlag.h"
-
 class OutputMemoryBitStream;
 
 class GameObject
 {
 public:
-	ReplicationFlag replicationFlag = ReplicationFlag::DF_NONE;
-
 	GameObject(PxVec2 location, PxVec2 velocity);
 	virtual ~GameObject();
-
-	void SetDirtyFlag(ReplicationFlag flag);
 
 	void SetVelocity(PxVec2 velocity);
 	void SetRigidbody(PxRigidDynamic& rigidbody);

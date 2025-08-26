@@ -25,6 +25,8 @@ void Engine::InitPhysics()
 	pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
 	pxDispatcher = PxDefaultCpuDispatcherCreate(2);
 
+	lastPhysxFixedUpdateTime = system_clock::now();
+
 	cout << "InitPhysics done." << endl;
 }
 
