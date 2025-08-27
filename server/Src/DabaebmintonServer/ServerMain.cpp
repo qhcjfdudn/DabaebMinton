@@ -10,10 +10,12 @@
 #include "Constant.h"
 #include "Level.h"
 
+#include "DeveloperCommandFunctor.h"
+
 void signalHandler(int signum)
 {
 	cout << "\nInterrupt signal (" << signum << ") received." << endl;
-	
+
 	GameEngine::GetInstance().TurnOff();
 }
 
@@ -43,7 +45,7 @@ int main()
 		}
 		});
 
-	thread physicsThread([]() {
+	thread physicsThread([] {
 		auto& gameEngine = GameEngine::GetInstance();
 		auto& physicsEngine = PhysicsEngine::GetInstance();
 
@@ -70,32 +72,18 @@ int main()
 		vector<Level> levels(1);
 		levels[0].InitLevel();
 
-
-	// 서버 검증을 위한 커맨드 처리용 Thread
-		thread developerInputThread([&levels] {
-			auto& gameEngine = GameEngine::GetInstance();
-			string cmd;
-			while (gameEngine.isRunning)
-			{
-				std::getline(std::cin, cmd);
-				if (cmd == "r")
-				{
-					for (auto& level : levels)
-						level.RemoveAllGameObjects();
-				}
-				else if (cmd == "s")
-				{
-					for (auto& level : levels)
-						level.InitLevel();
-				}
-			}
-			});
+		// 서버 검증을 위한 커맨드 처리용 Thread
+		DeveloperCommandFunctor developerCommandFunctor(levels);
+		thread developerInputThread(developerCommandFunctor);
 
 		auto& gameEngine = GameEngine::GetInstance();
 
 		while (gameEngine.isRunning) {
 			for (auto& level : levels) {
-				level.FixedUpdate();
+				if (level.HasElapsedFixedUpdateInterval()) {
+					level.FixedUpdate();
+					level.SetLastFixedUpdateTimeToNow();
+				}
 			}
 		}
 
@@ -119,6 +107,6 @@ int main()
 		NetworkManagerServer::GetInstance().RemoveAllGameObjectsForReplication();
 		});
 	networkEngineTurnOffThread.join();
-	
+
 	cout << "Server Main done." << endl;
 }

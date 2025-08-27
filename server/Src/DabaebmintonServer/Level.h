@@ -26,6 +26,8 @@ public:
 
 	void RemoveAllStaticGameObjects();
 
+	bool HasElapsedFixedUpdateInterval();
+	void SetLastFixedUpdateTimeToNow();
 	void FixedUpdate();
 
 	system_clock::time_point lastFixedUpdateTime;

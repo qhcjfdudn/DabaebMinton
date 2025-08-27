@@ -127,17 +127,22 @@ void Level::RemoveAllStaticGameObjects()
 	}
 }
 
-void Level::FixedUpdate()
+bool Level::HasElapsedFixedUpdateInterval()
 {
 	system_clock::time_point currentTime = system_clock::now();
 	std::chrono::duration<double> elapsedTime = currentTime - lastFixedUpdateTime;
 
-	if (elapsedTime.count() < Constant::FIXED_UPDATE_TIMESTEP)
-		return;
+	return elapsedTime.count() >= Constant::FIXED_UPDATE_TIMESTEP;
+}
 
-	lastFixedUpdateTime = currentTime;
+void Level::SetLastFixedUpdateTimeToNow()
+{
+	lastFixedUpdateTime = system_clock::now();
+}
 
-	const local_time<system_clock::duration> now = zoned_time{ current_zone(), currentTime }.get_local_time();
+void Level::FixedUpdate()
+{
+	const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
 	cout << "[" << now << "] FixedUpdate" << endl;
 
 	// 아래 코드가 안정성을 보장하는지 검증 필요
@@ -145,8 +150,6 @@ void Level::FixedUpdate()
 	auto gameObjectsCopied = gameObjects;
 	for (auto& gameObject : gameObjectsCopied)
 	{
-		auto& engineInstance = PhysicsEngine::GetInstance();
-
 		pxScene->lockRead();
 		bool isChanged = gameObject->FixedUpdate();
 		pxScene->unlockRead();
