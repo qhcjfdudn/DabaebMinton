@@ -20,8 +20,6 @@ public:
 	void ClearLevel();
 	void Release();
 
-	void StepPhysics();
-
 	void RemoveAllGameObjects();
 	void RemoveGameObject(size_t idx);
 	void Remove(PxActor* actor);

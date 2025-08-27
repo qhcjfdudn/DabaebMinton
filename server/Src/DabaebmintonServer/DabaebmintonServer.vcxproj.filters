@@ -51,7 +51,7 @@
     <ClCompile Include="LinkingContext.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Engine.cpp">
+    <ClCompile Include="PhysicsEngine.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ReplicationFlag.cpp">
@@ -73,6 +73,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="Packet.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEngine.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +119,7 @@
     <ClInclude Include="LinkingContext.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h">
+    <ClInclude Include="PhysicsEngine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ReplicationFlag.h">
@@ -138,6 +141,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Packet.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEngine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

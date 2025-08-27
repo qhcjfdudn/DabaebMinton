@@ -1,12 +1,12 @@
 #include "ServerPCH.h"
 #include "BadmintonBottom.h"
 
-#include "Engine.h"
+#include "PhysicsEngine.h"
 #include "OutputMemoryBitStream.h"
 
 BadmintonBottom::BadmintonBottom(PxVec2 location) : StaticGameObject(location)
 {
-	auto& engineInstance = Engine::GetInstance();
+	auto& engineInstance = PhysicsEngine::GetInstance();
 	_rigidbody = engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
 }
 

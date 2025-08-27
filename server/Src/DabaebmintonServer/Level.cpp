@@ -1,7 +1,7 @@
 #include "ServerPCH.h"
 #include "Level.h"
 
-#include "Engine.h"
+#include "PhysicsEngine.h"
 
 #include "Constant.h"
 
@@ -16,7 +16,7 @@
 
 Level::Level()
 {
-	auto& engineInstance = Engine::GetInstance();
+	auto& engineInstance = PhysicsEngine::GetInstance();
 	
 	PxSceneDesc sceneDesc(engineInstance.GetTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
@@ -49,7 +49,7 @@ Level::~Level()
 
 void Level::InitLevel()
 {
-	auto& engineInstance = Engine::GetInstance();
+	auto& engineInstance = PhysicsEngine::GetInstance();
 
 	auto bottom = make_shared<BadmintonBottom>(PxVec2{ 0, 0 });
 	pxScene->addActor(*bottom->GetRigidbody());
@@ -80,14 +80,6 @@ void Level::Release()
 	PX_RELEASE(pxScene);
 }
 
-void Level::StepPhysics()
-{
-	pxScene->lockWrite();
-	pxScene->simulate(Constant::PHYSX_FIXED_UPDATE_TIMESTEP);
-	pxScene->fetchResults(true);
-	pxScene->unlockWrite();
-}
-
 void Level::RemoveAllGameObjects()
 {
 	for (int idx = static_cast<int>(gameObjects.size()) - 1; idx >= 0; --idx)
@@ -100,7 +92,7 @@ void Level::RemoveGameObject(size_t idx)
 
 	NetworkManagerServer::GetInstance().RemoveGameObjectForReplication(go);
 
-	auto& engineInstance = Engine::GetInstance();
+	auto& engineInstance = PhysicsEngine::GetInstance();
 	Remove(go->GetRigidbody());
 
 	swap(go, gameObjects.back());
@@ -153,7 +145,7 @@ void Level::FixedUpdate()
 	auto gameObjectsCopied = gameObjects;
 	for (auto& gameObject : gameObjectsCopied)
 	{
-		auto& engineInstance = Engine::GetInstance();
+		auto& engineInstance = PhysicsEngine::GetInstance();
 
 		pxScene->lockRead();
 		bool isChanged = gameObject->FixedUpdate();

@@ -1,12 +1,12 @@
 #include "ServerPCH.h"
 #include "BadmintonNet.h"
 
-#include "Engine.h"
+#include "PhysicsEngine.h"
 #include "OutputMemoryBitStream.h"
 
 BadmintonNet::BadmintonNet(PxVec2 location) : StaticGameObject(location)
 {
-	auto& engineInstance = Engine::GetInstance();
+	auto& engineInstance = PhysicsEngine::GetInstance();
 	_rigidbody = engineInstance.CreateBox2DStatic(location, _halfX, _halfY);
 }
 

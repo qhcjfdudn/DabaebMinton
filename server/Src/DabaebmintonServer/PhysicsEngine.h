@@ -1,15 +1,10 @@
 #pragma once
 
-#include "Observer.h"
-
-class Engine
+class PhysicsEngine
 {
 public:
-	static Engine& GetInstance();
-	bool isRunning = true;
-
-	void TurnOff();
-
+	static PhysicsEngine& GetInstance();
+	
 	void InitPhysics();
 	void CleanupPhysics();
 
@@ -29,11 +24,13 @@ public:
 		const PxGeometry& geometry,
 		const PxVec3& velocity = PxVec3(0));
 
+	void StepPhysicsEveryScene();
+
 	system_clock::time_point lastPhysxFixedUpdateTime;
 
 private:
-	Engine() = default;
-	~Engine() {}
+	PhysicsEngine() = default;
+	~PhysicsEngine() {}
 
 	PxDefaultAllocator		pxAllocator{};
 	PxDefaultErrorCallback	pxErrorCallback{};
@@ -43,8 +40,8 @@ private:
 	PxMaterial* pxMaterial = nullptr;
 	PxPvd* pxPvd = nullptr;
 
-	PxReal stackZ = 10.0f;
+	vector<PxScene*> scenes{};
 
-	Observer observer;
+	PxReal stackZ = 10.0f;
 };
 

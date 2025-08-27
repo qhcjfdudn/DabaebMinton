@@ -1,20 +1,15 @@
 #include "ServerPCH.h"
-#include "Engine.h"
+#include "PhysicsEngine.h"
 
 #include "Constant.h"
 
-Engine& Engine::GetInstance() {
-	static Engine instance;
+PhysicsEngine& PhysicsEngine::GetInstance() {
+	static PhysicsEngine instance;
 	return instance;
 }
 
-void Engine::TurnOff()
-{
-	isRunning = false;
-	observer.notify(ObserverEvent::EngineOff);
-}
 
-void Engine::InitPhysics()
+void PhysicsEngine::InitPhysics()
 {
 	pxFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, pxAllocator, pxErrorCallback);
 
@@ -30,7 +25,7 @@ void Engine::InitPhysics()
 	cout << "InitPhysics done." << endl;
 }
 
-void Engine::CleanupPhysics()
+void PhysicsEngine::CleanupPhysics()
 {
 	PX_RELEASE(pxDispatcher);
 	PX_RELEASE(pxPhysics);
@@ -45,29 +40,31 @@ void Engine::CleanupPhysics()
 	cout << "CleanupPhysics done." << endl;
 }
 
-const PxTolerancesScale& Engine::GetTolerancesScale() const
+const PxTolerancesScale& PhysicsEngine::GetTolerancesScale() const
 {
 	return pxPhysics->getTolerancesScale();
 }
 
-PxCpuDispatcher* Engine::GetCpuDispatcher()
+PxCpuDispatcher* PhysicsEngine::GetCpuDispatcher()
 {
 	return pxDispatcher;
 }
 
-PxScene* Engine::CreateScene(PxSceneDesc sceneDesc)
+PxScene* PhysicsEngine::CreateScene(PxSceneDesc sceneDesc)
 {
-	return pxPhysics->createScene(sceneDesc);
+	PxScene* pxScene = pxPhysics->createScene(sceneDesc);
+	scenes.push_back(pxScene);
+	return pxScene;
 }
 
-PxRigidStatic* Engine::CreatePlain(float nx, float ny, float nz, float distance)
+PxRigidStatic* PhysicsEngine::CreatePlain(float nx, float ny, float nz, float distance)
 {
 	pxMaterial = pxPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
 	return PxCreatePlane(*pxPhysics, PxPlane(nx, ny, nz, distance), *pxMaterial);
 }
 
-PxRigidDynamic * Engine::CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ)
+PxRigidDynamic * PhysicsEngine::CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ)
 {
 	PxRigidDynamic* body = pxPhysics->createRigidDynamic(tp);
 
@@ -80,7 +77,7 @@ PxRigidDynamic * Engine::CreateBox(const PxTransform& tp, float halfExtentX, flo
 	return body;
 }
 
-PxRigidDynamic * Engine::CreateBox2D(const PxVec2& location, float halfExtentX, float halfExtentY)
+PxRigidDynamic * PhysicsEngine::CreateBox2D(const PxVec2& location, float halfExtentX, float halfExtentY)
 {
 	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
 
@@ -93,7 +90,7 @@ PxRigidDynamic * Engine::CreateBox2D(const PxVec2& location, float halfExtentX, 
 	return body;
 }
 
-PxRigidStatic* Engine::CreateBox2DStatic(const PxVec2& location, float halfExtentX, float halfExtentY)
+PxRigidStatic* PhysicsEngine::CreateBox2DStatic(const PxVec2& location, float halfExtentX, float halfExtentY)
 {
 	PxRigidStatic* body = pxPhysics->createRigidStatic(PxTransform{ location.x, location.y, 0 });
 
@@ -104,7 +101,7 @@ PxRigidStatic* Engine::CreateBox2DStatic(const PxVec2& location, float halfExten
 	return body;
 }
 
-PxRigidDynamic * Engine::CreateSphere2D(const PxVec2& location, const PxVec2& velocity, float halfExtentRadius)
+PxRigidDynamic * PhysicsEngine::CreateSphere2D(const PxVec2& location, const PxVec2& velocity, float halfExtentRadius)
 {
 	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
 
@@ -125,11 +122,21 @@ PxRigidDynamic * Engine::CreateSphere2D(const PxVec2& location, const PxVec2& ve
 	return body;
 }
 
-PxRigidDynamic * Engine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
+PxRigidDynamic * PhysicsEngine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
 	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);
 	dynamic->setAngularDamping(0.5f);
 	dynamic->setLinearVelocity(velocity);
 
 	return dynamic;
+}
+
+void PhysicsEngine::StepPhysicsEveryScene()
+{
+	for (auto* pxScene : scenes) {
+		pxScene->lockWrite();
+		pxScene->simulate(Constant::PHYSX_FIXED_UPDATE_TIMESTEP);
+		pxScene->fetchResults(true);
+		pxScene->unlockWrite();
+	}
 }

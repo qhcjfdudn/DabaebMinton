@@ -2,12 +2,12 @@
 #include "Shuttlecock.h"
 
 #include "OutputMemoryBitStream.h"
-#include "Engine.h"
+#include "PhysicsEngine.h"
 
 Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 	GameObject(location, velocity)
 {
-	auto& engineInstance = Engine::GetInstance();
+	auto& engineInstance = PhysicsEngine::GetInstance();
 
 	_rigidbody = engineInstance.CreateSphere2D(location, velocity, _radius);
 	PxRigidBodyExt::updateMassAndInertia(*_rigidbody, 10.0f);
