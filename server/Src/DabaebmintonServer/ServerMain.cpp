@@ -24,13 +24,23 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	signal(SIGINT, signalHandler);
 
-	thread networkThread([] {
+	thread networkEngineInitThread([] {
 		auto& networkInstance = NetworkManagerServer::GetInstance();
-		shared_ptr<ReplicationManager> replicationManager = make_shared<ReplicationManager>();
-		networkInstance.SetReplicationManager(replicationManager);
+		networkInstance.SetReplicationManager(make_shared<ReplicationManager>());
 		networkInstance.InitIOCP();
+		});
 
+	thread physicsEngineInitThread([] {
+		PhysicsEngine::GetInstance().InitPhysics();
+		});
+
+	networkEngineInitThread.join();
+	physicsEngineInitThread.join();
+
+	thread networkEngineRunningThread([] {
+		auto& networkInstance = NetworkManagerServer::GetInstance();
 		auto& gameEngine = GameEngine::GetInstance();
+		
 		while (gameEngine.isRunning)
 		{
 			networkInstance.ProcessIOCPEvent();
@@ -45,11 +55,9 @@ int main()
 		}
 		});
 
-	thread physicsThread([] {
+	thread physicsEngineRunningThread([] {
 		auto& gameEngine = GameEngine::GetInstance();
 		auto& physicsEngine = PhysicsEngine::GetInstance();
-
-		physicsEngine.InitPhysics();
 
 		// thread 내에서 참조하는 외부 변수. atomic으로 변경해 잠재적 동시성 오류 해결하자.
 		while (gameEngine.isRunning)
@@ -60,13 +68,6 @@ int main()
 			}
 		}
 		});
-
-	auto& physEngine = PhysicsEngine::GetInstance();
-
-	while (physEngine.GetEngineRunningState() != PhysicsEngineRunningState::Running)
-	{
-		Sleep(10);
-	}
 
 	thread levelPlayThread([] {
 		vector<Level> levels(1);
@@ -93,9 +94,9 @@ int main()
 			level.Release();
 		});
 
+	networkEngineRunningThread.join();
+	physicsEngineRunningThread.join();
 	levelPlayThread.join();
-	physicsThread.join();
-	networkThread.join();
 
 	// 기반 코드 종료 Routine 수행
 	thread physicsEngineCleaupThread([] {
