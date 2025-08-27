@@ -1,5 +1,12 @@
 #pragma once
 
+enum class PhysicsEngineRunningState {
+	Initiating,
+	Running,
+	Exiting,
+	TurnedOff
+};
+
 class PhysicsEngine
 {
 public:
@@ -26,7 +33,10 @@ public:
 
 	void StepPhysicsEveryScene();
 
-	system_clock::time_point lastPhysxFixedUpdateTime;
+	bool HasElapsedPhysicsUpdateInterval();
+	void SetLastUpdateTimeToNow();
+
+	PhysicsEngineRunningState GetEngineRunningState();
 
 private:
 	PhysicsEngine() = default;
@@ -41,6 +51,10 @@ private:
 	PxPvd* pxPvd = nullptr;
 
 	vector<PxScene*> scenes{};
+
+	system_clock::time_point _lastPhysxFixedUpdateTime;
+
+	PhysicsEngineRunningState _engineRunningState{ PhysicsEngineRunningState::Initiating };
 
 	PxReal stackZ = 10.0f;
 };

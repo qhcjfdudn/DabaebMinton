@@ -3,9 +3,9 @@
 #include <csignal>
 
 #include "GameEngine.h"
-#include "PhysicsEngine.h"
-#include "NetworkManagerServer.h"
 #include "ReplicationManager.h"
+#include "NetworkManagerServer.h"
+#include "PhysicsEngine.h"
 
 #include "Constant.h"
 #include "Level.h"
@@ -21,17 +21,14 @@ int main()
 {
 	SetConsoleOutputCP(CP_UTF8);
 	signal(SIGINT, signalHandler);
-	
-	auto& gameEngine = GameEngine::GetInstance();
 
-	shared_ptr<ReplicationManager> replicationManager = make_shared<ReplicationManager>();
-	auto& networkInstance = NetworkManagerServer::GetInstance();
-	networkInstance.SetReplicationManager(replicationManager);
-	networkInstance.InitIOCP();
+	thread networkThread([] {
+		auto& networkInstance = NetworkManagerServer::GetInstance();
+		shared_ptr<ReplicationManager> replicationManager = make_shared<ReplicationManager>();
+		networkInstance.SetReplicationManager(replicationManager);
+		networkInstance.InitIOCP();
 
-	thread networkThread([&networkInstance] {
 		auto& gameEngine = GameEngine::GetInstance();
-		
 		while (gameEngine.isRunning)
 		{
 			networkInstance.ProcessIOCPEvent();
@@ -41,7 +38,7 @@ int main()
 				networkInstance.ReplicateAllGameObjects();
 
 				// 채널 별로 interval이 필요한 것인가.
-				networkInstance.ResetPacketTimer();
+				networkInstance.SetLastPacketSendTimeToNow();
 			}
 		}
 
@@ -58,30 +55,33 @@ int main()
 		// thread 내에서 참조하는 외부 변수. atomic으로 변경해 잠재적 동시성 오류 해결하자.
 		while (gameEngine.isRunning)
 		{
-			system_clock::time_point currentTime = system_clock::now();
-			std::chrono::duration<double> elapsedTime = currentTime - physicsEngine.lastPhysxFixedUpdateTime;
-
-			if (elapsedTime.count() < Constant::PHYSX_FIXED_UPDATE_TIMESTEP)
-				continue;
-
-			physicsEngine.StepPhysicsEveryScene();
-
-			physicsEngine.lastPhysxFixedUpdateTime = currentTime;
+			if (physicsEngine.HasElapsedPhysicsUpdateInterval()) {
+				physicsEngine.StepPhysicsEveryScene();
+				physicsEngine.SetLastUpdateTimeToNow();
+			}
 		}
 
 		physicsEngine.CleanupPhysics();
 		});
 
+	auto& physEngine = PhysicsEngine::GetInstance();
+
+	while (physEngine.GetEngineRunningState() != PhysicsEngineRunningState::Running)
+	{
+		Sleep(10);
+	}
+
 	vector<Level> levels(1);
 	levels[0].InitLevel();
 
 	thread levelPlayThread([&levels] {
+		
+
 		auto& gameEngine = GameEngine::GetInstance();
 
 		while (gameEngine.isRunning) {
 			for (auto& level : levels) {
 				level.FixedUpdate();
-				//level.WriteWorldStateToStream();
 			}
 		}
 

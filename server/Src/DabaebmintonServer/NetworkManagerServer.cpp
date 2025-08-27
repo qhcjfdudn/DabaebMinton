@@ -407,7 +407,7 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 }
 
 NetworkManagerServer::NetworkManagerServer()
-	: lastPacketUpdateTime{ system_clock::now() }
+	: lastPacketSendTime{ system_clock::now() }
 {
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
 	{
@@ -505,14 +505,14 @@ void NetworkManagerServer::GetLPFN()
 bool NetworkManagerServer::HasElapsedPacketInterval()
 {
 	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - lastPacketUpdateTime;
+	std::chrono::duration<double> elapsedTime = currentTime - lastPacketSendTime;
 
 	return elapsedTime.count() >= Constant::PACKET_PERIOD;
 }
 
-void NetworkManagerServer::ResetPacketTimer()
+void NetworkManagerServer::SetLastPacketSendTimeToNow()
 {
-	lastPacketUpdateTime = system_clock::now();
+	lastPacketSendTime = system_clock::now();
 }
 
 int NetworkManagerServer::ReplicateAllGameObjects()

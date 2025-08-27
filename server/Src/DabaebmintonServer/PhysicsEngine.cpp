@@ -20,7 +20,9 @@ void PhysicsEngine::InitPhysics()
 	pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
 	pxDispatcher = PxDefaultCpuDispatcherCreate(2);
 
-	lastPhysxFixedUpdateTime = system_clock::now();
+	_lastPhysxFixedUpdateTime = system_clock::now();
+
+	_engineRunningState = PhysicsEngineRunningState::Running;
 
 	cout << "InitPhysics done." << endl;
 }
@@ -36,6 +38,8 @@ void PhysicsEngine::CleanupPhysics()
 		PX_RELEASE(transport);
 	}
 	PX_RELEASE(pxFoundation);
+
+	_engineRunningState = PhysicsEngineRunningState::TurnedOff;
 
 	cout << "CleanupPhysics done." << endl;
 }
@@ -139,4 +143,22 @@ void PhysicsEngine::StepPhysicsEveryScene()
 		pxScene->fetchResults(true);
 		pxScene->unlockWrite();
 	}
+}
+
+bool PhysicsEngine::HasElapsedPhysicsUpdateInterval()
+{
+	system_clock::time_point currentTime = system_clock::now();
+	std::chrono::duration<double> elapsedTime = currentTime - _lastPhysxFixedUpdateTime;
+
+	return elapsedTime.count() >= Constant::PHYSX_FIXED_UPDATE_TIMESTEP;
+}
+
+void PhysicsEngine::SetLastUpdateTimeToNow()
+{
+	_lastPhysxFixedUpdateTime = system_clock::now();
+}
+
+PhysicsEngineRunningState PhysicsEngine::GetEngineRunningState()
+{
+	return _engineRunningState;
 }

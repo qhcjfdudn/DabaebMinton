@@ -28,7 +28,7 @@ public:
 	int RecvFrom(shared_ptr<Socket> clientSocket);
 
 	bool HasElapsedPacketInterval();
-	void ResetPacketTimer();
+	void SetLastPacketSendTimeToNow();
 
 	int ReplicateAllGameObjects();
 	void AddGameObjectForReplication(shared_ptr<GameObject> gameObject);
@@ -66,7 +66,7 @@ private:
 
 	Socket m_rudpSocket{};
 
-	system_clock::time_point lastPacketUpdateTime;
+	system_clock::time_point lastPacketSendTime;
 
 	shared_ptr<ReplicationManager> p_replicationManager;
 	vector<shared_ptr<GameObject> > _gameObjectsForReplication{};
