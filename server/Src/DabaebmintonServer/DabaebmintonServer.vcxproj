@@ -147,6 +147,7 @@
   <ItemGroup>
     <ClCompile Include="BadmintonNet.cpp" />
     <ClCompile Include="BadmintonBottom.cpp" />
+    <ClCompile Include="DeveloperCommandFunctor.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -189,6 +190,7 @@
   <ItemGroup>
     <ClInclude Include="BadmintonNet.h" />
     <ClInclude Include="BadmintonBottom.h" />
+    <ClInclude Include="DeveloperCommandFunctor.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="GameObject.h" />
