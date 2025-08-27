@@ -7,7 +7,6 @@
 #include "NetworkManagerServer.h"
 #include "PhysicsEngine.h"
 
-#include "Constant.h"
 #include "Level.h"
 
 #include "DeveloperCommandFunctor.h"
@@ -24,6 +23,7 @@ int main()
 	SetConsoleOutputCP(CP_UTF8);
 	signal(SIGINT, signalHandler);
 
+	// Engine Init
 	thread networkEngineInitThread([] {
 		auto& networkInstance = NetworkManagerServer::GetInstance();
 		networkInstance.SetReplicationManager(make_shared<ReplicationManager>());
@@ -37,6 +37,7 @@ int main()
 	networkEngineInitThread.join();
 	physicsEngineInitThread.join();
 
+	// Engine and Game Working
 	thread networkEngineRunningThread([] {
 		auto& networkInstance = NetworkManagerServer::GetInstance();
 		auto& gameEngine = GameEngine::GetInstance();
@@ -98,7 +99,7 @@ int main()
 	physicsEngineRunningThread.join();
 	levelPlayThread.join();
 
-	// 기반 코드 종료 Routine 수행
+	// Engine Turn Off with Garbage Collection
 	thread physicsEngineCleaupThread([] {
 		PhysicsEngine::GetInstance().CleanupPhysics();
 		});
