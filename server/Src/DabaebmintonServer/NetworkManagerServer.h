@@ -31,8 +31,8 @@ public:
 	void SetLastPacketSendTimeToNow();
 
 	int ReplicateAllGameObjects();
-	void AddGameObjectForReplication(shared_ptr<GameObject> gameObject);
-	void RemoveGameObjectForReplication(shared_ptr<GameObject> gameObject);
+	void AddGameObjectForReplication(GameObject* gameObject);
+	void RemoveGameObjectForReplication(GameObject* gameObject);
 	void RemoveAllGameObjectsForReplication();
 
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
@@ -69,9 +69,9 @@ private:
 	system_clock::time_point lastPacketSendTime;
 
 	shared_ptr<ReplicationManager> p_replicationManager;
-	vector<shared_ptr<GameObject> > _gameObjectsForReplication{};
-	queue<shared_ptr<GameObject> > _pendingCreatedGameObjectsForReplication{};
-	queue<shared_ptr<GameObject> > _pendingDeletedGameObjectsForReplication{};
+	vector<GameObject*> _gameObjectsForReplication{};
+	queue<GameObject*> _pendingCreatedGameObjectsForReplication{};
+	queue<GameObject*> _pendingDeletedGameObjectsForReplication{};
 
 	int m_maxChannelId;
 };

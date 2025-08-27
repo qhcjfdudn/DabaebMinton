@@ -41,9 +41,6 @@ int main()
 				networkInstance.SetLastPacketSendTimeToNow();
 			}
 		}
-
-		networkInstance.RemoveAllGameObjectsForReplication();
-
 		});
 
 	thread physicsThread([]() {
@@ -60,8 +57,6 @@ int main()
 				physicsEngine.SetLastUpdateTimeToNow();
 			}
 		}
-
-		physicsEngine.CleanupPhysics();
 		});
 
 	auto& physEngine = PhysicsEngine::GetInstance();
@@ -71,11 +66,30 @@ int main()
 		Sleep(10);
 	}
 
-	vector<Level> levels(1);
-	levels[0].InitLevel();
+	thread levelPlayThread([] {
+		vector<Level> levels(1);
+		levels[0].InitLevel();
 
-	thread levelPlayThread([&levels] {
-		
+
+	// 서버 검증을 위한 커맨드 처리용 Thread
+		thread developerInputThread([&levels] {
+			auto& gameEngine = GameEngine::GetInstance();
+			string cmd;
+			while (gameEngine.isRunning)
+			{
+				std::getline(std::cin, cmd);
+				if (cmd == "r")
+				{
+					for (auto& level : levels)
+						level.RemoveAllGameObjects();
+				}
+				else if (cmd == "s")
+				{
+					for (auto& level : levels)
+						level.InitLevel();
+				}
+			}
+			});
 
 		auto& gameEngine = GameEngine::GetInstance();
 
@@ -85,34 +99,26 @@ int main()
 			}
 		}
 
+		developerInputThread.join();
+
 		for (auto& level : levels)
 			level.Release();
 		});
 
-	// 서버 검증을 위한 커맨드 처리용 Thread
-	thread developerInputThread([&levels] {
-		auto& gameEngine = GameEngine::GetInstance();
-		string cmd;
-		while (gameEngine.isRunning)
-		{
-			std::getline(std::cin, cmd);
-			if (cmd == "r")
-			{
-				for (auto& level : levels)
-					level.RemoveAllGameObjects();
-			}
-			else if (cmd == "s")
-			{
-				for (auto& level : levels)
-					level.InitLevel();
-			}
-		}
-		});
-
-	developerInputThread.join();
 	levelPlayThread.join();
 	physicsThread.join();
 	networkThread.join();
+
+	// 기반 코드 종료 Routine 수행
+	thread physicsEngineCleaupThread([] {
+		PhysicsEngine::GetInstance().CleanupPhysics();
+		});
+	physicsEngineCleaupThread.join();
+
+	thread networkEngineTurnOffThread([] {
+		NetworkManagerServer::GetInstance().RemoveAllGameObjectsForReplication();
+		});
+	networkEngineTurnOffThread.join();
 	
 	cout << "Server Main done." << endl;
 }

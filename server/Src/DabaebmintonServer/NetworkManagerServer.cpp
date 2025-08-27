@@ -544,14 +544,14 @@ int NetworkManagerServer::ReplicateAllGameObjects()
 	return cnt;
 }
 
-void NetworkManagerServer::AddGameObjectForReplication(shared_ptr<GameObject> gameObject)
+void NetworkManagerServer::AddGameObjectForReplication(GameObject* gameObject)
 {
 	_gameObjectsForReplication.push_back(gameObject);
 	p_replicationManager->linkingContext.AddGameObject(gameObject);
 	_pendingCreatedGameObjectsForReplication.push(gameObject);
 }
 
-void NetworkManagerServer::RemoveGameObjectForReplication(shared_ptr<GameObject> gameObject)
+void NetworkManagerServer::RemoveGameObjectForReplication(GameObject* gameObject)
 {
 	_gameObjectsForReplication.erase(
 		std::remove(

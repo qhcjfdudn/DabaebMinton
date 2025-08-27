@@ -10,10 +10,10 @@ class ReplicationManager
 public:
 	ReplicationManager();
 
-	void ReplicateUpdate(OutputMemoryBitStream& inStream, shared_ptr<GameObject> inGameObject);
-	void ReplicateUpdate(OutputMemoryBitStream& inStream, vector<shared_ptr<GameObject> > inGameObjects);
+	void ReplicateUpdate(OutputMemoryBitStream& inStream, GameObject* inGameObject);
+	void ReplicateUpdate(OutputMemoryBitStream& inStream, vector<GameObject*> inGameObjects);
 
-	void ReplicateDelete(OutputMemoryBitStream& inStream, const shared_ptr<GameObject> inGameObject);
+	void ReplicateDelete(OutputMemoryBitStream& inStream, GameObject* const inGameObject);
 
 	bool HasElapsedReplicationInterval() const;
 

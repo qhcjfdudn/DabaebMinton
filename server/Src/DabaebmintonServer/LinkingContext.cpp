@@ -8,7 +8,7 @@ void LinkingContext::Clear()
 	_nextNetworkId = 1;
 }
 
-NetworkId_t LinkingContext::GetNetworkId(shared_ptr<GameObject> gameObject)
+NetworkId_t LinkingContext::GetNetworkId(GameObject* gameObject)
 {
 	if (_gameObjectToNetworkIdMap.find(gameObject) == _gameObjectToNetworkIdMap.end())
 	{
@@ -17,11 +17,11 @@ NetworkId_t LinkingContext::GetNetworkId(shared_ptr<GameObject> gameObject)
 
 	return _gameObjectToNetworkIdMap[gameObject];
 }
-shared_ptr<GameObject> LinkingContext::GetGameObject(NetworkId_t networkId)
+GameObject* LinkingContext::GetGameObject(NetworkId_t networkId)
 {
 	return _networkIdToGameObjectMap[networkId];
 }
-void LinkingContext::AddGameObject(shared_ptr<GameObject> gameObject)
+void LinkingContext::AddGameObject(GameObject* gameObject)
 {
 	_networkIdToGameObjectMap[_nextNetworkId] = gameObject;
 	_gameObjectToNetworkIdMap[gameObject] = _nextNetworkId;
@@ -34,7 +34,7 @@ void LinkingContext::RemoveGameObject(NetworkId_t networkId)
 	_gameObjectToNetworkIdMap.erase(gameObject);
 }
 
-void LinkingContext::RemoveGameObject(shared_ptr<GameObject> gameObject)
+void LinkingContext::RemoveGameObject(GameObject* gameObject)
 {
 	NetworkId_t networkId = _gameObjectToNetworkIdMap[gameObject];
 	_networkIdToGameObjectMap.erase(networkId);

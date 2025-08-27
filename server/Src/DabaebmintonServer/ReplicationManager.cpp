@@ -14,7 +14,7 @@ ReplicationManager::ReplicationManager() :
 {
 }
 
-void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, shared_ptr<GameObject> inGameObject)
+void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, GameObject* inGameObject)
 {
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Update,
 		linkingContext.GetNetworkId(inGameObject),
@@ -24,13 +24,13 @@ void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, shared
 	inGameObject->Write(inStream);
 }
 
-void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, vector<shared_ptr<GameObject>> inGameObjects)
+void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, vector<GameObject*> inGameObjects)
 {
 	for (const auto& go : inGameObjects)
 		ReplicateUpdate(inStream, go);
 }
 
-void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& inStream, const shared_ptr<GameObject> inGameObject)
+void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& inStream, GameObject* const inGameObject)
 {
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Delete,
 		linkingContext.GetNetworkId(inGameObject),

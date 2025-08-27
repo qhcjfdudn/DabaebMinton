@@ -18,6 +18,8 @@ public:
 	const PxTolerancesScale& GetTolerancesScale() const;
 	PxCpuDispatcher* GetCpuDispatcher();
 	PxScene* CreateScene(PxSceneDesc sceneDesc);
+	void Release(PxScene* scene);
+	void ReleaseEveryScene();
 
 	PxRigidStatic* CreatePlain(float nx, float ny, float nz, float distance);
 

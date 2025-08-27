@@ -16,14 +16,14 @@
 
 Level::Level()
 {
-	auto& engineInstance = PhysicsEngine::GetInstance();
+	auto& physicsEngine = PhysicsEngine::GetInstance();
 	
-	PxSceneDesc sceneDesc(engineInstance.GetTolerancesScale());
+	PxSceneDesc sceneDesc(physicsEngine.GetTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = engineInstance.GetCpuDispatcher();
+	sceneDesc.cpuDispatcher = physicsEngine.GetCpuDispatcher();
 	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 	
-	pxScene = engineInstance.CreateScene(sceneDesc);
+	pxScene = physicsEngine.CreateScene(sceneDesc);
 
 	if (pxScene == nullptr)
 	{
@@ -44,7 +44,8 @@ Level::Level()
 
 Level::~Level()
 {
-	PX_RELEASE(pxScene);
+	auto& physicsEngine = PhysicsEngine::GetInstance();
+	physicsEngine.Release(pxScene);
 }
 
 void Level::InitLevel()
@@ -65,7 +66,7 @@ void Level::InitLevel()
 	pxScene->addActor(*shuttlecock->GetRigidbody());
 	gameObjects.push_back(shuttlecock);
 
-	NetworkManagerServer::GetInstance().AddGameObjectForReplication(shuttlecock);
+	NetworkManagerServer::GetInstance().AddGameObjectForReplication(shuttlecock.get());
 }
 
 void Level::ClearLevel()
@@ -77,7 +78,6 @@ void Level::ClearLevel()
 void Level::Release()
 {
 	ClearLevel();
-	PX_RELEASE(pxScene);
 }
 
 void Level::RemoveAllGameObjects()
@@ -90,7 +90,7 @@ void Level::RemoveGameObject(size_t idx)
 {
 	auto& go = gameObjects[idx];
 
-	NetworkManagerServer::GetInstance().RemoveGameObjectForReplication(go);
+	NetworkManagerServer::GetInstance().RemoveGameObjectForReplication(go.get());
 
 	auto& engineInstance = PhysicsEngine::GetInstance();
 	Remove(go->GetRigidbody());

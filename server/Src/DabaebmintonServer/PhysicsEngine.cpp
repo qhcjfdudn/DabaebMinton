@@ -29,6 +29,8 @@ void PhysicsEngine::InitPhysics()
 
 void PhysicsEngine::CleanupPhysics()
 {
+	// 관리하는 모든 객체를 여기서 반납해버려도 될까?
+
 	PX_RELEASE(pxDispatcher);
 	PX_RELEASE(pxPhysics);
 	if (pxPvd)
@@ -59,6 +61,27 @@ PxScene* PhysicsEngine::CreateScene(PxSceneDesc sceneDesc)
 	PxScene* pxScene = pxPhysics->createScene(sceneDesc);
 	scenes.push_back(pxScene);
 	return pxScene;
+}
+
+void PhysicsEngine::Release(PxScene* scene)
+{
+	auto iter = std::find(scenes.begin(), scenes.end(), scene);
+	if (iter == scenes.end())
+		return;
+
+	int idx = iter - scenes.begin();
+	std::swap(scenes[idx], scenes[scenes.size() - 1]);
+	scenes.pop_back();
+
+	PX_RELEASE(scene);
+}
+
+void PhysicsEngine::ReleaseEveryScene()
+{
+	for (auto scene : scenes)
+		PX_RELEASE(scene);
+
+	scenes.clear();
 }
 
 PxRigidStatic* PhysicsEngine::CreatePlain(float nx, float ny, float nz, float distance)
