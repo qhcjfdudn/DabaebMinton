@@ -151,6 +151,7 @@
     <ClCompile Include="DeveloperCommandFunctor.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="OverlappedDto.cpp" />
     <ClCompile Include="ServerEngine.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="DeveloperCommandFunctor.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="OverlappedDto.h" />
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="GameObject.h" />
