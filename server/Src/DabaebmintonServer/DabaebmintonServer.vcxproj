@@ -147,7 +147,10 @@
   <ItemGroup>
     <ClCompile Include="BadmintonNet.cpp" />
     <ClCompile Include="BadmintonBottom.cpp" />
+    <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="DeveloperCommandFunctor.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="ServerEngine.cpp" />
     <ClCompile Include="PhysicsEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -190,7 +193,10 @@
   <ItemGroup>
     <ClInclude Include="BadmintonNet.h" />
     <ClInclude Include="BadmintonBottom.h" />
+    <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="DeveloperCommandFunctor.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="GameObject.h" />

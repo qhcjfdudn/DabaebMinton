@@ -69,7 +69,7 @@ void PhysicsEngine::Release(PxScene* scene)
 	if (iter == scenes.end())
 		return;
 
-	int idx = iter - scenes.begin();
+	int idx = static_cast<int>(iter - scenes.begin());
 	std::swap(scenes[idx], scenes[scenes.size() - 1]);
 	scenes.pop_back();
 
