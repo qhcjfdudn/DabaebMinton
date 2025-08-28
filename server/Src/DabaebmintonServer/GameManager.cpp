@@ -3,7 +3,12 @@
 
 #include "Game.h"
 
-bool GameManager::CreateGame(unsigned long long gameKey, const sockaddr_in& player1, const sockaddr_in& player2)
+GameManager& GameManager::GetInstance() {
+	static GameManager instance;
+	return instance;
+}
+
+bool GameManager::CreateGame(unsigned long long gameKey, ClientInfo* player1, ClientInfo* player2)
 {
 	if (_gameKeyToGameMap.find(gameKey) != _gameKeyToGameMap.end())
 	{

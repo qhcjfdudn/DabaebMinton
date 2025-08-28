@@ -5,6 +5,7 @@
 #include "ReplicationManager.h"
 
 class GameObject;
+class ClientInfo;
 
 class NetworkManagerServer
 {
@@ -32,6 +33,8 @@ public:
 	void AddGameObjectForReplication(GameObject* gameObject);
 	void RemoveGameObjectForReplication(GameObject* gameObject);
 	void RemoveAllGameObjectsForReplication();
+
+	shared_ptr<ClientInfo> CreateClientInfo(ULONG_PTR completionKey, const sockaddr_in& addr);
 
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;
@@ -71,13 +74,14 @@ private:
 	queue<GameObject*> _pendingCreatedGameObjectsForReplication{};
 	queue<GameObject*> _pendingDeletedGameObjectsForReplication{};
 
-	int m_maxChannelId;
+	unordered_map<ULONG_PTR, shared_ptr<ClientInfo> > _completionKeyToClientInfoMap;
 };
 
 enum class PacketType
 {
 	PT_Hello,
 	PT_ReplicationData,
+	PT_RPC,
 	PT_Disconnect,
 	PT_Max
 };

@@ -5,7 +5,9 @@ class Game;
 class GameManager
 {
 public:
-	bool CreateGame(unsigned long long gameKey, const sockaddr_in& player1, const sockaddr_in& player2);
+	static GameManager& GetInstance();
+
+	bool CreateGame(unsigned long long gameKey, ClientInfo* player1, ClientInfo* player2);
 	void RemoveGame(unsigned long long gameKey);
 
 	Game* FindGame(ULONG_PTR completionKey);

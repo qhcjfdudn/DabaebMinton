@@ -7,6 +7,8 @@
 #include "Constant.h"
 #include "GetRequiredBits.h"
 
+#include "ClientInfo.h"
+
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
 	return sInstance;
@@ -564,4 +566,9 @@ void NetworkManagerServer::RemoveAllGameObjectsForReplication()
 	for (auto go : _gameObjectsForReplication) {
 		RemoveGameObjectForReplication(go);
 	}
+}
+
+shared_ptr<ClientInfo> NetworkManagerServer::CreateClientInfo(ULONG_PTR completionKey, const sockaddr_in& addr)
+{
+	return make_shared<ClientInfo>(completionKey, addr);
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "LinkingContext.h"
+#include "Level.h"
 
-class Level;
 class ClientInfo;
 
 class GameController {
@@ -18,7 +18,9 @@ enum class GamePlayState {
 class Game
 {
 public:
-	Level* p_level;
+	Game(ClientInfo* player1, ClientInfo* player2);
+
+	Level _level;
 	
 	GameController gameController;
 
@@ -28,7 +30,6 @@ public:
 	ClientInfo* p_player2;
 	LinkingContext _linkingContext;
 	system_clock::time_point _lastReplicationUpdatedTime;
-
 
 private:
 	GamePlayState _gamePlayState;
