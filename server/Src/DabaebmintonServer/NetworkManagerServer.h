@@ -2,16 +2,14 @@
 
 #include "IOCPEvent.h"
 #include "Socket.h"
+#include "ReplicationManager.h"
 
-class ReplicationManager;
 class GameObject;
 
 class NetworkManagerServer
 {
 public:
 	static NetworkManagerServer& GetInstance();
-
-	void SetReplicationManager(shared_ptr<ReplicationManager> replicationManager);
 
 	void InitIOCP();
 	void AcceptEx();
@@ -68,7 +66,7 @@ private:
 
 	system_clock::time_point lastPacketSendTime;
 
-	shared_ptr<ReplicationManager> p_replicationManager;
+	ReplicationManager _replicationManager;
 	vector<GameObject*> _gameObjectsForReplication{};
 	queue<GameObject*> _pendingCreatedGameObjectsForReplication{};
 	queue<GameObject*> _pendingDeletedGameObjectsForReplication{};

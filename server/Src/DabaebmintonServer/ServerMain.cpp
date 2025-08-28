@@ -3,7 +3,6 @@
 #include <csignal>
 
 #include "GameEngine.h"
-#include "ReplicationManager.h"
 #include "NetworkManagerServer.h"
 #include "PhysicsEngine.h"
 
@@ -26,7 +25,6 @@ int main()
 	// Engine Init
 	thread networkEngineInitThread([] {
 		auto& networkInstance = NetworkManagerServer::GetInstance();
-		networkInstance.SetReplicationManager(make_shared<ReplicationManager>());
 		networkInstance.InitIOCP();
 		});
 

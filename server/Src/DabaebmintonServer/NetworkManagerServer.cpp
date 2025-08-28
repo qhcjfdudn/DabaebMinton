@@ -1,7 +1,6 @@
 #include "ServerPCH.h"
 #include "NetworkManagerServer.h"
 
-#include "ReplicationManager.h"
 #include "OutputMemoryBitStream.h"
 #include "PacketQueue.h"
 
@@ -11,11 +10,6 @@
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
 	return sInstance;
-}
-
-void NetworkManagerServer::SetReplicationManager(shared_ptr<ReplicationManager> replicationManager)
-{
-	p_replicationManager = replicationManager;
 }
 
 void NetworkManagerServer::InitIOCP() {
@@ -406,8 +400,9 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 	return retCode;
 }
 
-NetworkManagerServer::NetworkManagerServer()
-	: lastPacketSendTime{ system_clock::now() }
+NetworkManagerServer::NetworkManagerServer() :
+	lastPacketSendTime{ system_clock::now() },
+	_replicationManager{}
 {
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
 	{
@@ -526,7 +521,7 @@ int NetworkManagerServer::ReplicateAllGameObjects()
 	stream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
 		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
 
-	p_replicationManager->ReplicateUpdate(stream, _gameObjectsForReplication);
+	_replicationManager.ReplicateUpdate(stream, _gameObjectsForReplication);
 	int cnt = static_cast<int>(_gameObjectsForReplication.size());
 
  	cout << "outStream.GetBitLength(): " << stream.GetBitLength() << endl;
@@ -547,7 +542,7 @@ int NetworkManagerServer::ReplicateAllGameObjects()
 void NetworkManagerServer::AddGameObjectForReplication(GameObject* gameObject)
 {
 	_gameObjectsForReplication.push_back(gameObject);
-	p_replicationManager->linkingContext.AddGameObject(gameObject);
+	_replicationManager.linkingContext.AddGameObject(gameObject);
 	_pendingCreatedGameObjectsForReplication.push(gameObject);
 }
 
@@ -560,7 +555,7 @@ void NetworkManagerServer::RemoveGameObjectForReplication(GameObject* gameObject
 			gameObject),
 		_gameObjectsForReplication.end());
 
-	p_replicationManager->linkingContext.RemoveGameObject(gameObject);
+	_replicationManager.linkingContext.RemoveGameObject(gameObject);
 	_pendingDeletedGameObjectsForReplication.push(gameObject);
 }
 
