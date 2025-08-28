@@ -2,10 +2,10 @@
 
 #include "Observer.h"
 
-class GameEngine
+class ServerEngine
 {
 public:
-	static GameEngine& GetInstance();
+	static ServerEngine& GetInstance();
 
 	void TurnOff();
 

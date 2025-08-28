@@ -75,7 +75,7 @@
     <ClCompile Include="Packet.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="GameEngine.cpp">
+    <ClCompile Include="ServerEngine.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="DeveloperCommandFunctor.cpp">
@@ -146,7 +146,7 @@
     <ClInclude Include="Packet.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="GameEngine.h">
+    <ClInclude Include="ServerEngine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="DeveloperCommandFunctor.h">

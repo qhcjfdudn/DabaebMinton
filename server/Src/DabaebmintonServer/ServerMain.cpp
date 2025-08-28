@@ -2,7 +2,7 @@
 
 #include <csignal>
 
-#include "GameEngine.h"
+#include "ServerEngine.h"
 #include "NetworkManagerServer.h"
 #include "PhysicsEngine.h"
 
@@ -14,7 +14,7 @@ void signalHandler(int signum)
 {
 	cout << "\nInterrupt signal (" << signum << ") received." << endl;
 
-	GameEngine::GetInstance().TurnOff();
+	ServerEngine::GetInstance().TurnOff();
 }
 
 int main()
@@ -38,7 +38,7 @@ int main()
 	// Engine and Game Working
 	thread networkEngineRunningThread([] {
 		auto& networkInstance = NetworkManagerServer::GetInstance();
-		auto& gameEngine = GameEngine::GetInstance();
+		auto& gameEngine = ServerEngine::GetInstance();
 		
 		while (gameEngine.isRunning)
 		{
@@ -55,7 +55,7 @@ int main()
 		});
 
 	thread physicsEngineRunningThread([] {
-		auto& gameEngine = GameEngine::GetInstance();
+		auto& gameEngine = ServerEngine::GetInstance();
 		auto& physicsEngine = PhysicsEngine::GetInstance();
 
 		// thread 내에서 참조하는 외부 변수. atomic으로 변경해 잠재적 동시성 오류 해결하자.
@@ -76,7 +76,7 @@ int main()
 		DeveloperCommandFunctor developerCommandFunctor(levels);
 		thread developerInputThread(developerCommandFunctor);
 
-		auto& gameEngine = GameEngine::GetInstance();
+		auto& gameEngine = ServerEngine::GetInstance();
 
 		while (gameEngine.isRunning) {
 			for (auto& level : levels) {

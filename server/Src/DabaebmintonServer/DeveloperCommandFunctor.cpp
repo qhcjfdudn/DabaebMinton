@@ -1,14 +1,14 @@
 #include "ServerPCH.h"
 #include "DeveloperCommandFunctor.h"
 
-#include "GameEngine.h"
+#include "ServerEngine.h"
 
 DeveloperCommandFunctor::DeveloperCommandFunctor(vector<Level>& levels)
 	: _levels(levels)
 {}
 
 void DeveloperCommandFunctor::operator()() {
-	auto& gameEngine = GameEngine::GetInstance();
+	auto& gameEngine = ServerEngine::GetInstance();
 	string cmd;
 	while (gameEngine.isRunning)
 	{
