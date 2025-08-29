@@ -1,6 +1,7 @@
 #pragma once
 
 class Game;
+class ClientInfo;
 
 class GameManager
 {
@@ -12,8 +13,14 @@ public:
 
 	Game* FindGame(ULONG_PTR completionKey);
 
+	vector<shared_ptr<Game> > _games;
+	
+	queue<Game*> _pendingReplicationQueue;
+	mutex _pendingReplicationMutex;
+	condition_variable _replicationCv;
+
 
 private:
-	unordered_map<unsigned long long, shared_ptr<Game> > _gameKeyToGameMap;
-	unordered_map<ULONG_PTR, shared_ptr<Game> > _completionKeyToGameMap;
+	unordered_map<unsigned long long, size_t> _gameKeyToGameIdxMap;
+	unordered_map<ULONG_PTR, size_t> _completionKeyToGameIdxMap;
 };

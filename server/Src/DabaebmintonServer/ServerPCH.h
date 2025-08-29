@@ -5,6 +5,9 @@
 #include <memory>
 #include <queue>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
@@ -34,6 +37,9 @@ using std::unordered_set;
 using std::queue;
 
 using std::thread;
+using std::mutex;
+using std::condition_variable;
+using std::atomic;
 
 using NetworkId_t = unsigned int;
 
