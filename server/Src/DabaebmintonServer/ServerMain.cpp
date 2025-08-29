@@ -77,6 +77,7 @@ int main()
 
 			while (serverEngine.isRunning)
 			{
+				std::lock_guard gamesLock(gameManager._gamesMutex);
 				for (auto game : gameManager._games)
 				{
 					if (game->_replicationState.load() == GameReplicationState::None
@@ -90,6 +91,7 @@ int main()
 					}
 				}
 			}
+			gameManager._replicationCv.notify_all();
 		});
 
 	vector<thread> gameStepProcessingThreads;

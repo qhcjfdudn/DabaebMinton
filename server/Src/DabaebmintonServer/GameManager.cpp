@@ -22,8 +22,10 @@ bool GameManager::CreateGame(unsigned long long gameKey, ClientInfo* player1, Cl
 	shared_ptr<Game> game = make_shared<Game>(player1, player2);
 	Game* p_game = game.get();
 
+	_gamesMutex.lock();
 	size_t idx = _games.size();
 	_games.push_back(game);
+	_gamesMutex.unlock();
 
 	_gameKeyToGameIdxMap.emplace(gameKey, idx);
 	_completionKeyToGameIdxMap.emplace(player1->_completionKey, idx);
@@ -41,6 +43,8 @@ void GameManager::RemoveGame(unsigned long long gameKey)
 	}
 
 	size_t gameIdx = _gameKeyToGameIdxMap[gameKey];
+	
+	_gamesMutex.lock();
 	shared_ptr<Game> game = _games[gameIdx];
 
 	_gameKeyToGameIdxMap.erase(gameKey);
@@ -49,6 +53,7 @@ void GameManager::RemoveGame(unsigned long long gameKey)
 
 	swap(_games[gameIdx], _games[_games.size() - 1]);
 	_games.pop_back();
+	_gamesMutex.unlock();
 }
 
 Game* GameManager::FindGame(ULONG_PTR completionKey)
@@ -59,5 +64,6 @@ Game* GameManager::FindGame(ULONG_PTR completionKey)
 		return nullptr;
 	}
 
+	std::lock_guard lk(_gamesMutex);
 	return _games[_completionKeyToGameIdxMap[completionKey]].get();
 }

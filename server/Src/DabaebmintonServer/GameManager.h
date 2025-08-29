@@ -14,7 +14,8 @@ public:
 	Game* FindGame(ULONG_PTR completionKey);
 
 	vector<shared_ptr<Game> > _games;
-	
+	mutex _gamesMutex;
+
 	queue<Game*> _pendingReplicationQueue;
 	mutex _pendingReplicationMutex;
 	condition_variable _replicationCv;
