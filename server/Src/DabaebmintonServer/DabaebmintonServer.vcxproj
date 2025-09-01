@@ -84,6 +84,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -98,6 +101,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -116,14 +121,14 @@
       <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);Ws2_32.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevelAABB_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevelDynamics_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevel_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCharacterKinematic_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCommon_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCooking_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXExtensions_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXFoundation_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXPvdSDK_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXTask_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXVehicle2_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXVehicle_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysX_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PVDRuntime_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/SceneQuery_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/SimulationController_static_64.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);Ws2_32.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevelAABB_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevelDynamics_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/LowLevel_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCharacterKinematic_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCommon_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXCooking_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXExtensions_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXFoundation_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXPvdSDK_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXTask_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXVehicle2_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysXVehicle_static_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PhysX_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/PVDRuntime_64.lib;$(SolutionDir)ExternalLibrary/$(Platform)/$(Configuration)/physx/SceneQuery_static_64.lib;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\SimulationController_static_64.lib;$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\DabaebMintonServerCore.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,6 +140,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_WINSOCK_DEPRECATED_NO_WARNINGS;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,84 +152,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BadmintonNet.cpp" />
-    <ClCompile Include="BadmintonBottom.cpp" />
-    <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="DeveloperCommandFunctor.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="OverlappedDto.cpp" />
-    <ClCompile Include="ReplicationUpdateProducer.cpp" />
-    <ClCompile Include="ReplicationUpdateConsumer.cpp" />
-    <ClCompile Include="ServerEngine.cpp" />
-    <ClCompile Include="PhysicsEngine.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="Level.cpp" />
-    <ClCompile Include="LinkingContext.cpp" />
-    <ClCompile Include="Observer.cpp" />
-    <ClCompile Include="OutputMemoryBitStream.cpp" />
-    <ClCompile Include="Packet.cpp" />
-    <ClCompile Include="ReplicationFlag.cpp" />
-    <ClCompile Include="ReplicationHeader.cpp" />
-    <ClCompile Include="ReplicationManager.cpp" />
-    <ClCompile Include="IOCPEvent.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="NetworkManagerServer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="PacketQueue.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="ServerMain.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="ServerPCH.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Shuttlecock.cpp" />
-    <ClCompile Include="Socket.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="StaticGameObject.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BadmintonNet.h" />
-    <ClInclude Include="BadmintonBottom.h" />
-    <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="DeveloperCommandFunctor.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="OverlappedDto.h" />
-    <ClInclude Include="ReplicationUpdateProducer.h" />
-    <ClInclude Include="ReplicationUpdateConsumer.h" />
-    <ClInclude Include="ServerEngine.h" />
-    <ClInclude Include="PhysicsEngine.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="GetRequiredBits.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="LinkingContext.h" />
-    <ClInclude Include="Observer.h" />
-    <ClInclude Include="OutputMemoryBitStream.h" />
-    <ClInclude Include="Packet.h" />
-    <ClInclude Include="ReplicationFlag.h" />
-    <ClInclude Include="ReplicationHeader.h" />
-    <ClInclude Include="ReplicationManager.h" />
-    <ClInclude Include="Constant.h" />
-    <ClInclude Include="IOCPEvent.h" />
-    <ClInclude Include="NetworkManagerServer.h" />
-    <ClInclude Include="PacketQueue.h" />
     <ClInclude Include="ServerPCH.h" />
-    <ClInclude Include="Shuttlecock.h" />
-    <ClInclude Include="Socket.h" />
-    <ClInclude Include="StaticGameObject.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DabaebmintonServerCore\DabaebmintonServerCore.vcxproj">
+      <Project>{f77211a2-b55c-4708-a6ab-d0166b6a2f2f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\DabaebmintonServerTest\DabaebmintonServerTest.vcxproj">
+      <Project>{c3e28c4f-530a-4281-a977-287813f851ae}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

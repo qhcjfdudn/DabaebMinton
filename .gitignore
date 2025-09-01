@@ -41,6 +41,7 @@ server/Src/UtilProject
 server/Src/DabaebMintonServerTest
 
 server/ExternalLibrary
+server/InternalLibrary
 server/packages
 resources/
 
