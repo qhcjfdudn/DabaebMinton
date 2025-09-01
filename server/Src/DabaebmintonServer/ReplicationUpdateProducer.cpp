@@ -28,6 +28,10 @@ void ReplicationUpdateProducer::operator() ()
 				gameManager._replicationCv.notify_one();
 			}
 		}
+
+		// 추후 _games를 ReplicationUpdate 위해서 순회하는 게 아니라,
+		// GameManager에서 Playing 상태 game만 array 구성한 뒤
+		// 이 array를 순회하도록 변경 필요
 	}
 	gameManager._replicationCv.notify_all();
 }
