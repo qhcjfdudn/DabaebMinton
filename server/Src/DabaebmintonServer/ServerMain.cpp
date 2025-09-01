@@ -10,6 +10,9 @@
 #include "Game.h"
 #include "Level.h"
 
+#include "ReplicationUpdateProducer.h"
+#include "ReplicationUpdateConsumer.h"
+
 #include "DeveloperCommandFunctor.h"
 
 void signalHandler(int signum)
@@ -37,7 +40,7 @@ int main()
 	networkEngineInitThread.join();
 	physicsEngineInitThread.join();
 
-	// Engine and Game Working
+	// Engine working
 	thread networkEngineRunningThread([] {
 		auto& networkInstance = NetworkManagerServer::GetInstance();
 		auto& gameEngine = ServerEngine::GetInstance();
@@ -70,66 +73,16 @@ int main()
 		}
 		});
 
-	thread AllGamesReplicationIntervalProducerThread([]
-		{
-			auto& serverEngine = ServerEngine::GetInstance();
-			auto& gameManager = GameManager::GetInstance();
+	// Level replication update producer-consumer working
+	ReplicationUpdateProducer replicationUpdateProducer;
+	thread replicationUpdateProduceWorker(replicationUpdateProducer);
 
-			while (serverEngine.isRunning)
-			{
-				std::lock_guard gamesLock(gameManager._gamesMutex);
-				for (auto game : gameManager._games)
-				{
-					if (game->_replicationState.load() == GameReplicationState::None
-						&& game->HasElapsedReplicationInterval())
-					{
-						game->_replicationState.store(GameReplicationState::Pending, std::memory_order_acquire);
-						gameManager._pendingReplicationMutex.lock();
-						gameManager._pendingReplicationQueue.push(game.get());
-						gameManager._pendingReplicationMutex.unlock();
-						gameManager._replicationCv.notify_one();
-					}
-				}
-			}
-			gameManager._replicationCv.notify_all();
-		});
+	ReplicationUpdateConsumer replicationUpdateConsumer;
+	vector<thread> gameReplicationUpdateConsumers;
+	for (int i = 0; i < 4; ++i)
+		gameReplicationUpdateConsumers.emplace_back(replicationUpdateConsumer);
 
-	vector<thread> gameStepProcessingThreads;
-	for (int i = 0; i < 4; ++i) {
-		gameStepProcessingThreads.emplace_back([]
-			{
-				auto& serverEngine = ServerEngine::GetInstance();
-				auto& gameManager = GameManager::GetInstance();
-
-				while (serverEngine.isRunning)
-				{
-					Game* game = nullptr;
-
-					for (; game == nullptr;)
-					{
-						std::unique_lock lk(gameManager._pendingReplicationMutex);
-						if (gameManager._pendingReplicationQueue.empty())
-						{
-							gameManager._replicationCv.wait(lk);
-						}
-
-						if (gameManager._pendingReplicationQueue.empty())
-							continue;
-
-						game = gameManager._pendingReplicationQueue.front();
-						gameManager._pendingReplicationQueue.pop();
-					}
-
-					game->ReplicateLevel();
-					game->SetLastReplicationTimeToNow();
-					game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
-				}
-
-			});
-	}
-
-	AllGamesReplicationIntervalProducerThread.join();
-
+	// Level running
 	thread levelPlayThread([] {
 		vector<Level> levels(1);
 		levels[0].InitLevel();
@@ -155,7 +108,8 @@ int main()
 			level.Release();
 		});
 
-	for (thread& t : gameStepProcessingThreads)
+	replicationUpdateProduceWorker.join();
+	for (thread& t : gameReplicationUpdateConsumers)
 		t.join();
 
 	networkEngineRunningThread.join();
