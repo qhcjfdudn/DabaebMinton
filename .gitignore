@@ -38,6 +38,9 @@ server/Build
 server/Src/Server/Server.vcxproj.user
 server/Src/Client/Client.vcxproj.user
 server/Src/UtilProject
+server/Src/DabaebMintonServerTest
 
 server/ExternalLibrary
+server/packages
 resources/
+
