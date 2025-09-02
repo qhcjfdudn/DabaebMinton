@@ -5,12 +5,14 @@
 
 DeveloperCommandFunctor::DeveloperCommandFunctor(vector<Level>& levels)
 	: _levels(levels)
-{}
+{
+}
 
-void DeveloperCommandFunctor::operator()() {
+void DeveloperCommandFunctor::operator()()
+{
 	auto& gameEngine = ServerEngine::GetInstance();
 	string cmd;
-	while (gameEngine.isRunning)
+	while (gameEngine.isRunning.load(std::memory_order_acquire))
 	{
 		std::getline(std::cin, cmd);
 		if (cmd == "r")

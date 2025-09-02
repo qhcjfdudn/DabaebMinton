@@ -45,7 +45,7 @@ int main()
 		auto& networkInstance = NetworkManagerServer::GetInstance();
 		auto& gameEngine = ServerEngine::GetInstance();
 		
-		while (gameEngine.isRunning)
+		while (gameEngine.isRunning.load(std::memory_order_acquire))
 		{
 			networkInstance.ProcessIOCPEvent();
 
@@ -58,13 +58,13 @@ int main()
 			}
 		}
 		});
-
+	
 	thread physicsEngineRunningThread([] {
 		auto& gameEngine = ServerEngine::GetInstance();
 		auto& physicsEngine = PhysicsEngine::GetInstance();
 
 		// thread 내에서 참조하는 외부 변수. atomic으로 변경해 잠재적 동시성 오류 해결하자.
-		while (gameEngine.isRunning)
+		while (gameEngine.isRunning.load(std::memory_order_acquire))
 		{
 			if (physicsEngine.HasElapsedPhysicsUpdateInterval()) {
 				physicsEngine.StepPhysicsEveryScene();
@@ -93,7 +93,7 @@ int main()
 
 		auto& gameEngine = ServerEngine::GetInstance();
 
-		while (gameEngine.isRunning) {
+		while (gameEngine.isRunning.load(std::memory_order_acquire)) {
 			for (auto& level : levels) {
 				if (level.HasElapsedFixedUpdateInterval()) {
 					level.FixedUpdate();

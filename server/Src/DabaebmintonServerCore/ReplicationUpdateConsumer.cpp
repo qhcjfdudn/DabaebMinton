@@ -11,7 +11,7 @@ void ReplicationUpdateConsumer::operator() ()
 	auto& serverEngine = ServerEngine::GetInstance();
 	auto& gameManager = GameManager::GetInstance();
 
-	while (serverEngine.isRunning)
+	while (serverEngine.isRunning.load(std::memory_order_acquire))
 	{
 		Game* game = nullptr;
 

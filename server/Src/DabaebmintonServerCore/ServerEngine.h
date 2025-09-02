@@ -9,9 +9,11 @@ public:
 
 	void TurnOff();
 
-	bool isRunning = true;
+	atomic<bool> isRunning;
 
 private:
+	ServerEngine();
+
 	Observer observer;
 };
 
