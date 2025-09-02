@@ -24,14 +24,17 @@ void ReplicationUpdateConsumer::operator() ()
 			}
 
 			if (gameManager._pendingReplicationQueue.empty())
-				continue;
+				break;
 
 			game = gameManager._pendingReplicationQueue.front();
 			gameManager._pendingReplicationQueue.pop();
 		}
 
-		game->ReplicateLevel();
-		game->SetLastReplicationTimeToNow();
-		game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
+		if (game != nullptr)
+		{
+			game->ReplicateLevel();
+			game->SetLastReplicationTimeToNow();
+			game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
+		}
 	}
 }

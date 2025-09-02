@@ -109,6 +109,7 @@ int main()
 		});
 
 	replicationUpdateProduceWorker.join();
+
 	for (thread& t : gameReplicationUpdateConsumers)
 		t.join();
 
