@@ -169,9 +169,6 @@
     <ProjectReference Include="..\DabaebmintonServerCore\DabaebmintonServerCore.vcxproj">
       <Project>{f77211a2-b55c-4708-a6ab-d0166b6a2f2f}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\DabaebmintonServerTest\DabaebmintonServerTest.vcxproj">
-      <Project>{c3e28c4f-530a-4281-a977-287813f851ae}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
