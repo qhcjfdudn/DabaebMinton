@@ -13,9 +13,9 @@ public:
 
 	// for RUDP + IOCP
 	const int _channelCount = 2;
-	int m_sequenceNoInChannels[2];
-	OverlappedDto m_receiveOverlappedDto, m_sendOverlappedDtdo[2];
+	int m_sequenceNoInChannels[2] = {};
+	OverlappedDto m_receiveOverlappedDto{}, m_sendOverlappedDtdo[2] = {};
 	
-	OutputMemoryBitStream _pendingStreamToSendingInChannels[2];
+	OutputMemoryBitStream _pendingStreamToSendingInChannels[2] = {};
 };
 
