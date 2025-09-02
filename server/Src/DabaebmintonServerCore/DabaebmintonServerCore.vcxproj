@@ -104,7 +104,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)*.h" "$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include"</Command>
+      <Command>robocopy $(ProjectDir) $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include *.h /XF ServerPCH.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>.lib 배포 위한 include 디렉터리 생성</Message>
@@ -129,7 +129,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)*.h" "$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include"</Command>
+      <Command>robocopy $(ProjectDir) $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include *.h /XF ServerPCH.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>.lib 배포 위한 include 디렉터리 생성</Message>
@@ -154,7 +154,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)*.h" "$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include"</Command>
+      <Command>robocopy $(ProjectDir) $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include *.h /XF ServerPCH.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>.lib 배포 위한 include 디렉터리 생성</Message>
@@ -179,7 +179,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(ProjectDir)*.h" "$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include"</Command>
+      <Command>robocopy $(ProjectDir) $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include *.h /XF ServerPCH.h</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>.lib 배포 위한 include 디렉터리 생성</Message>
