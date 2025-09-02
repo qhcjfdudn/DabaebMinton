@@ -13,15 +13,15 @@ public:
 
 	Game* FindGame(ULONG_PTR completionKey);
 
-	vector<shared_ptr<Game> > _games;
-	mutex _gamesMutex;
+	std::vector<std::shared_ptr<Game> > _games;
+	std::mutex _gamesMutex;
 
-	queue<Game*> _pendingReplicationQueue;
-	mutex _pendingReplicationMutex;
-	condition_variable _replicationCv;
+	std::queue<Game*> _pendingReplicationQueue;
+	std::mutex _pendingReplicationMutex;
+	std::condition_variable _replicationCv;
 
 
 private:
-	unordered_map<unsigned long long, size_t> _gameKeyToGameIdxMap;
-	unordered_map<ULONG_PTR, size_t> _completionKeyToGameIdxMap;
+	std::unordered_map<unsigned long long, size_t> _gameKeyToGameIdxMap;
+	std::unordered_map<ULONG_PTR, size_t> _completionKeyToGameIdxMap;
 };
