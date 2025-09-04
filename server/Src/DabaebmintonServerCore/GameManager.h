@@ -8,7 +8,7 @@ class GameManager
 public:
 	static GameManager& GetInstance();
 
-	Game* CreateGame(const string clientIps[2], const int clientPorts[2]);
+	Game* CreateGame(const string clientIps[2], const unsigned int clientPorts[2]);
 	bool RemoveGame(ClientInfo* clientInfo);
 	Game* FindGame(ClientInfo* clientInfo);
 

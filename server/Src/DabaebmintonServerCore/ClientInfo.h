@@ -8,7 +8,7 @@ class ClientInfo
 public:
 	ClientInfo(const string& ip, const unsigned int port);
 
-	std::string _ipPort;
+	const std::string _ipPort;
 
 	// for RUDP + IOCP
 	const int _channelCount = 2;

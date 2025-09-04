@@ -595,10 +595,42 @@ ClientInfo* NetworkManagerServer::CreateClientInfo(const string& ip, const unsig
 
 bool NetworkManagerServer::RemoveClientInfo(ClientInfo* clientInfo)
 {
+	if (clientInfo == nullptr)
+		return false;
+
 	string key = clientInfo->_ipPort;
+	
 	_ipPortToClientInfoMapMutex.lock();
+	if (_ipPortToClientInfoMap.find(key) == _ipPortToClientInfoMap.end())
+	{
+		_ipPortToClientInfoMapMutex.unlock();
+		cout << "[NetworkManagerServer::RemoveClientInfo] " << key << " client does not exist." << endl;
+
+		return false;
+	}
+
 	_ipPortToClientInfoMap.erase(key);
 	_ipPortToClientInfoMapMutex.unlock();
 
 	return true;
+}
+
+ClientInfo* NetworkManagerServer::GetClientInfo(const string& ip, const unsigned int port)
+{
+	const string key = ip + ":" + std::to_string(port);
+
+	_ipPortToClientInfoMapMutex.lock();
+	if (_ipPortToClientInfoMap.find(key) == _ipPortToClientInfoMap.end())
+	{
+		_ipPortToClientInfoMapMutex.unlock();
+		cout << "[NetworkManagerServer::GetClientInfo] " << key << " client does not exist." << endl;
+
+		return nullptr;
+	}
+
+	ClientInfo* ret = _ipPortToClientInfoMap[key].get();
+
+	_ipPortToClientInfoMapMutex.unlock();
+
+	return ret;
 }

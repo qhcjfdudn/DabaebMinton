@@ -36,6 +36,7 @@ public:
 
 	ClientInfo* CreateClientInfo(const string& ip, const unsigned int port);
 	bool RemoveClientInfo(ClientInfo* clientInfo);
+	ClientInfo* GetClientInfo(const string& ip, const unsigned int port);
 
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;

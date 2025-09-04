@@ -10,7 +10,7 @@ GameManager& GameManager::GetInstance() {
 	return instance;
 }
 
-Game* GameManager::CreateGame(const string clientIps[2], const int clientPorts[2])
+Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clientPorts[2])
 {
 	Game* ret = nullptr;
 

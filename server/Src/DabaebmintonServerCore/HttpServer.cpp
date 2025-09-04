@@ -42,7 +42,7 @@ void HttpServer::Init()
 			}
 
 			string ips[2];
-			int ports[2];
+			unsigned int ports[2];
 
 			for (int i = 0; i < len; ++i) {
 				json& client = clientList[i];
