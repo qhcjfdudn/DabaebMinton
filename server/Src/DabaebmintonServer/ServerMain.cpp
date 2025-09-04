@@ -49,19 +49,19 @@ int main()
 
 	// Engine working
 	thread networkEngineRunningThread([] {
-		auto& networkInstance = NetworkManagerServer::GetInstance();
-		auto& gameEngine = ServerEngine::GetInstance();
+		auto& networkManagerServer = NetworkManagerServer::GetInstance();
+		auto& serverEngine = ServerEngine::GetInstance();
 
-		while (gameEngine.isRunning.load(std::memory_order_acquire))
+		while (serverEngine.isRunning.load(std::memory_order_acquire))
 		{
-			networkInstance.ProcessIOCPEvent();
+			networkManagerServer.ProcessIOCPEvent();
 
-			if (networkInstance.HasElapsedPacketInterval())
+			if (networkManagerServer.HasElapsedPacketInterval())
 			{
-				networkInstance.ReplicateAllGameObjects();
+				//networkManagerServer.ReplicateAllGameObjects();
 
 				// 채널 별로 interval이 필요한 것인가.
-				networkInstance.SetLastPacketSendTimeToNow();
+				networkManagerServer.SetLastPacketSendTimeToNow();
 			}
 		}
 		});

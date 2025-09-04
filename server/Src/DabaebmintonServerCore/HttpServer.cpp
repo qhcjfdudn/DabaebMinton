@@ -50,7 +50,9 @@ void HttpServer::Init()
 				ports[i] = client["port"];
 			}
 
-			GameManager::GetInstance().CreateGame(ips, ports);
+			Game* game = GameManager::GetInstance().CreateGame(ips, ports);
+			// 이 game을 NetworkManager와 LevelRunningThread로 전달해야
+			// FixedUpdate가 된다.
 		});
 
 	_server.Post("/stop", [&] (const httplib::Request& req, httplib::Response& res)

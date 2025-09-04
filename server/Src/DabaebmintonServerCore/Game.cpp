@@ -11,7 +11,6 @@ Game::Game(ClientInfo* player1, ClientInfo* player2) :
 {
 	_level.InitLevel();
 
-
 	_lastReplicationUpdatedTime = system_clock::now();
 }
 

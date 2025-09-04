@@ -65,7 +65,7 @@ private:
 	DWORD m_timeoutMs{ 100 };
 
 	Socket m_listenSocket{};
-	Socket m_clientCandidateSocket{}; // accept target socket
+	Socket m_clientCandidateSocket{}; // accept target TCP socket
 
 	Socket m_rudpSocket{};
 
