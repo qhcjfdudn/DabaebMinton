@@ -1,8 +1,7 @@
 #include "ServerPCH.h"
 #include "ClientInfo.h"
 
-ClientInfo::ClientInfo(ULONG_PTR completionKey, const sockaddr_in& addr)
+ClientInfo::ClientInfo(const string& ip, const unsigned int port) :
+	_ipPort{ ip + ":" + std::to_string(port) }
 {
-	_completionKey = completionKey;
-	_addr = addr;
 }

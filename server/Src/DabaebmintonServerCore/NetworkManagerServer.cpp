@@ -526,8 +526,8 @@ int NetworkManagerServer::ReplicateAllGameObjects()
 	_replicationManager.ReplicateUpdate(stream, _gameObjectsForReplication);
 	int cnt = static_cast<int>(_gameObjectsForReplication.size());
 
- 	cout << "outStream.GetBitLength(): " << stream.GetBitLength() << endl;
-	cout << "outStream.GetByteLength(): " << stream.GetByteLength() << endl;
+ //	cout << "outStream.GetBitLength(): " << stream.GetBitLength() << endl;
+	//cout << "outStream.GetByteLength(): " << stream.GetByteLength() << endl;
 
 	Packet packet{ stream.GetBufferPtr(), stream.GetByteLength() };
 
@@ -568,7 +568,37 @@ void NetworkManagerServer::RemoveAllGameObjectsForReplication()
 	}
 }
 
-shared_ptr<ClientInfo> NetworkManagerServer::CreateClientInfo(ULONG_PTR completionKey, const sockaddr_in& addr)
+ClientInfo* NetworkManagerServer::CreateClientInfo(const string& ip, const unsigned int port)
 {
-	return make_shared<ClientInfo>(completionKey, addr);
+	ClientInfo* ret = nullptr;
+
+	string key = ip + ":" + std::to_string(port);
+
+	_ipPortToClientInfoMapMutex.lock();
+	if (_ipPortToClientInfoMap.find(key) != _ipPortToClientInfoMap.end())
+	{
+		ret = _ipPortToClientInfoMap[key].get();
+		_ipPortToClientInfoMapMutex.unlock();
+		
+		cout << key << " client already exists." << endl;
+		
+		return ret;
+	}
+
+	shared_ptr<ClientInfo> ci = make_shared<ClientInfo>(ip, port);
+
+	_ipPortToClientInfoMap.emplace(key, ci);
+	_ipPortToClientInfoMapMutex.unlock();
+
+	return ci.get();
+}
+
+bool NetworkManagerServer::RemoveClientInfo(ClientInfo* clientInfo)
+{
+	string key = clientInfo->_ipPort;
+	_ipPortToClientInfoMapMutex.lock();
+	_ipPortToClientInfoMap.erase(key);
+	_ipPortToClientInfoMapMutex.unlock();
+
+	return true;
 }

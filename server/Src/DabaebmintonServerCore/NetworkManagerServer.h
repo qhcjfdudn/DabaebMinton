@@ -34,7 +34,8 @@ public:
 	void RemoveGameObjectForReplication(GameObject* gameObject);
 	void RemoveAllGameObjectsForReplication();
 
-	shared_ptr<ClientInfo> CreateClientInfo(ULONG_PTR completionKey, const sockaddr_in& addr);
+	ClientInfo* CreateClientInfo(const string& ip, const unsigned int port);
+	bool RemoveClientInfo(ClientInfo* clientInfo);
 
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;
@@ -74,7 +75,8 @@ private:
 	queue<GameObject*> _pendingCreatedGameObjectsForReplication{};
 	queue<GameObject*> _pendingDeletedGameObjectsForReplication{};
 
-	unordered_map<ULONG_PTR, shared_ptr<ClientInfo> > _completionKeyToClientInfoMap;
+	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
+	std::mutex _ipPortToClientInfoMapMutex;
 };
 
 enum class PacketType

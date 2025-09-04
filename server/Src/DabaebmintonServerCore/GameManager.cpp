@@ -1,6 +1,7 @@
 #include "ServerPCH.h"
 #include "GameManager.h"
 
+#include "NetworkManagerServer.h"
 #include "Game.h"
 #include "ClientInfo.h"
 
@@ -9,61 +10,90 @@ GameManager& GameManager::GetInstance() {
 	return instance;
 }
 
-bool GameManager::CreateGame(unsigned long long gameKey, ClientInfo* player1, ClientInfo* player2)
+Game* GameManager::CreateGame(const string clientIps[2], const int clientPorts[2])
 {
-	if (_gameKeyToGameIdxMap.find(gameKey) != _gameKeyToGameIdxMap.end())
+	Game* ret = nullptr;
+
+	auto& networkManagerServer = NetworkManagerServer::GetInstance();
+
+	ClientInfo* ci1 = networkManagerServer.CreateClientInfo(clientIps[0], clientPorts[0]);
+	ClientInfo* ci2 = networkManagerServer.CreateClientInfo(clientIps[1], clientPorts[1]);
+	
+	auto& mp = _clientInfoToGameIdxMap;
+
+	_gamesMutex.lock();
+	if (mp.find(ci1) != mp.end())
 	{
-		cout << "[GameManager::CreateGame] A same gameKey already exists. gameKey: " << gameKey << endl;
+		ret = _games[mp[ci1]].get();
+		_gamesMutex.unlock();
+		
+		cout << "[GameManager::CreateGame] A game already exists." << endl;
+		
+		return ret;
+	}
+
+	if (mp.find(ci2) != mp.end())
+	{
+		ret = _games[mp[ci2]].get();
+		_gamesMutex.unlock();
+
+		cout << "[GameManager::CreateGame] A game already exists." << endl;
+		
+		return ret;
+	}
+
+	shared_ptr<Game> game = make_shared<Game>(ci1, ci2);
+	ret = game.get();
+
+	size_t idx = _games.size();
+	_games.push_back(game);
+
+	_clientInfoToGameIdxMap.emplace(ci1, idx);
+	_clientInfoToGameIdxMap.emplace(ci2, idx);
+	
+	_gamesMutex.unlock();
+
+	return ret;
+}
+
+bool GameManager::RemoveGame(ClientInfo* clientInfo)
+{
+	_gamesMutex.lock();
+	if (_clientInfoToGameIdxMap.find(clientInfo) == _clientInfoToGameIdxMap.end())
+	{
+		_gamesMutex.unlock();
+		cout << "[GameManager::RemoveGame] A game does not exist." << endl;
 		return false;
 	}
 
-	// 전달 받은 sockaddr_in 정보로 Client를 만들어서 Game의 생성자 인자로 전달해줄 것.
+	size_t gameIdx = _clientInfoToGameIdxMap[clientInfo];
 
-	shared_ptr<Game> game = make_shared<Game>(player1, player2);
-	Game* p_game = game.get();
-
-	_gamesMutex.lock();
-	size_t idx = _games.size();
-	_games.push_back(game);
-	_gamesMutex.unlock();
-
-	_gameKeyToGameIdxMap.emplace(gameKey, idx);
-	_completionKeyToGameIdxMap.emplace(player1->_completionKey, idx);
-	_completionKeyToGameIdxMap.emplace(player2->_completionKey, idx);
-
-    return true;
-}
-
-void GameManager::RemoveGame(unsigned long long gameKey)
-{
-	if (_gameKeyToGameIdxMap.find(gameKey) == _gameKeyToGameIdxMap.end())
-	{
-		cout << "[GameManager::RemoveGame] A gameKey does not exist. gameKey: " << gameKey << endl;
-		return;
-	}
-
-	size_t gameIdx = _gameKeyToGameIdxMap[gameKey];
-	
-	_gamesMutex.lock();
 	shared_ptr<Game> game = _games[gameIdx];
-
-	_gameKeyToGameIdxMap.erase(gameKey);
-	_completionKeyToGameIdxMap.erase(game->p_player1->_completionKey);
-	_completionKeyToGameIdxMap.erase(game->p_player2->_completionKey);
+	_clientInfoToGameIdxMap.erase(game->p_player1);
+	_clientInfoToGameIdxMap.erase(game->p_player2);
 
 	swap(_games[gameIdx], _games[_games.size() - 1]);
 	_games.pop_back();
+	
 	_gamesMutex.unlock();
+
+	return true;
 }
 
-Game* GameManager::FindGame(ULONG_PTR completionKey)
+Game* GameManager::FindGame(ClientInfo* clientInfo)
 {
-	if (_completionKeyToGameIdxMap.find(completionKey) == _completionKeyToGameIdxMap.end())
+	_gamesMutex.lock();
+	if (_clientInfoToGameIdxMap.find(clientInfo) == _clientInfoToGameIdxMap.end())
 	{
-		cout << "[GameManager::FindGame] No game is found to use this completionKey: " << completionKey << endl;
+		_gamesMutex.unlock();
+
+		cout << "[GameManager::FindGame] No game is found to use this clientInfo: " << clientInfo << endl;
 		return nullptr;
 	}
+	
+	Game* game = _games[_clientInfoToGameIdxMap[clientInfo]].get();
+	
+	_gamesMutex.unlock();
 
-	std::lock_guard lk(_gamesMutex);
-	return _games[_completionKeyToGameIdxMap[completionKey]].get();
+	return game;
 }

@@ -5,6 +5,8 @@
 #include "ServerEngine.h"
 #include "NetworkManagerServer.h"
 #include "PhysicsEngine.h"
+#include "HttpServer.h"
+#include "Observer.h"
 
 #include "GameManager.h"
 #include "Game.h"
@@ -19,7 +21,7 @@ void signalHandler(int signum)
 {
 	cout << "\nInterrupt signal (" << signum << ") received." << endl;
 
-	ServerEngine::GetInstance().TurnOff();
+	Observer::notify(ObserverEvent::EngineOff);
 }
 
 int main()
@@ -37,14 +39,19 @@ int main()
 		PhysicsEngine::GetInstance().InitPhysics();
 		});
 
+	thread httpServerInitThread([] {
+		HttpServer::GetInstance().Init();
+		});
+
 	networkEngineInitThread.join();
 	physicsEngineInitThread.join();
+	httpServerInitThread.join();
 
 	// Engine working
 	thread networkEngineRunningThread([] {
 		auto& networkInstance = NetworkManagerServer::GetInstance();
 		auto& gameEngine = ServerEngine::GetInstance();
-		
+
 		while (gameEngine.isRunning.load(std::memory_order_acquire))
 		{
 			networkInstance.ProcessIOCPEvent();
@@ -58,7 +65,7 @@ int main()
 			}
 		}
 		});
-	
+
 	thread physicsEngineRunningThread([] {
 		auto& gameEngine = ServerEngine::GetInstance();
 		auto& physicsEngine = PhysicsEngine::GetInstance();
@@ -66,11 +73,16 @@ int main()
 		// thread 내에서 참조하는 외부 변수. atomic으로 변경해 잠재적 동시성 오류 해결하자.
 		while (gameEngine.isRunning.load(std::memory_order_acquire))
 		{
-			if (physicsEngine.HasElapsedPhysicsUpdateInterval()) {
+			if (physicsEngine.HasElapsedPhysicsUpdateInterval())
+			{
 				physicsEngine.StepPhysicsEveryScene();
 				physicsEngine.SetLastUpdateTimeToNow();
 			}
 		}
+		});
+
+	thread httpServerRunningThread([] {
+		HttpServer::GetInstance().ListenBlock();
 		});
 
 	// Level replication update producer-consumer working
@@ -93,9 +105,12 @@ int main()
 
 		auto& gameEngine = ServerEngine::GetInstance();
 
-		while (gameEngine.isRunning.load(std::memory_order_acquire)) {
-			for (auto& level : levels) {
-				if (level.HasElapsedFixedUpdateInterval()) {
+		while (gameEngine.isRunning.load(std::memory_order_acquire))
+		{
+			for (auto& level : levels)
+			{
+				if (level.HasElapsedFixedUpdateInterval())
+				{
 					level.FixedUpdate();
 					level.SetLastFixedUpdateTimeToNow();
 				}
@@ -127,6 +142,8 @@ int main()
 		NetworkManagerServer::GetInstance().RemoveAllGameObjectsForReplication();
 		});
 	networkEngineTurnOffThread.join();
+
+	httpServerRunningThread.join();
 
 	cout << "Server Main done." << endl;
 }

@@ -93,6 +93,9 @@
     <ClCompile Include="ServerPCH.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="HttpServer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Level.h">
@@ -177,6 +180,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpServer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

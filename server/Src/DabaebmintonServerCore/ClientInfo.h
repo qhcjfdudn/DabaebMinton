@@ -6,10 +6,9 @@
 class ClientInfo
 {
 public:
-	ClientInfo(ULONG_PTR completionKey, const sockaddr_in& addr);
+	ClientInfo(const string& ip, const unsigned int port);
 
-	ULONG_PTR _completionKey;
-	sockaddr_in _addr;
+	std::string _ipPort;
 
 	// for RUDP + IOCP
 	const int _channelCount = 2;
@@ -18,4 +17,3 @@ public:
 	
 	OutputMemoryBitStream _pendingStreamToSendingInChannels[2] = {};
 };
-

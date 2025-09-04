@@ -8,6 +8,6 @@ enum class ObserverEvent
 class Observer
 {
 public:
-	void notify(const ObserverEvent& oe) const;
+	static void notify(const ObserverEvent& oe);
 };
 
