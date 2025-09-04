@@ -33,12 +33,15 @@ public:
 		const PxGeometry& geometry,
 		const PxVec3& velocity = PxVec3(0));
 
-	void StepPhysicsEveryScene();
-
-	bool HasElapsedPhysicsUpdateInterval();
-	void SetLastUpdateTimeToNow();
+	void StepPhysics(PxScene* scene, PxReal elapsedTime);
+	void SetLastUpdateTimeToNow(system_clock::time_point& lastUpdateTime);
+	bool StepPhysicsIfHasElapsedPhysicsFixedUpdateInterval(PxScene* scene, system_clock::time_point& lastUpdateTime);
 
 	PhysicsEngineRunningState GetEngineRunningState();
+
+	std::vector<PxScene*> scenes;
+	std::vector<system_clock::time_point> _lastPhysXFixedUpdateTimeArray;
+	std::mutex scenesMutex;
 
 private:
 	PhysicsEngine() = default;
@@ -51,10 +54,6 @@ private:
 	PxDefaultCpuDispatcher* pxDispatcher = nullptr;
 	PxMaterial* pxMaterial = nullptr;
 	PxPvd* pxPvd = nullptr;
-
-	vector<PxScene*> scenes{};
-
-	system_clock::time_point _lastPhysxFixedUpdateTime;
 
 	PhysicsEngineRunningState _engineRunningState{ PhysicsEngineRunningState::Initiating };
 

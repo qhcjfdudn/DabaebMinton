@@ -67,16 +67,19 @@ int main()
 		});
 
 	thread physicsEngineRunningThread([] {
-		auto& gameEngine = ServerEngine::GetInstance();
+		auto& serverEngine = ServerEngine::GetInstance();
 		auto& physicsEngine = PhysicsEngine::GetInstance();
 
-		// thread 내에서 참조하는 외부 변수. atomic으로 변경해 잠재적 동시성 오류 해결하자.
-		while (gameEngine.isRunning.load(std::memory_order_acquire))
+		auto& scenes = physicsEngine.scenes;
+		auto& lastTimes = physicsEngine._lastPhysXFixedUpdateTimeArray;
+
+		while (serverEngine.isRunning.load(std::memory_order_acquire))
 		{
-			if (physicsEngine.HasElapsedPhysicsUpdateInterval())
+			std::lock_guard lk(physicsEngine.scenesMutex);
+			int len = static_cast<int>(scenes.size());
+			for (int i = 0; i < len; ++i)
 			{
-				physicsEngine.StepPhysicsEveryScene();
-				physicsEngine.SetLastUpdateTimeToNow();
+				physicsEngine.StepPhysicsIfHasElapsedPhysicsFixedUpdateInterval(scenes[i], lastTimes[i]);
 			}
 		}
 		});
