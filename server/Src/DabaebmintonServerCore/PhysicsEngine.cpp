@@ -184,7 +184,7 @@ bool PhysicsEngine::StepPhysicsIfHasElapsedPhysicsFixedUpdateInterval(PxScene* s
 	if (elapsedTime.count() >= Constant::PHYSX_FIXED_UPDATE_TIMESTEP)
 	{
 		StepPhysics(scene, static_cast<PxReal>(elapsedTime.count()));
-		SetLastUpdateTimeToNow(lastUpdateTime);
+		lastUpdateTime = currentTime;
 
 		return true;
 	}
