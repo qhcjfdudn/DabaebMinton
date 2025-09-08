@@ -12,6 +12,8 @@ public:
 	bool RemoveGame(ClientInfo* clientInfo);
 	Game* FindGame(ClientInfo* clientInfo);
 
+	int RemoveAllGames();
+
 	std::vector<std::shared_ptr<Game> > _games;
 	std::mutex _gamesMutex;
 

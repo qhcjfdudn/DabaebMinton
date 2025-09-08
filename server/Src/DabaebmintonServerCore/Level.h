@@ -10,8 +10,6 @@ class Level
 public:
 	Level();
 	~Level();
-	
-	PxScene* pxScene = nullptr;
 
 	vector<shared_ptr<GameObject>> gameObjects;
 	vector<shared_ptr<StaticGameObject>> staticGameObjects;
@@ -29,6 +27,8 @@ public:
 	bool HasElapsedFixedUpdateInterval();
 	void SetLastFixedUpdateTimeToNow();
 	void FixedUpdate();
+	
+	PxScene* pxScene = nullptr;
 
 	system_clock::time_point lastFixedUpdateTime;
 };

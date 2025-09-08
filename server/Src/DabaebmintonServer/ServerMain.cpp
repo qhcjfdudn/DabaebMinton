@@ -98,42 +98,48 @@ int main()
 		gameReplicationUpdateConsumers.emplace_back(replicationUpdateConsumer);
 
 	// Level running - 이 thread가 없어도 되는 것 같다. 왜냐하면? level을 유지하지 않기 때문.
-	thread levelPlayThread([] {
-		vector<Level> levels(1);
-		levels[0].InitLevel();
+	// 당장은 Worker를 만들어 Worker에서 별도로 동작하도록 구현 조치 필요.
+	//thread levelPlayThread([] {
+	//	auto& gameEngine = ServerEngine::GetInstance();
 
-		// 서버 검증을 위한 커맨드 처리용 Thread
-		DeveloperCommandFunctor developerCommandFunctor(levels);
-		thread developerInputThread(developerCommandFunctor);
+	//	while (gameEngine.isRunning.load(std::memory_order_acquire))
+	//	{
+	//		for (auto& level : levels)
+	//		{
+	//			if (level.HasElapsedFixedUpdateInterval())
+	//			{
+	//				level.FixedUpdate();
+	//				level.SetLastFixedUpdateTimeToNow();
+	//			}
+	//		}
+	//	}
 
-		auto& gameEngine = ServerEngine::GetInstance();
+	//	for (auto& level : levels)
+	//		level.Release();
+	//	});
 
-		while (gameEngine.isRunning.load(std::memory_order_acquire))
-		{
-			for (auto& level : levels)
-			{
-				if (level.HasElapsedFixedUpdateInterval())
-				{
-					level.FixedUpdate();
-					level.SetLastFixedUpdateTimeToNow();
-				}
-			}
-		}
+	// 서버 검증을 위한 커맨드 처리용 Thread
+	DeveloperCommandFunctor developerCommandFunctor;
+	thread developerInputThread(developerCommandFunctor);
 
-		developerInputThread.join();
+	///////////////////////////////
+	// Server 종료 signal 이후 로직
+	///////////////////////////////
 
-		for (auto& level : levels)
-			level.Release();
-		});
+	developerInputThread.join();
 
+	//levelPlayThread.join();
+	
 	replicationUpdateProducer.join();
 
 	for (thread& gameReplicationUpdateConsumer : gameReplicationUpdateConsumers)
 		gameReplicationUpdateConsumer.join();
 
+	// Game이 사용하는 resource 반납
+	GameManager::GetInstance().RemoveAllGames();
+
 	networkEngineRunningThread.join();
 	physicsEngineRunningThread.join();
-	levelPlayThread.join();
 
 	// Engine Turn Off with Garbage Collection
 	thread physicsEngineCleaupThread([] {
@@ -142,7 +148,7 @@ int main()
 	physicsEngineCleaupThread.join();
 
 	thread networkEngineTurnOffThread([] {
-		NetworkManagerServer::GetInstance().RemoveAllGameObjectsForReplication();
+		// NetworkEngine이 origin을 갖고 있는 멤버의 release 필요
 		});
 	networkEngineTurnOffThread.join();
 

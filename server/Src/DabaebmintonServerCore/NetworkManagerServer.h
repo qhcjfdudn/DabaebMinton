@@ -29,10 +29,9 @@ public:
 	bool HasElapsedPacketInterval();
 	void SetLastPacketSendTimeToNow();
 
-	int ReplicateAllGameObjects();
-	void AddGameObjectForReplication(GameObject* gameObject);
-	void RemoveGameObjectForReplication(GameObject* gameObject);
-	void RemoveAllGameObjectsForReplication();
+	//void AddGameObjectForReplication(GameObject* gameObject);
+	//void RemoveGameObjectForReplication(GameObject* gameObject);
+	//void RemoveAllGameObjectsForReplication();
 
 	ClientInfo* CreateClientInfo(const string& ip, const unsigned int port);
 	bool RemoveClientInfo(ClientInfo* clientInfo);
@@ -71,10 +70,10 @@ private:
 
 	system_clock::time_point lastPacketSendTime;
 
-	ReplicationManager _replicationManager;
-	vector<GameObject*> _gameObjectsForReplication{};
-	queue<GameObject*> _pendingCreatedGameObjectsForReplication{};
-	queue<GameObject*> _pendingDeletedGameObjectsForReplication{};
+	//ReplicationManager _replicationManager;
+	//vector<GameObject*> _gameObjectsForReplication{};
+	//queue<GameObject*> _pendingCreatedGameObjectsForReplication{};
+	//queue<GameObject*> _pendingDeletedGameObjectsForReplication{};
 
 	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
 	std::mutex _ipPortToClientInfoMapMutex;

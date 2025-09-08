@@ -97,3 +97,16 @@ Game* GameManager::FindGame(ClientInfo* clientInfo)
 
 	return game;
 }
+
+int GameManager::RemoveAllGames()
+{
+	_gamesMutex.lock();
+	
+	int ret = static_cast<int>(_games.size());
+	_games.clear();
+	_clientInfoToGameIdxMap.clear();
+
+	_gamesMutex.unlock();
+
+	return ret;
+}

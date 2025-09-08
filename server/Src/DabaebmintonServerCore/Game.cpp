@@ -2,14 +2,23 @@
 #include "Game.h"
 
 #include "NetworkManagerServer.h"
+#include "OutputMemoryBitStream.h"
 #include "Constant.h"
 
 Game::Game(ClientInfo* player1, ClientInfo* player2) :
 	p_player1{ player1 }, p_player2{ player2 },
 	_gamePlayState{ GamePlayState::Initializing },
-	_level{}
+	_level{},
+	gameController{}
 {
 	_level.InitLevel();
+
+	OutputMemoryBitStream stream;
+
+	for (auto gameObject : _level.gameObjects)
+		ReplicationManager::GetInstance().ReplicateCreate(stream, _linkingContext, gameObject.get());
+
+	// stream을 NetworkManager 통해서 1채널로 Packet 발송하도록 구현 필요
 
 	_lastReplicationUpdatedTime = system_clock::now();
 }

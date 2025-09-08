@@ -3,11 +3,9 @@
 #include "LinkingContext.h"
 #include "Level.h"
 
+#include "GameController.h"
+
 class ClientInfo;
-
-class GameController {
-
-};
 
 enum class GamePlayState {
 	Initializing,
@@ -42,7 +40,6 @@ public:
 
 	system_clock::time_point _lastReplicationUpdatedTime;
 	atomic<GameReplicationState> _replicationState{ GameReplicationState::None };
-
 
 private:
 	GamePlayState _gamePlayState;

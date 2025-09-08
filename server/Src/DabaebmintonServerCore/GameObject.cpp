@@ -42,12 +42,12 @@ void GameObject::SetCurrentTransform()
 	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
 }
 
-unsigned int GameObject::GetClassId()
+unsigned int GameObject::GetClassId() const
 {
 	return 'GMOJ';
 }
 
-void GameObject::Write(OutputMemoryBitStream& inStream)
+void GameObject::Write(OutputMemoryBitStream& inStream) const
 {
 	inStream.Write(_location);
 	inStream.Write(_velocity);

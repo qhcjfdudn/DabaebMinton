@@ -5,11 +5,6 @@
 
 #include "Constant.h"
 
-#include "PacketQueue.h"
-#include "OutputMemoryBitStream.h"
-#include "GetRequiredBits.h"
-#include "NetworkManagerServer.h"
-
 #include "Shuttlecock.h"
 #include "BadmintonBottom.h"
 #include "BadmintonNet.h"
@@ -50,23 +45,21 @@ Level::~Level()
 
 void Level::InitLevel()
 {
-	auto& engineInstance = PhysicsEngine::GetInstance();
+	auto& physicsEngine = PhysicsEngine::GetInstance();
 
+	// Replication 불필요한 static GameObjects
 	auto bottom = make_shared<BadmintonBottom>(PxVec2{ 0, 0 });
 	pxScene->addActor(*bottom->GetRigidbody());
 	staticGameObjects.push_back(bottom);
 
-	// Net
 	auto net = make_shared<BadmintonNet>(PxVec2{ 0, 2.5f });
 	pxScene->addActor(*net->GetRigidbody());
 	staticGameObjects.push_back(net);
 	
-	// Shuttlecock
+	// Replication 필요한 Dynamic GameObjects
 	auto shuttlecock = make_shared<Shuttlecock>(PxVec2{ -3, 10 }, PxVec2{ 2, 5 });
 	pxScene->addActor(*shuttlecock->GetRigidbody());
 	gameObjects.push_back(shuttlecock);
-
-	NetworkManagerServer::GetInstance().AddGameObjectForReplication(shuttlecock.get());
 }
 
 void Level::ClearLevel()
@@ -89,8 +82,6 @@ void Level::RemoveAllGameObjects()
 void Level::RemoveGameObject(size_t idx)
 {
 	auto& go = gameObjects[idx];
-
-	NetworkManagerServer::GetInstance().RemoveGameObjectForReplication(go.get());
 
 	auto& engineInstance = PhysicsEngine::GetInstance();
 	Remove(go->GetRigidbody());

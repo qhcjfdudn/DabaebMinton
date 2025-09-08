@@ -27,12 +27,12 @@ bool Shuttlecock::FixedUpdate()
 	return true;
 }
 
-unsigned int Shuttlecock::GetClassId()
+unsigned int Shuttlecock::GetClassId() const
 {
 	return 'STCK';
 }
 
-void Shuttlecock::Write(OutputMemoryBitStream& inStream)
+void Shuttlecock::Write(OutputMemoryBitStream& inStream) const
 {
 	GameObject::Write(inStream);
 }

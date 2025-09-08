@@ -403,8 +403,7 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 }
 
 NetworkManagerServer::NetworkManagerServer() :
-	lastPacketSendTime{ system_clock::now() },
-	_replicationManager{}
+	lastPacketSendTime{ system_clock::now() }
 {
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
 	{
@@ -512,61 +511,54 @@ void NetworkManagerServer::SetLastPacketSendTimeToNow()
 	lastPacketSendTime = system_clock::now();
 }
 
-int NetworkManagerServer::ReplicateAllGameObjects()
-{
-	if (_gameObjectsForReplication.size() == 0)
-		return 0;
-
-	OutputMemoryBitStream stream;
-	// 0채널로 broadcast 예정
-
-	stream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
-		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-
-	_replicationManager.ReplicateUpdate(stream, _gameObjectsForReplication);
-	int cnt = static_cast<int>(_gameObjectsForReplication.size());
-
- //	cout << "outStream.GetBitLength(): " << stream.GetBitLength() << endl;
-	//cout << "outStream.GetByteLength(): " << stream.GetByteLength() << endl;
-
-	Packet packet{ stream.GetBufferPtr(), stream.GetByteLength() };
-
-	packet.PrintInHex();
-
-	PacketQueue::GetSendStaticInstance()
-		.PushCopy(packet);
-
-	SendPacketsIOCP();
-
-	return cnt;
-}
-
-void NetworkManagerServer::AddGameObjectForReplication(GameObject* gameObject)
-{
-	_gameObjectsForReplication.push_back(gameObject);
-	_replicationManager.linkingContext.AddGameObject(gameObject);
-	_pendingCreatedGameObjectsForReplication.push(gameObject);
-}
-
-void NetworkManagerServer::RemoveGameObjectForReplication(GameObject* gameObject)
-{
-	_gameObjectsForReplication.erase(
-		std::remove(
-			_gameObjectsForReplication.begin(),
-			_gameObjectsForReplication.end(),
-			gameObject),
-		_gameObjectsForReplication.end());
-
-	_replicationManager.linkingContext.RemoveGameObject(gameObject);
-	_pendingDeletedGameObjectsForReplication.push(gameObject);
-}
-
-void NetworkManagerServer::RemoveAllGameObjectsForReplication()
-{
-	for (auto go : _gameObjectsForReplication) {
-		RemoveGameObjectForReplication(go);
-	}
-}
+//int NetworkManagerServer::ReplicateAllGameObjects()
+//{
+//	if (_gameObjectsForReplication.size() == 0)
+//		return 0;
+//
+//	OutputMemoryBitStream stream;
+//	// 0채널로 broadcast 예정
+//
+//	stream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
+//		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
+//
+//	_replicationManager.ReplicateUpdate(stream, _gameObjectsForReplication);
+//	int cnt = static_cast<int>(_gameObjectsForReplication.size());
+//
+// //	cout << "outStream.GetBitLength(): " << stream.GetBitLength() << endl;
+//	//cout << "outStream.GetByteLength(): " << stream.GetByteLength() << endl;
+//
+//	Packet packet{ stream.GetBufferPtr(), stream.GetByteLength() };
+//
+//	packet.PrintInHex();
+//
+//	PacketQueue::GetSendStaticInstance()
+//		.PushCopy(packet);
+//
+//	SendPacketsIOCP();
+//
+//	return cnt;
+//}
+//
+//void NetworkManagerServer::AddGameObjectForReplication(GameObject* gameObject)
+//{
+//	_gameObjectsForReplication.push_back(gameObject);
+//	_replicationManager.linkingContext.AddGameObject(gameObject);
+//	_pendingCreatedGameObjectsForReplication.push(gameObject);
+//}
+//
+//void NetworkManagerServer::RemoveGameObjectForReplication(GameObject* gameObject)
+//{
+//	_gameObjectsForReplication.erase(
+//		std::remove(
+//			_gameObjectsForReplication.begin(),
+//			_gameObjectsForReplication.end(),
+//			gameObject),
+//		_gameObjectsForReplication.end());
+//
+//	_replicationManager.linkingContext.RemoveGameObject(gameObject);
+//	_pendingDeletedGameObjectsForReplication.push(gameObject);
+//}
 
 ClientInfo* NetworkManagerServer::CreateClientInfo(const string& ip, const unsigned int port)
 {

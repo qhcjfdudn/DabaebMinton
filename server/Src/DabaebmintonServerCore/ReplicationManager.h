@@ -1,25 +1,18 @@
 #pragma once
 
-#include "LinkingContext.h"
-
+class LinkingContext;
 class OutputMemoryBitStream;
 class GameObject;
 
 class ReplicationManager
 {
 public:
-	ReplicationManager();
+	static ReplicationManager GetInstance();
 
-	void ReplicateUpdate(OutputMemoryBitStream& inStream, GameObject* inGameObject);
-	void ReplicateUpdate(OutputMemoryBitStream& inStream, vector<GameObject*> inGameObjects);
-
-	void ReplicateDelete(OutputMemoryBitStream& inStream, GameObject* const inGameObject);
-
-	bool HasElapsedReplicationInterval() const;
-
-	LinkingContext linkingContext;
+	void ReplicateCreate(OutputMemoryBitStream& inStream, LinkingContext& linkingContext, const GameObject* inGameObject);
+	void ReplicateUpdate(OutputMemoryBitStream& inStream, const LinkingContext& linkingContext, const GameObject* inGameObject);
+	void ReplicateDelete(OutputMemoryBitStream& inStream, LinkingContext& linkingContext, const GameObject* inGameObject);
 
 private:
-	double _replicationInterval;	
-	system_clock::time_point _timeSinceLastReplication;
+	ReplicationManager() = default;
 };

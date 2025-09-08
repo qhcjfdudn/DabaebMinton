@@ -14,8 +14,8 @@ public:
 	virtual bool FixedUpdate();
 	void SetCurrentTransform();
 
-	virtual unsigned int GetClassId();
-	virtual void Write(OutputMemoryBitStream& inStream);
+	virtual unsigned int GetClassId() const;
+	virtual void Write(OutputMemoryBitStream& inStream) const;
 
 	PxActor* GetRigidbody() const;
 

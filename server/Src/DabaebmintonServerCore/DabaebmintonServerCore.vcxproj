@@ -202,6 +202,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
     <ClCompile Include="Game.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="GameController.cpp" />
     <ClCompile Include="GameManager.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -283,6 +284,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
     <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="Constant.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameController.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GetRequiredBits.h" />
