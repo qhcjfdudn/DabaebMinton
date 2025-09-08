@@ -89,15 +89,15 @@ int main()
 		});
 
 	// Level replication update producer-consumer working
-	ReplicationUpdateProducer replicationUpdateProducer;
-	thread replicationUpdateProduceWorker(replicationUpdateProducer);
+	ReplicationUpdateProducer replicationUpdateProducerFunctor;
+	thread replicationUpdateProducer(replicationUpdateProducerFunctor);
 
 	ReplicationUpdateConsumer replicationUpdateConsumer;
 	vector<thread> gameReplicationUpdateConsumers;
 	for (int i = 0; i < 4; ++i)
 		gameReplicationUpdateConsumers.emplace_back(replicationUpdateConsumer);
 
-	// Level running
+	// Level running - 이 thread가 없어도 되는 것 같다. 왜냐하면? level을 유지하지 않기 때문.
 	thread levelPlayThread([] {
 		vector<Level> levels(1);
 		levels[0].InitLevel();
@@ -126,10 +126,10 @@ int main()
 			level.Release();
 		});
 
-	replicationUpdateProduceWorker.join();
+	replicationUpdateProducer.join();
 
-	for (thread& t : gameReplicationUpdateConsumers)
-		t.join();
+	for (thread& gameReplicationUpdateConsumer : gameReplicationUpdateConsumers)
+		gameReplicationUpdateConsumer.join();
 
 	networkEngineRunningThread.join();
 	physicsEngineRunningThread.join();
