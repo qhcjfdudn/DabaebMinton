@@ -6,6 +6,7 @@
 #include "ClientInfo.h"
 #include "RUDPPacketizer.h"
 #include "Packet.h"
+#include "GameObject.h"
 
 Game::Game(ClientInfo* player1, ClientInfo* player2) :
 	p_player1{ player1 }, p_player2{ player2 },
@@ -16,9 +17,16 @@ Game::Game(ClientInfo* player1, ClientInfo* player2) :
 {
 	_level.InitLevel();
 
-	OutputMemoryBitStream stream;
+	auto& player1Stream = p_player1->m_pendingStreamToSendingInChannels[1];
+	auto& player2Stream = p_player2->m_pendingStreamToSendingInChannels[1];
+
 	for (auto gameObject : _level.gameObjects)
-		ReplicationManager::GetInstance().ReplicateCreate(stream, _linkingContext, gameObject.get());
+	{
+		spdlog::debug("[Game::Game] object: {}", gameObject->GetClassId());
+
+		ReplicationManager::GetInstance().ReplicateCreate(player1Stream, _linkingContext, gameObject.get());
+		ReplicationManager::GetInstance().ReplicateCreate(player2Stream, _linkingContext, gameObject.get());
+	}
 }
 
 bool Game::HasElapsedReplicationInterval()
