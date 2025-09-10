@@ -16,7 +16,7 @@ public:
 	
 	int Bind(const char* const ip, unsigned int port);
 	
-	void SetSendBuffer(const char* str, size_t len);
+	void SetSendBuffer(const unsigned char* str, size_t len);
 
 	SocketProtocolType GetProtocolType() const { return m_protocolType; }
 	void SetProtocolType(SocketProtocolType protocolType) { m_protocolType = protocolType; }

@@ -8,15 +8,14 @@ public:
 	Packet(Packet&& src) noexcept;
 	~Packet();
 
-	const char* GetBuffer() const;
-	unsigned int GetLength() const;
+	const unsigned char* GetBuffer() const;
+	size_t GetLength() const;
 
-	void PrintInHex() const;
-	void Print() const;
+	string GetInHex() const;
 
 private:
-	char* _buffer;
-	unsigned int _len;
+	unsigned char* _buffer;
+	size_t _len;
 };
 
 enum class PacketType

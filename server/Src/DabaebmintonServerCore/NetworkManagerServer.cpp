@@ -6,8 +6,9 @@
 
 #include "Constant.h"
 #include "GetRequiredBits.h"
-
 #include "ClientInfo.h"
+
+#include "spdlog/spdlog.h"
 
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
@@ -264,7 +265,7 @@ void NetworkManagerServer::SendPacketsIOCP()
 	while (sendQueue.Empty() == false)
 	{
 		auto data = sendQueue.Front();
-		unsigned int sentBytes = data->GetLength();
+		size_t sentBytes = data->GetLength();
 		cout << "sentBytes: " << sentBytes << endl;
 		
 		// broadcast
@@ -369,6 +370,12 @@ int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 
 int NetworkManagerServer::SendTo(ClientInfo* client, vector<shared_ptr<Packet>>& packets)
 {
+	spdlog::info("[NetworkManagerServer::SendTo] Client IP:PORT: {}", client->_ipPort);
+	for (auto& packet : packets)
+	{
+		spdlog::info("[NetworkManagerServer::SendTo] data: {}", packet->GetInHex());
+	}
+
 	return 0;
 }
 

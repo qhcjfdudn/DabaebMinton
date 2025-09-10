@@ -95,7 +95,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -122,7 +122,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -146,7 +146,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -174,7 +174,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ServerPCH.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\physx\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>
