@@ -1,8 +1,6 @@
 #include "ServerPCH.h"
 #include "Packet.h"
 
-#include <spdlog/spdlog.h>
-
 Packet::Packet(const char* src, unsigned int bytes) :
 	_len(bytes)
 {

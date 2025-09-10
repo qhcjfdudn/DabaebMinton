@@ -17,6 +17,7 @@
 #include <mswsock.h>
 
 #include <PxPhysicsAPI.h>
+#include <spdlog/spdlog.h>
 
 using std::shared_ptr;
 using std::unique_ptr;

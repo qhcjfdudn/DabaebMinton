@@ -17,17 +17,28 @@
 
 #include "DeveloperCommandFunctor.h"
 
+#include <spdlog/spdlog.h>
+
 void signalHandler(int signum)
 {
-	cout << "\nInterrupt signal (" << signum << ") received." << endl;
+	spdlog::debug("[signalHandler] Interrupt signal ({}) received.", signum);
 
 	Observer::notify(ObserverEvent::EngineOff);
+}
+
+void InitLoggingLevel()
+{
+#ifdef NDEBUG
+#else
+	spdlog::set_level(spdlog::level::debug);
+#endif
 }
 
 int main()
 {
 	SetConsoleOutputCP(CP_UTF8);
 	signal(SIGINT, signalHandler);
+	InitLoggingLevel();
 
 	// Engine Init
 	thread networkEngineInitThread([] {
@@ -154,5 +165,5 @@ int main()
 
 	httpServerRunningThread.join();
 
-	cout << "Server Main done." << endl;
+	spdlog::info("[ServerMain::main] Server Main done.");
 }

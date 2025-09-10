@@ -21,7 +21,7 @@ void PhysicsEngine::InitPhysics()
 
 	_engineRunningState = PhysicsEngineRunningState::Running;
 
-	cout << "InitPhysics done." << endl;
+	spdlog::info("[PhysicsEngine::InitPhysics] InitPhysics done.");
 }
 
 void PhysicsEngine::CleanupPhysics()
@@ -40,7 +40,7 @@ void PhysicsEngine::CleanupPhysics()
 
 	_engineRunningState = PhysicsEngineRunningState::TurnedOff;
 
-	cout << "CleanupPhysics done." << endl;
+	spdlog::info("[PhysicsEngine::CleanupPhysics] CleanupPhysics done.");
 }
 
 const PxTolerancesScale& PhysicsEngine::GetTolerancesScale() const
@@ -137,7 +137,7 @@ PxRigidDynamic * PhysicsEngine::CreateSphere2D(const PxVec2& location, const PxV
 
 	if (body == nullptr)
 	{
-		cout << "Shuttlecock(): CreateSphere2D error" << endl;
+		spdlog::error("[PhysicsEngine::CreateSphere2D] Shuttlecock(): CreateSphere2D error.");
 		return nullptr;
 	}
 
@@ -168,7 +168,7 @@ void PhysicsEngine::StepPhysics(PxScene* scene, PxReal elapsedTime)
 	scene->fetchResults(true);
 	scene->unlockWrite();
 
-	cout << "[" << system_clock::now() << " PhysicsEngine::StepPhysics] update scene." << endl;
+	spdlog::info("[PhysicsEngine::StepPhysics] update scene.");
 }
 
 void PhysicsEngine::SetLastUpdateTimeToNow(system_clock::time_point& lastUpdateTime)

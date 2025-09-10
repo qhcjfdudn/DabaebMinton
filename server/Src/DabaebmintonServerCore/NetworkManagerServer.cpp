@@ -8,8 +8,6 @@
 #include "GetRequiredBits.h"
 #include "ClientInfo.h"
 
-#include "spdlog/spdlog.h"
-
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
 	return sInstance;
@@ -23,7 +21,7 @@ void NetworkManagerServer::InitIOCP() {
 		reinterpret_cast<ULONG_PTR>(nullptr), 
 		m_threadCount);
 
-	cout << "[InitIOCP] IOCP creation complete." << endl;
+	spdlog::info("[NetworkManagerServer::InitIOCP] IOCP creation complete.");
 
 	CreateListenSocket();
 
@@ -37,11 +35,11 @@ void NetworkManagerServer::InitIOCP() {
 		mh_iocp, 
 		reinterpret_cast<ULONG_PTR>(nullptr), 
 		0) == nullptr) {
-		cout << "[InitIOCP] Add IOCP error: " << GetLastError() << endl;
+		spdlog::error("[NetworkManagerServer::InitIOCP] Add IOCP error: {}", WSAGetLastError());
 		return;
 	}
 
-	cout << "[InitIOCP] listenSocket attach complete." << endl;
+	spdlog::info("[NetworkManagerServer::InitIOCP] listenSocket attach complete.");
 
 	AcceptEx();
 
@@ -51,12 +49,12 @@ void NetworkManagerServer::InitIOCP() {
 
 	m_clientsMap.emplace(completionKey, rudpSocketPtr);
 
-	cout << "completionKey: " << completionKey << endl;
+	spdlog::info("[NetworkManagerServer::InitIOCP] completionKey: {}", completionKey);
 
 	AddSocketIOCP(rudpSocketPtr, completionKey);
 	RecvFrom(rudpSocketPtr);
 
-	cout << "[InitIOCP] RUDPSocket attach complete." << endl;
+	spdlog::info("[NetworkManagerServer::InitIOCP] RUDPSocket attach complete.");
 }
 void NetworkManagerServer::AcceptEx()
 {
@@ -370,10 +368,10 @@ int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 
 int NetworkManagerServer::SendTo(ClientInfo* client, vector<shared_ptr<Packet>>& packets)
 {
-	spdlog::info("[NetworkManagerServer::SendTo] Client IP:PORT: {}", client->_ipPort);
+	spdlog::debug("[NetworkManagerServer::SendTo] Client ({})", client->_ipPort);
 	for (auto& packet : packets)
 	{
-		spdlog::info("[NetworkManagerServer::SendTo] data: {}", packet->GetInHex());
+		spdlog::debug("[NetworkManagerServer::SendTo] data: {}", packet->GetInHex());
 	}
 
 	return 0;
@@ -424,11 +422,11 @@ NetworkManagerServer::NetworkManagerServer() :
 		
 		return;
 	}
-	cout << "WSAStartup" << endl;
+	spdlog::info("[NetworkManagerServer::NetworkManagerServer] WSAStartup.");
 }
 NetworkManagerServer::~NetworkManagerServer() {
 	WSACleanup();
-	cout << "WSACleanup" << endl;
+	spdlog::info("[NetworkManagerServer::~NetworkManagerServer] WSACleanup.");
 }
 
 void NetworkManagerServer::CreateListenSocket()
@@ -437,31 +435,32 @@ void NetworkManagerServer::CreateListenSocket()
 	m_listenSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_TCP);
 	m_listenSocket.SetProtocolType(SocketProtocolType::SPT_TCP);
 
-	cout << "[CreateListenSocket] Socket creation complete." << endl;
+	spdlog::info("[NetworkManagerServer::CreateListenSocket] Socket creation complete.");
 
 	if (m_listenSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
-		cout << "[CreateListenSocket] bind error: " << WSAGetLastError() << endl;
+		spdlog::error("[NetworkManagerServer::CreateListenSocket] bind error: {}", WSAGetLastError());
 		return;
 	}
 
-	cout << "[CreateListenSocket] bind complete." << endl;
+	spdlog::info("[NetworkManagerServer::CreateListenSocket] bind complete.");
 
 	if (listen(m_listenSocket.m_socket, 10) == SOCKET_ERROR) {
-		cout << "listen error: " << WSAGetLastError() << endl;
+		spdlog::error("[NetworkManagerServer::CreateListenSocket] listen error: {}", WSAGetLastError());
 		return;
 	}
 
-	cout << "[CreateListenSocket] Listen Start" << endl;
+	spdlog::info("[NetworkManagerServer::CreateListenSocket] Listen Start.");
 }
+
 void NetworkManagerServer::CreateRUDPSocket()
 {
 	m_rudpSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_RUDP);
 	m_rudpSocket.SetProtocolType(SocketProtocolType::SPT_RUDP);
 
-	cout << "[CreateRUDPSocket] RUDP Socket Creation Complete." << endl;
+	spdlog::info("[NetworkManagerServer::CreateRUDPSocket] RUDP Socket Creation Complete.");
 	
 	if (m_rudpSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
-		cout << "[CreateRUDPSocket] bind error: " << WSAGetLastError() << endl;
+		spdlog::error("[NetworkManagerServer::CreateRUDPSocket] bind error: {}", WSAGetLastError());
 		return;
 	}
 }
@@ -483,16 +482,16 @@ void NetworkManagerServer::GetLPFN()
 		nullptr,							// lpOverlapped: WSAOVERLAPPED 구조체 포인터. 지금 불필요.
 		nullptr) == SOCKET_ERROR) {			// lpCompletionRoutine: 작업 완료 후 호출할 루틴 전달 가능. // 지금 불필요.
 
-		cout << "[GetLPFN] WSAIoctl error: " << WSAGetLastError() << endl;
+		spdlog::error("[NetworkManagerServer::GetLPFN] WSAIoctl error: {}", WSAGetLastError());
 	}
 
 	if (m_AcceptEx == nullptr) {
-		cout << "[GetLPFN] Getting AcceptEx ptr failed." << endl;
+		spdlog::error("[NetworkManagerServer::GetLPFN] Getting AcceptEx ptr failed.");
 
 		return;
 	}
 
-	cout << "[GetLPFN] Init AcceptEx function complete." << endl;
+	spdlog::info("[NetworkManagerServer::GetLPFN] Init AcceptEx function complete.");
 
 	if (WSAIoctl(
 		m_listenSocket.m_socket,
@@ -505,10 +504,10 @@ void NetworkManagerServer::GetLPFN()
 		nullptr,
 		nullptr) == SOCKET_ERROR) {
 
-		cout << "WSAIoctl error: " << WSAGetLastError() << endl;
+		spdlog::error("[NetworkManagerServer::GetLPFN] WSAIoctl error: {}", WSAGetLastError());
 	}
 
-	cout << "[GetLPFN] Init GetAcceptExSockAddrs function complete." << endl;
+	spdlog::info("[NetworkManagerServer::GetLPFN] Init GetAcceptExSockAddrs function complete.");
 }
 
 bool NetworkManagerServer::HasElapsedPacketInterval()

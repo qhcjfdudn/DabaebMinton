@@ -34,12 +34,7 @@ void HttpServer::Init()
 				return;
 			}
 
-			cout << "[HttpServer] new Game request." << endl;
-
-			for (int i = 0; i < len; ++i) {
-				json& client = clientList[i];
-				cout << "[HttpServer] Client" << (i + 1) << ": " << client["ip"] << ":" << client["port"] << endl;
-			}
+			spdlog::info("[HttpServer/game] new Game request.");
 
 			string ips[2];
 			unsigned int ports[2];
@@ -48,6 +43,8 @@ void HttpServer::Init()
 				json& client = clientList[i];
 				ips[i] = client["ip"];
 				ports[i] = client["port"];
+
+				spdlog::info("[HttpServer/game] Client{0:d}: {1}:{2:d}", i + 1, ips[i], ports[i]);
 			}
 
 			Game* game = GameManager::GetInstance().CreateGame(ips, ports);

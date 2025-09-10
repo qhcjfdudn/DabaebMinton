@@ -156,8 +156,9 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PostBuildEvent>
-      <Command>robocopy $(ProjectDir) $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include *.h /XF ServerPCH.h;
-robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include *.h;</Command>
+      <Command>robocopy $(ProjectDir) $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include *.h /XF ServerPCH.h &gt;nul || exit 0
+robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include /E &gt;nul || exit 0
+robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include $(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebmintonServerCore\include /E &gt;nul || exit 0</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>.lib 배포 위한 include 디렉터리 생성</Message>
