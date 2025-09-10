@@ -322,7 +322,7 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 {
 	WSABUF b;
 	b.buf = clientSocket->m_receiveBuffer;
-	b.len = clientSocket->MAX_RECEIVE_LENGTH;
+	b.len = Constant::MAX_PACKET_SIZE;
 
 	DWORD& numberOfBytesReceived = clientSocket->m_numberOfBytesReceived;
 	

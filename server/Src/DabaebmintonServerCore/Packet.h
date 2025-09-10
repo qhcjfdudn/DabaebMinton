@@ -18,3 +18,12 @@ private:
 	char* _buffer;
 	unsigned int _len;
 };
+
+enum class PacketType
+{
+	PT_Hello,
+	PT_ReplicationData,
+	PT_RPC,
+	PT_Disconnect,
+	PT_Max
+};

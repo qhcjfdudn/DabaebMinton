@@ -22,6 +22,4 @@ private:
 	ReplicationAction _ra;
 	NetworkId_t _nid;
 	unsigned int _cid;
-
 };
-

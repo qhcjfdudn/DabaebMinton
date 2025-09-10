@@ -70,20 +70,6 @@ private:
 
 	system_clock::time_point lastPacketSendTime;
 
-	//ReplicationManager _replicationManager;
-	//vector<GameObject*> _gameObjectsForReplication{};
-	//queue<GameObject*> _pendingCreatedGameObjectsForReplication{};
-	//queue<GameObject*> _pendingDeletedGameObjectsForReplication{};
-
 	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
 	std::mutex _ipPortToClientInfoMapMutex;
-};
-
-enum class PacketType
-{
-	PT_Hello,
-	PT_ReplicationData,
-	PT_RPC,
-	PT_Disconnect,
-	PT_Max
 };

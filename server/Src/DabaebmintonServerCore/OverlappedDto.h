@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Constant.h"
+
 struct OverlappedDto
 {
-	static const int MAX_BUFFER_LENGTH = 8'192;
-
-	char _Buffer[MAX_BUFFER_LENGTH + 1];
+	char _Buffer[Constant::MAX_PACKET_SIZE];
 	DWORD _numberOfBytesTransfered{};
 	DWORD _overlappedFlags{};
 	OVERLAPPED _overlapped;
