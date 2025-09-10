@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Constant.h"
 #include "OutputMemoryBitStream.h"
 #include "OverlappedDto.h"
 
@@ -11,9 +12,8 @@ public:
 	const std::string _ipPort;
 
 	// for RUDP + IOCP
-	const int _channelCount = 2;
-	int m_sequenceNoInChannels[2] = {};
-	OverlappedDto m_receiveOverlappedDto{}, m_sendOverlappedDtdo[2] = {};
+	uint8_t m_sequenceNoInChannels[Constant::RUDP_MAX_CHANNEL_SIZE] = {};
+	OverlappedDto m_OverlappedDtdo[Constant::RUDP_MAX_CHANNEL_SIZE] = {};
 	
-	OutputMemoryBitStream _pendingStreamToSendingInChannels[2] = {};
+	OutputMemoryBitStream m_pendingStreamToSendingInChannels[Constant::RUDP_MAX_CHANNEL_SIZE] = {};
 };
