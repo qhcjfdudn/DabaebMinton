@@ -18,6 +18,8 @@ public:
 		free(_buffer);
 	}
 
+	void Clear();
+
 	void WriteBits(uint8_t inData, size_t inBitCount);
 	void WriteBits(const void* inData, size_t inBitCount);
 
@@ -30,6 +32,8 @@ public:
 	}
 
 	void Write(uint32_t inData);
+	void Write(uint16_t inData);
+	void Write(uint8_t inData);
 	void Write(float inData);
 	void Write(std::string inData);
 	void Write(PxVec2 inData);

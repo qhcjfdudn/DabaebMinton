@@ -6,6 +6,7 @@
 
 class GameObject;
 class ClientInfo;
+class Packet;
 
 class NetworkManagerServer
 {
@@ -24,6 +25,7 @@ public:
 	int Send(shared_ptr<Socket> clientSocket, size_t len);
 	int Recv(shared_ptr<Socket> clientSocket);
 	int SendTo(shared_ptr<Socket> clientSocket, size_t len);
+	int SendTo(ClientInfo* client, vector<shared_ptr<Packet>>& packets);
 	int RecvFrom(shared_ptr<Socket> clientSocket);
 
 	bool HasElapsedPacketInterval();

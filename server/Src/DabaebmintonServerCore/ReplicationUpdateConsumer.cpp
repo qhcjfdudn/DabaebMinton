@@ -32,7 +32,7 @@ void ReplicationUpdateConsumer::operator() ()
 
 		if (game != nullptr)
 		{
-			game->ReplicateLevel();
+			game->SendPacket();
 			game->SetLastReplicationTimeToNow();
 			game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
 		}

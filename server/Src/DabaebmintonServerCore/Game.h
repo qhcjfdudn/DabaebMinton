@@ -23,10 +23,11 @@ class Game
 public:
 	Game(ClientInfo* player1, ClientInfo* player2);
 
-	void ReplicateLevel();
-
 	bool HasElapsedReplicationInterval();
 	void SetLastReplicationTimeToNow();
+
+	void SendPacket();
+	void SendPacket(ClientInfo* client);
 
 	Level _level;
 	
@@ -44,4 +45,3 @@ public:
 private:
 	GamePlayState _gamePlayState;
 };
-

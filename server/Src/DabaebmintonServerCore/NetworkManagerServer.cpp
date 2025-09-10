@@ -366,6 +366,12 @@ int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 
 	return retCode;
 }
+
+int NetworkManagerServer::SendTo(ClientInfo* client, vector<shared_ptr<Packet>>& packets)
+{
+	return 0;
+}
+
 int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 {
 	clientSocket->lpFromLen = sizeof(clientSocket->m_remoteAddr);

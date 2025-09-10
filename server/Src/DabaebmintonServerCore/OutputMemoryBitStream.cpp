@@ -1,5 +1,10 @@
-﻿#include "ServerPCH.h"
+#include "ServerPCH.h"
 #include "OutputMemoryBitStream.h"
+
+void OutputMemoryBitStream::Clear()
+{
+	_bitHead = 0;
+}
 
 void OutputMemoryBitStream::ReallocBuffer(uint32_t newBitCapacity) {
 	char* newBuffer = new char[newBitCapacity];
@@ -57,6 +62,16 @@ void OutputMemoryBitStream::WriteBits(const void* inData, size_t inBitCount)
 void OutputMemoryBitStream::Write(uint32_t inData)
 {
 	WriteBits(&inData, sizeof(uint32_t) << 3);
+}
+
+void OutputMemoryBitStream::Write(uint16_t inData)
+{
+	WriteBits(&inData, sizeof(uint16_t) << 3);
+}
+
+void OutputMemoryBitStream::Write(uint8_t inData)
+{
+	WriteBits(&inData, sizeof(uint8_t) << 3);
 }
 
 void OutputMemoryBitStream::Write(float inData)

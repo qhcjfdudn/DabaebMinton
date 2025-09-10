@@ -13,35 +13,41 @@ ReplicationManager ReplicationManager::GetInstance()
 	return instance;
 }
 
-void ReplicationManager::ReplicateCreate(OutputMemoryBitStream& inStream, LinkingContext& linkingContext, const GameObject* inGameObject)
+void ReplicationManager::ReplicateCreate(OutputMemoryBitStream & outStream, LinkingContext& linkingContext, const GameObject * gameObject)
 {
-	linkingContext.AddGameObject(inGameObject);
+	linkingContext.AddGameObject(gameObject);
 
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Create,
-		linkingContext.GetNetworkId(inGameObject),
-		inGameObject->GetClassId());
+		linkingContext.GetNetworkId(gameObject),
+		gameObject->GetClassId());
 
-	rh.Write(inStream);
-	inGameObject->Write(inStream);
+	rh.Write(outStream);
+	gameObject->Write(outStream);
 }
 
-void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& inStream, const LinkingContext& linkingContext, const GameObject* inGameObject)
+void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& outStream, const LinkingContext& linkingContext, const GameObject* gameObject)
 {
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Update,
-		linkingContext.GetNetworkId(inGameObject),
-		inGameObject->GetClassId());
+		linkingContext.GetNetworkId(gameObject),
+		gameObject->GetClassId());
 
-	rh.Write(inStream);
-	inGameObject->Write(inStream);
+	rh.Write(outStream);
+	gameObject->Write(outStream);
 }
 
-void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& inStream, LinkingContext& linkingContext, const GameObject* inGameObject)
+void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& outStream, const LinkingContext& linkingContext, const vector<shared_ptr<GameObject>>& gameObjects)
+{
+	for (auto& gameObject : gameObjects)
+		ReplicateUpdate(outStream, linkingContext, gameObject.get());
+}
+
+void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& outStream, LinkingContext& linkingContext, const GameObject* gameObject)
 {
 	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Delete,
-		linkingContext.GetNetworkId(inGameObject),
-		inGameObject->GetClassId());
-	rh.Write(inStream);
-	inGameObject->Write(inStream);
+		linkingContext.GetNetworkId(gameObject),
+		gameObject->GetClassId());
+	rh.Write(outStream);
+	gameObject->Write(outStream);
 
-	linkingContext.RemoveGameObject(inGameObject);
+	linkingContext.RemoveGameObject(gameObject);
 }

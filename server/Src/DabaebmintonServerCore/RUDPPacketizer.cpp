@@ -61,7 +61,7 @@ vector<shared_ptr<Packet>> RUDPPacketizer::PacketizeReliable(
 	const int channelId,
 	uint8_t& outSeqNum, 
 	const PacketType packetType, 
-	const OutputMemoryBitStream& inStream)
+	OutputMemoryBitStream& inStream)
 {
 	return vector<shared_ptr<Packet>>();
 }
