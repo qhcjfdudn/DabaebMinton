@@ -7,7 +7,7 @@ void OutputMemoryBitStream::Clear()
 }
 
 void OutputMemoryBitStream::ReallocBuffer(uint32_t newBitCapacity) {
-	char* newBuffer = new char[newBitCapacity];
+	unsigned char* newBuffer = new unsigned char[newBitCapacity];
 
 	if (_buffer != nullptr)
 	{

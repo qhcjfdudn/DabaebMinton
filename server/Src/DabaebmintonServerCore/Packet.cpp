@@ -1,7 +1,7 @@
 #include "ServerPCH.h"
 #include "Packet.h"
 
-Packet::Packet(const char* src, unsigned int bytes) :
+Packet::Packet(const unsigned char* src, unsigned int bytes) :
 	_len(bytes)
 {
 	_buffer = new unsigned char[bytes];

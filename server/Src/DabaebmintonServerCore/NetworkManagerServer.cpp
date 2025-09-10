@@ -303,7 +303,7 @@ void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSo
 int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 {
 	WSABUF b;
-	b.buf = clientSocket->m_sendBuffer;
+	b.buf = reinterpret_cast<CHAR*>(clientSocket->m_sendBuffer);
 	b.len = static_cast<ULONG>(len);
 
 	int retCode = WSASend(
@@ -320,7 +320,7 @@ int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 {
 	WSABUF b;
-	b.buf = clientSocket->m_receiveBuffer;
+	b.buf = reinterpret_cast<CHAR*>(clientSocket->m_receiveBuffer);
 	b.len = Constant::MAX_PACKET_SIZE;
 
 	DWORD& numberOfBytesReceived = clientSocket->m_numberOfBytesReceived;
@@ -342,7 +342,7 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 {
 	WSABUF b;
-	b.buf = clientSocket->m_sendBuffer;
+	b.buf = reinterpret_cast<CHAR*>(clientSocket->m_sendBuffer);
 	b.len = static_cast<ULONG>(len);
 
 	int retCode = WSASendTo(
@@ -382,7 +382,7 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 	clientSocket->lpFromLen = sizeof(clientSocket->m_remoteAddr);
 
 	WSABUF wsaBuf;
-	wsaBuf.buf = clientSocket->m_receiveBuffer;
+	wsaBuf.buf = reinterpret_cast<CHAR*>(clientSocket->m_receiveBuffer);
 	wsaBuf.len = sizeof(clientSocket->m_receiveBuffer);
 
 	memset(&clientSocket->m_receiveOverlappedStruct, 0, sizeof(clientSocket->m_receiveOverlappedStruct));

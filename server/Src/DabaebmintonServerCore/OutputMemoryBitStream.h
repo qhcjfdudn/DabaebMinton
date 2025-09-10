@@ -23,7 +23,7 @@ public:
 	void WriteBits(uint8_t inData, size_t inBitCount);
 	void WriteBits(const void* inData, size_t inBitCount);
 
-	const char* GetBufferPtr() const { return _buffer; }
+	const unsigned char* GetBufferPtr() const { return _buffer; }
 	uint32_t GetBitLength() const { return _bitHead; }
 	uint32_t GetByteLength() const { return (_bitHead + 7) >> 3; }
 
@@ -41,7 +41,7 @@ public:
 private:
 	void ReallocBuffer(uint32_t newBitCapacity);
 
-	char* _buffer;
+	unsigned char* _buffer;
 	uint32_t _bitHead;
 	uint32_t _bitCapacity;
 };

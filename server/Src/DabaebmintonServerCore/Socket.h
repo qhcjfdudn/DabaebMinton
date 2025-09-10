@@ -21,12 +21,12 @@ public:
 	SocketProtocolType GetProtocolType() const { return m_protocolType; }
 	void SetProtocolType(SocketProtocolType protocolType) { m_protocolType = protocolType; }
 
-	char m_receiveBuffer[Constant::MAX_PACKET_SIZE + 1] = { 0, };
+	unsigned char m_receiveBuffer[Constant::MAX_PACKET_SIZE + 1] = { 0, };
 	DWORD m_numberOfBytesReceived{};
 	DWORD m_receiveFlags{};
 	OVERLAPPED m_receiveOverlappedStruct{};
 	
-	char m_sendBuffer[Constant::MAX_PACKET_SIZE + 1] = { 0, };
+	unsigned char m_sendBuffer[Constant::MAX_PACKET_SIZE + 1] = { 0, };
 	DWORD m_numberOfBytesSent{};
 	DWORD m_sendFlags{};
 	OVERLAPPED m_sendOverlappedStruct{};

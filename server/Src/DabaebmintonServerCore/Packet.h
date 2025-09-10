@@ -3,7 +3,7 @@
 class Packet
 {
 public:
-	Packet(const char* src, unsigned int bytes);
+	Packet(const unsigned char * src, unsigned int bytes);
 	Packet(const Packet& src);
 	Packet(Packet&& src) noexcept;
 	~Packet();
