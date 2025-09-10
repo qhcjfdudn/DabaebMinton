@@ -255,6 +255,8 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
     <ClCompile Include="ReplicationUpdateProducer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="RUDPHeader.cpp" />
+    <ClCompile Include="RUDPPacketizer.cpp" />
     <ClCompile Include="ServerEngine.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -304,6 +306,8 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\incl
     <ClInclude Include="ReplicationManager.h" />
     <ClInclude Include="ReplicationUpdateConsumer.h" />
     <ClInclude Include="ReplicationUpdateProducer.h" />
+    <ClInclude Include="RUDPHeader.h" />
+    <ClInclude Include="RUDPPacketizer.h" />
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="Shuttlecock.h" />
