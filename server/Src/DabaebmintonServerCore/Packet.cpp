@@ -49,9 +49,10 @@ string Packet::GetInHex() const
 	string ret = "";
 	ret.reserve((_len << 1) + (_len - 1) / 4);
 
-	for (int i = 0, size = static_cast<int>(_len); i < size; ++i)
+	ret += fmt::format("{:02X}", _buffer[0]);
+	for (int i = 1, size = static_cast<int>(_len); i < size; ++i)
 	{
-		if (i > 0 && (i & 3) == 0)
+		if ((i & 3) == 0)
 			ret += ' ';
 
 		ret += fmt::format("{:02X}", _buffer[i]);
