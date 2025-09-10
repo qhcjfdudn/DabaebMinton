@@ -584,7 +584,7 @@ ClientInfo* NetworkManagerServer::CreateClientInfo(const string& ip, const unsig
 		ret = _ipPortToClientInfoMap[key].get();
 		_ipPortToClientInfoMapMutex.unlock();
 		
-		cout << key << " client already exists." << endl;
+		spdlog::info("[NetworkManagerServer::CreateClientInfo] {} client already exists.", key);
 		
 		return ret;
 	}

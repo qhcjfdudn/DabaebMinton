@@ -27,7 +27,7 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 		ret = _games[mp[ci1]].get();
 		_gamesMutex.unlock();
 		
-		cout << "[GameManager::CreateGame] A game already exists." << endl;
+		spdlog::info("[GameManager::CreateGame] A game already exists.");
 		
 		return ret;
 	}
@@ -37,7 +37,7 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 		ret = _games[mp[ci2]].get();
 		_gamesMutex.unlock();
 
-		cout << "[GameManager::CreateGame] A game already exists." << endl;
+		spdlog::info("[GameManager::CreateGame] A game already exists.");
 		
 		return ret;
 	}
