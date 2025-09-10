@@ -8,7 +8,7 @@ public:
 	OutputMemoryBitStream() :
 		_buffer(nullptr), _bitHead(0), _bitCapacity(0)
 	{
-		ReallocBuffer(32);		// 32bytes
+		Reserve(32);		// 32bytes
 	}
 	~OutputMemoryBitStream()
 	{
@@ -18,6 +18,7 @@ public:
 		free(_buffer);
 	}
 
+	void Reserve(uint32_t newCapacity);
 	void Clear();
 
 	void WriteBits(uint8_t inData, size_t inBitCount);
@@ -39,8 +40,6 @@ public:
 	void Write(PxVec2 inData);
 
 private:
-	void ReallocBuffer(uint32_t newBitCapacity);
-
 	unsigned char* _buffer;
 	uint32_t _bitHead;
 	uint32_t _bitCapacity;

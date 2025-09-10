@@ -6,8 +6,12 @@ void OutputMemoryBitStream::Clear()
 	_bitHead = 0;
 }
 
-void OutputMemoryBitStream::ReallocBuffer(uint32_t newBitCapacity) {
-	unsigned char* newBuffer = new unsigned char[newBitCapacity];
+void OutputMemoryBitStream::Reserve(uint32_t newCapacity)
+{
+	if (_bitCapacity >= newCapacity)
+		return;
+
+	unsigned char* newBuffer = new unsigned char[newCapacity];
 
 	if (_buffer != nullptr)
 	{
@@ -24,7 +28,7 @@ void OutputMemoryBitStream::WriteBits(uint8_t inData, size_t inBitCount)
 	// inBitCount와 비교해 buffer의 사이즈를 늘려줄지 판단
 	uint32_t nextBitHead = _bitHead + static_cast<uint32_t>(inBitCount);
 	if (nextBitHead > _bitCapacity) {
-		ReallocBuffer(max(_bitCapacity * 2, nextBitHead));
+		Reserve(max(_bitCapacity << 1, nextBitHead));
 	}
 
 	uint32_t byteOffset = _bitHead >> 3;
@@ -46,7 +50,6 @@ void OutputMemoryBitStream::WriteBits(uint8_t inData, size_t inBitCount)
 void OutputMemoryBitStream::WriteBits(const void* inData, size_t inBitCount)
 {
 	const char* srcByte = static_cast<const char*>(inData);
-	//printf("%d %d", srcByte[0], srcByte[1]);
 
 	while (inBitCount > 8) {
 		WriteBits(*srcByte, 8);
