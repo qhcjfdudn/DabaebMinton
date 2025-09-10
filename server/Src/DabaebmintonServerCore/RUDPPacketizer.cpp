@@ -20,39 +20,51 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 	vector<shared_ptr<GameObject>> gameObjects)
 {
 	vector<shared_ptr<Packet>> ret;
+	
+	RUDPHeader dummyHeader{ 0, 0 };
+	OutputMemoryBitStream dummyStream;
+	dummyHeader.Write(dummyStream);
 
-	OutputMemoryBitStream curStream, nextStream;
-	RUDPHeader header{ channelId, outSeqNum };
+	const int BIT_HEADER_SIZE = dummyStream.GetBitLength();
+	const int MAX_BIT_PAYLOAD_SIZE = (Constant::MAX_PACKET_SIZE << 3) - BIT_HEADER_SIZE;
 
-	header.Write(curStream);
-	curStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-	header.Write(nextStream);
-	nextStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
+	OutputMemoryBitStream packetStream, bufferStream;
+	packetStream.Reserve(Constant::MAX_PACKET_SIZE);
+	bufferStream.Reserve(Constant::MAX_PACKET_SIZE);
 
-	for (auto gameObject : gameObjects)
+	int curIdx = 0;
+	int goIdx = 0;
+	int goSize = gameObjects.size();
+
+	while (goIdx < goSize)
 	{
-		gameObject->Write(nextStream);
-		if (nextStream.GetByteLength() > Constant::MAX_PACKET_SIZE)
+		bufferStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
+		int curLength = bufferStream.GetBitLength();
+
+		for (; goIdx < goSize; ++goIdx)
 		{
-			ret.push_back(make_shared<Packet>(curStream.GetBufferPtr(), curStream.GetByteLength()));
+			gameObjects[goIdx]->Write(bufferStream);
+			if (bufferStream.GetBitLength() > MAX_BIT_PAYLOAD_SIZE)
+			{
+				bufferStream.Clear();
+				break;
+			}
 
-			curStream.Clear();
-			nextStream.Clear();
-
-			header = { channelId, ++outSeqNum };
-			
-			header.Write(curStream);
-			curStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-			header.Write(nextStream);
-			nextStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-			
-			gameObject->Write(nextStream);
+			curLength = bufferStream.GetBitLength();
 		}
-		gameObject->Write(curStream);
-	}
 
-	ret.push_back(make_shared<Packet>(curStream.GetBufferPtr(), curStream.GetByteLength()));
-	++outSeqNum;
+		RUDPHeader header{ channelId, outSeqNum++, curLength, 0, curLength };
+		header.Write(packetStream);
+		packetStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
+
+		for (; curIdx < goIdx; ++curIdx)
+		{
+			gameObjects[curIdx]->Write(packetStream);
+		}
+
+		ret.push_back(make_shared<Packet>(packetStream.GetBufferPtr(), packetStream.GetByteLength()));
+		packetStream.Clear();
+	}
 
 	return ret;
 }
