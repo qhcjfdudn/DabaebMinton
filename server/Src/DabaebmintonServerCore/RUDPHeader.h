@@ -5,11 +5,12 @@ class OutputMemoryBitStream;
 class RUDPHeader
 {
 public:
-	RUDPHeader(uint8_t channelId, 
-		uint8_t sequenceNumber, 
-		uint32_t totalBitLength = 0, 
+	RUDPHeader(
+		uint8_t channelId,
+		uint8_t sequenceNumber,
+		uint32_t totalBitLength = 0,
 		uint32_t offset = 0, 
-		uint32_t chunkLength = 0);
+		uint16_t chunkLength = 0);
 
 	void Write(OutputMemoryBitStream& outStream) const;
 

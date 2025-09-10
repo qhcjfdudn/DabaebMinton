@@ -5,13 +5,19 @@
 #include "Constant.h"
 #include "GetRequiredBits.h"
 
-RUDPHeader::RUDPHeader(uint8_t channelId, uint8_t sequenceNumber, uint32_t totalBitLength, uint32_t offset, uint32_t chunkLength) :
+RUDPHeader::RUDPHeader(
+	uint8_t channelId,
+	uint8_t sequenceNumber,
+	uint32_t totalBitLength,
+	uint32_t offset, 
+	uint16_t chunkLength) :
 	_channelId(channelId),
 	_sequenceNumber(sequenceNumber),
 	_totalBitLength(totalBitLength),
 	_offset(offset),
 	_chunkLength(chunkLength)
-{}
+{
+}
 
 void RUDPHeader::Write(OutputMemoryBitStream& outStream) const
 {

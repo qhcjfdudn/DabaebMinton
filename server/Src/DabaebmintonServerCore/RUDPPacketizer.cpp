@@ -25,8 +25,8 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 	OutputMemoryBitStream dummyStream;
 	dummyHeader.Write(dummyStream);
 
-	const int BIT_HEADER_SIZE = dummyStream.GetBitLength();
-	const int MAX_BIT_PAYLOAD_SIZE = (Constant::MAX_PACKET_SIZE << 3) - BIT_HEADER_SIZE;
+	const uint16_t BIT_HEADER_SIZE = dummyStream.GetBitLength();
+	const uint16_t MAX_BIT_PAYLOAD_SIZE = (Constant::MAX_PACKET_SIZE << 3) - BIT_HEADER_SIZE;
 
 	OutputMemoryBitStream packetStream, bufferStream;
 	packetStream.Reserve(Constant::MAX_PACKET_SIZE);
@@ -34,12 +34,12 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 
 	int curIdx = 0;
 	int goIdx = 0;
-	int goSize = gameObjects.size();
+	int goSize = static_cast<int>(gameObjects.size());
 
 	while (goIdx < goSize)
 	{
 		bufferStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-		int curLength = bufferStream.GetBitLength();
+		uint16_t curLength = bufferStream.GetBitLength();
 
 		for (; goIdx < goSize; ++goIdx)
 		{
@@ -70,7 +70,7 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 }
 
 vector<shared_ptr<Packet>> RUDPPacketizer::PacketizeReliable(
-	const int channelId,
+	const uint8_t channelId,
 	uint8_t& outSeqNum, 
 	const PacketType packetType, 
 	OutputMemoryBitStream& inStream)

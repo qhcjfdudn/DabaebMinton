@@ -17,7 +17,7 @@ public:
 		vector<shared_ptr<GameObject>> gameObjects);
 
 	vector<shared_ptr<Packet>> PacketizeReliable(
-		const int channelId,
+		const uint8_t channelId,
 		uint8_t& outSeqNum,
 		const PacketType packetType,
 		OutputMemoryBitStream& inStream); // InputMemoryBitStream으로 변경 필요. 현재 미구현.
