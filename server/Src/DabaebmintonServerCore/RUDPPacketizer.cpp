@@ -29,8 +29,8 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 	const uint16_t MAX_BIT_PAYLOAD_SIZE = (Constant::MAX_PACKET_SIZE << 3) - BIT_HEADER_SIZE;
 
 	OutputMemoryBitStream packetStream, bufferStream;
-	packetStream.Reserve(Constant::MAX_PACKET_SIZE);
-	bufferStream.Reserve(Constant::MAX_PACKET_SIZE);
+	packetStream.Reserve(Constant::MAX_PACKET_SIZE << 3);
+	bufferStream.Reserve(Constant::MAX_PACKET_SIZE << 3);
 
 	int curIdx = 0;
 	int goIdx = 0;

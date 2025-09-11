@@ -6,12 +6,13 @@ void OutputMemoryBitStream::Clear()
 	_bitHead = 0;
 }
 
-void OutputMemoryBitStream::Reserve(uint32_t newCapacity)
+void OutputMemoryBitStream::Reserve(uint32_t newBitCapacity)
 {
-	if (_bitCapacity >= newCapacity)
+	if (_bitCapacity >= newBitCapacity)
 		return;
 
-	unsigned char* newBuffer = new unsigned char[newCapacity];
+	size_t newByteCapacity = (newBitCapacity + 7) >> 3;
+	unsigned char* newBuffer = new unsigned char[newByteCapacity];
 
 	if (_buffer != nullptr)
 	{

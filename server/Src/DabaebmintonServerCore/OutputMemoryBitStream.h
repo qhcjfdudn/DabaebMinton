@@ -8,7 +8,7 @@ public:
 	OutputMemoryBitStream() :
 		_buffer(nullptr), _bitHead(0), _bitCapacity(0)
 	{
-		Reserve(32);		// 32bytes
+		Reserve(32 << 3);		// 32bytes
 	}
 	~OutputMemoryBitStream()
 	{
@@ -18,7 +18,7 @@ public:
 		free(_buffer);
 	}
 
-	void Reserve(uint32_t newCapacity);
+	void Reserve(uint32_t newBitCapacity);
 	void Clear();
 
 	void WriteBits(uint8_t inData, size_t inBitCount);
