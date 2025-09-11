@@ -62,7 +62,9 @@ bool GameManager::RemoveGame(ClientInfo* clientInfo)
 	if (_clientInfoToGameIdxMap.find(clientInfo) == _clientInfoToGameIdxMap.end())
 	{
 		_gamesMutex.unlock();
-		cout << "[GameManager::RemoveGame] A game does not exist." << endl;
+
+		spdlog::info("[GameManager::RemoveGame] A game does not exist.");
+
 		return false;
 	}
 

@@ -608,7 +608,7 @@ bool NetworkManagerServer::RemoveClientInfo(ClientInfo* clientInfo)
 	if (_ipPortToClientInfoMap.find(key) == _ipPortToClientInfoMap.end())
 	{
 		_ipPortToClientInfoMapMutex.unlock();
-		cout << "[NetworkManagerServer::RemoveClientInfo] " << key << " client does not exist." << endl;
+		spdlog::info("[NetworkManagerServer::RemoveClientInfo] {} client does not exist.", key);
 
 		return false;
 	}
@@ -627,7 +627,7 @@ ClientInfo* NetworkManagerServer::GetClientInfo(const string& ip, const unsigned
 	if (_ipPortToClientInfoMap.find(key) == _ipPortToClientInfoMap.end())
 	{
 		_ipPortToClientInfoMapMutex.unlock();
-		cout << "[NetworkManagerServer::GetClientInfo] " << key << " client does not exist." << endl;
+		spdlog::info("[NetworkManagerServer::GetClientInfo] {} client does not exist.", key);
 
 		return nullptr;
 	}
