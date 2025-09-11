@@ -12,8 +12,7 @@ Game::Game(ClientInfo* player1, ClientInfo* player2) :
 	p_player1{ player1 }, p_player2{ player2 },
 	_gamePlayState{ GamePlayState::Initializing },
 	_level{},
-	gameController{},
-	_lastReplicationUpdatedTime{ system_clock::now() }
+	gameController{}
 {
 	_level.InitLevel();
 
@@ -27,19 +26,19 @@ Game::Game(ClientInfo* player1, ClientInfo* player2) :
 		ReplicationManager::GetInstance().ReplicateCreate(player1Stream, _linkingContext, gameObject.get());
 		ReplicationManager::GetInstance().ReplicateCreate(player2Stream, _linkingContext, gameObject.get());
 	}
+
+	SetNextReplicationTimeFromNow();
 }
 
 bool Game::HasElapsedReplicationInterval()
 {
-	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - _lastReplicationUpdatedTime;
-
-	return elapsedTime.count() >= Constant::PACKET_PERIOD;
+	return system_clock::now() >= _nextReplicationUpdatedTime;
 }
 
-void Game::SetLastReplicationTimeToNow()
+void Game::SetNextReplicationTimeFromNow()
 {
-	_lastReplicationUpdatedTime = system_clock::now();
+	std::chrono::duration<float> offset(Constant::REPLICATION_PERIOD);
+	_nextReplicationUpdatedTime = system_clock::now() + std::chrono::duration_cast<system_clock::duration>(offset);
 }
 
 void Game::SendPacket()

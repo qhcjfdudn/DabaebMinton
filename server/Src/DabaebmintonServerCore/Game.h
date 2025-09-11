@@ -24,7 +24,7 @@ public:
 	Game(ClientInfo* player1, ClientInfo* player2);
 
 	bool HasElapsedReplicationInterval();
-	void SetLastReplicationTimeToNow();
+	void SetNextReplicationTimeFromNow();
 
 	void SendPacket();
 	void SendPacket(ClientInfo* client);
@@ -39,7 +39,7 @@ public:
 	ClientInfo* p_player2;
 	LinkingContext _linkingContext;
 
-	system_clock::time_point _lastReplicationUpdatedTime;
+	system_clock::time_point _nextReplicationUpdatedTime;
 	atomic<GameReplicationState> _replicationState{ GameReplicationState::None };
 
 private:

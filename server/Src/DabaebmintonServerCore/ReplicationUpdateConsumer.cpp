@@ -13,28 +13,20 @@ void ReplicationUpdateConsumer::operator() ()
 
 	while (serverEngine.isRunning.load(std::memory_order_acquire))
 	{
-		Game* game = nullptr;
+		std::unique_lock lk(gameManager._pendingReplicationMutex, std::defer_lock);
+		lk.lock();
+		gameManager._replicationCv.wait(lk, [&] {
+			return serverEngine.isRunning.load(std::memory_order_acquire) == false
+				|| gameManager._pendingReplicationQueue.empty() == false; });
 
-		while (game == nullptr)
-		{
-			std::unique_lock lk(gameManager._pendingReplicationMutex);
-			if (gameManager._pendingReplicationQueue.empty())
-			{
-				gameManager._replicationCv.wait(lk);
-			}
+		if (serverEngine.isRunning.load(std::memory_order_acquire) == false)
+			break;
 
-			if (gameManager._pendingReplicationQueue.empty())
-				break;
+		Game* game = gameManager._pendingReplicationQueue.front();
+		gameManager._pendingReplicationQueue.pop();
+		lk.unlock();
 
-			game = gameManager._pendingReplicationQueue.front();
-			gameManager._pendingReplicationQueue.pop();
-		}
-
-		if (game != nullptr)
-		{
-			game->SendPacket();
-			game->SetLastReplicationTimeToNow();
-			game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
-		}
+		game->SendPacket();
+		game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
 	}
 }

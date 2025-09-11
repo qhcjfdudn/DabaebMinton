@@ -20,6 +20,7 @@ void ReplicationUpdateProducer::operator() ()
 				game->HasElapsedReplicationInterval())
 			{
 				game->_replicationState.store(GameReplicationState::Pending, std::memory_order_release);
+				game->SetNextReplicationTimeFromNow();
 				
 				gameManager._pendingReplicationMutex.lock();
 				gameManager._pendingReplicationQueue.push(game.get());
