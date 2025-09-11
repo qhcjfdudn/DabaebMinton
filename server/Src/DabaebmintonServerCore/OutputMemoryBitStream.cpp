@@ -17,10 +17,11 @@ void OutputMemoryBitStream::Reserve(uint32_t newBitCapacity)
 	if (_buffer != nullptr)
 	{
 		memcpy(newBuffer, _buffer, _bitHead);
-		free(_buffer);
+		delete[] _buffer;
 	}
 
 	_buffer = newBuffer;
+	_bitCapacity = newBitCapacity;
 }
 
 
