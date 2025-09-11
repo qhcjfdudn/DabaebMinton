@@ -16,14 +16,13 @@ void OutputMemoryBitStream::Reserve(uint32_t newBitCapacity)
 
 	if (_buffer != nullptr)
 	{
-		memcpy(newBuffer, _buffer, _bitHead);
+		memcpy(newBuffer, _buffer, (_bitHead + 7) >> 3);
 		delete[] _buffer;
 	}
 
 	_buffer = newBuffer;
 	_bitCapacity = newBitCapacity;
 }
-
 
 void OutputMemoryBitStream::WriteBits(uint8_t inData, size_t inBitCount)
 {

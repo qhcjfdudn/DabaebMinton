@@ -214,6 +214,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="HttpServer.cpp" />
+    <ClCompile Include="InputMemoryBitStream.cpp" />
     <ClCompile Include="IOCPEvent.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -295,6 +296,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GetRequiredBits.h" />
     <ClInclude Include="HttpServer.h" />
+    <ClInclude Include="InputMemoryBitStream.h" />
     <ClInclude Include="IOCPEvent.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LinkingContext.h" />
