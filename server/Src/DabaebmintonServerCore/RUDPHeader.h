@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Constant.h"
+#include "GetRequiredBits.h"
+
 class OutputMemoryBitStream;
 
 class RUDPHeader
@@ -9,10 +12,19 @@ public:
 		uint8_t channelId,
 		uint8_t sequenceNumber,
 		uint32_t totalBitLength = 0,
-		uint32_t offset = 0, 
+		uint32_t offset = 0,
 		uint16_t chunkLength = 0);
 
 	void Write(OutputMemoryBitStream& outStream) const;
+
+	static constexpr size_t CountsHeaderBits()
+	{
+		return GetRequiredBits(Constant::RUDP_MAX_CHANNEL_SIZE)
+			+ (sizeof(_sequenceNumber) << 3)
+			+ (sizeof(_totalBitLength) << 3)
+			+ (sizeof(_offset) << 3)
+			+ (sizeof(_chunkLength) << 3);
+	}
 
 private:
 	uint8_t _channelId;

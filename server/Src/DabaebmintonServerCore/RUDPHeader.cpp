@@ -2,8 +2,6 @@
 #include "RUDPHeader.h"
 
 #include "OutputMemoryBitStream.h"
-#include "Constant.h"
-#include "GetRequiredBits.h"
 
 RUDPHeader::RUDPHeader(
 	uint8_t channelId,
