@@ -1,7 +1,7 @@
 #pragma once
 
-constexpr int GetRequiredBits(int bits) {
-	int ret = 0;
+constexpr unsigned int GetRequiredBits(int bits) {
+	unsigned int ret = 0;
 
 	while (bits) {
 		++ret;
