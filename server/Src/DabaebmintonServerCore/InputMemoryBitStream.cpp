@@ -28,7 +28,9 @@ bool InputMemoryBitStream::isEndOfStream() const
     return _bitHead >= _bitCapacity;
 }
 
-size_t InputMemoryBitStream::BitsLeft() const
+size_t InputMemoryBitStream::GetBitLength() const { return _bitCapacity; }
+
+size_t InputMemoryBitStream::GetBitsLeft() const
 {
 	return _bitCapacity - _bitHead;
 }

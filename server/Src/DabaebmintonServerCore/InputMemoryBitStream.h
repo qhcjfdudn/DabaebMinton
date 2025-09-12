@@ -6,14 +6,22 @@ public:
 	~InputMemoryBitStream();
 
 	bool isEndOfStream() const;
-	size_t BitsLeft() const;
+	size_t GetBitLength() const;
+	size_t GetBitsLeft() const;
 
 	void ReadBits(uint8_t& outData, uint32_t inBitCount);
 	void ReadBits(void* outData, uint32_t inBitCount);
+
+	template<typename T>
+	T ReadBits(uint32_t inBitCount)
+	{
+		T data;
+		ReadBits(&data, inBitCount);
+		return data;
+	}
 
 private:
 	unsigned char* _buffer;
 	uint32_t _bitHead;
 	uint32_t _bitCapacity;
 };
-
