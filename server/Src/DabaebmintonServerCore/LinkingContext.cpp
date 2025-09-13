@@ -26,12 +26,18 @@ const GameObject* LinkingContext::GetGameObject(NetworkId_t networkId) const
 }
 void LinkingContext::AddGameObject(const GameObject* gameObject)
 {
+	if (_gameObjectToNetworkIdMap.find(gameObject) != _gameObjectToNetworkIdMap.end())
+		return;
+
 	_networkIdToGameObjectMap[_nextNetworkId] = gameObject;
 	_gameObjectToNetworkIdMap[gameObject] = _nextNetworkId;
 	++_nextNetworkId;
 }
 void LinkingContext::RemoveGameObject(NetworkId_t networkId)
 {
+	if (_networkIdToGameObjectMap.find(networkId) == _networkIdToGameObjectMap.end())
+		return;
+
 	auto gameObject = _networkIdToGameObjectMap[networkId];
 	_networkIdToGameObjectMap.erase(networkId);
 	_gameObjectToNetworkIdMap.erase(gameObject);
@@ -39,6 +45,9 @@ void LinkingContext::RemoveGameObject(NetworkId_t networkId)
 
 void LinkingContext::RemoveGameObject(const GameObject* gameObject)
 {
+	if (_gameObjectToNetworkIdMap.find(gameObject) == _gameObjectToNetworkIdMap.end())
+		return;
+
 	NetworkId_t networkId = _gameObjectToNetworkIdMap[gameObject];
 	_networkIdToGameObjectMap.erase(networkId);
 	_gameObjectToNetworkIdMap.erase(gameObject);
