@@ -17,7 +17,7 @@ public:
 
 	void Write(OutputMemoryBitStream& outStream) const;
 
-	static constexpr size_t CountsHeaderBits()
+	static consteval size_t CountsHeaderBits()
 	{
 		return GetRequiredBits(Constant::RUDP_MAX_CHANNEL_SIZE)
 			+ (sizeof(_sequenceNumber) << 3)
