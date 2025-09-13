@@ -95,7 +95,7 @@ TEST(MemoryBitStream, SerializeTest)
 	char cAfter;
 
 	InputMemoryBitStream inputStream{ outStream.GetBufferPtr(), outStream.GetBitLength() };
-	EXPECT_EQ(inputStream.BitsLeft(), outStream.GetBitLength());
+	EXPECT_EQ(inputStream.GetBitLength(), outStream.GetBitLength());
 
 	inputStream.ReadBits(&fAfter, sizeof(fAfter) << 3);
 	inputStream.ReadBits(&iAfter, sizeof(iAfter) << 3);

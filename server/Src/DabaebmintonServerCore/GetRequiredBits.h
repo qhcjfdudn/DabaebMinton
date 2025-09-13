@@ -1,6 +1,6 @@
 #pragma once
 
-constexpr unsigned int GetRequiredBits(int bits) {
+consteval unsigned int GetRequiredBits(int bits) {
 	unsigned int ret = 0;
 
 	while (bits) {

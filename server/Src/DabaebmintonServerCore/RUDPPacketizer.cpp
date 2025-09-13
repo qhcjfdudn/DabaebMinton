@@ -3,6 +3,7 @@
 
 #include "RUDPHeader.h"
 #include "OutputMemoryBitStream.h"
+#include "InputMemoryBitStream.h"
 #include "GameObject.h"
 #include "Constant.h"
 #include "GetRequiredBits.h"
@@ -21,12 +22,7 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 {
 	vector<shared_ptr<Packet>> ret;
 	
-	RUDPHeader dummyHeader{ 0, 0 };
-	OutputMemoryBitStream dummyStream;
-	dummyHeader.Write(dummyStream);
-
-	const uint16_t BIT_HEADER_SIZE = dummyStream.GetBitLength();
-	const uint16_t MAX_BIT_PAYLOAD_SIZE = (Constant::MAX_PACKET_SIZE << 3) - BIT_HEADER_SIZE;
+	constexpr size_t MAX_PAYLOAD_BIT_SIZE = (Constant::MAX_PACKET_SIZE << 3) - RUDPHeader::CountsHeaderBits();
 
 	OutputMemoryBitStream packetStream, bufferStream;
 	packetStream.Reserve(Constant::MAX_PACKET_SIZE << 3);
@@ -39,12 +35,12 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 	while (goIdx < goSize)
 	{
 		bufferStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-		uint16_t curLength = bufferStream.GetBitLength();
+		uint16_t curLength = GetRequiredBits(static_cast<int>(PacketType::PT_Max));
 
 		for (; goIdx < goSize; ++goIdx)
 		{
 			gameObjects[goIdx]->Write(bufferStream);
-			if (bufferStream.GetBitLength() > MAX_BIT_PAYLOAD_SIZE)
+			if (bufferStream.GetBitLength() > MAX_PAYLOAD_BIT_SIZE)
 			{
 				bufferStream.Clear();
 				break;
@@ -58,9 +54,7 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 		packetStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
 
 		for (; curIdx < goIdx; ++curIdx)
-		{
 			gameObjects[curIdx]->Write(packetStream);
-		}
 
 		ret.push_back(make_shared<Packet>(packetStream.GetBufferPtr(), packetStream.GetByteLength()));
 		packetStream.Clear();
@@ -71,9 +65,43 @@ vector<shared_ptr<Packet>> RUDPPacketizer::Packetize(
 
 vector<shared_ptr<Packet>> RUDPPacketizer::PacketizeReliable(
 	const uint8_t channelId,
-	uint8_t& outSeqNum, 
+	uint8_t& outSeqNum,
 	const PacketType packetType, 
-	OutputMemoryBitStream& inStream)
+	OutputMemoryBitStream& srcStream)
 {
-	return vector<shared_ptr<Packet>>();
+	// PacketType을 Payload에 포함
+	OutputMemoryBitStream packetStream;
+	packetStream.WriteBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
+	packetStream.WriteBits(srcStream.GetBufferPtr(), srcStream.GetBitLength());
+
+	InputMemoryBitStream payloadStream{ packetStream.GetBufferPtr(), packetStream.GetBitLength() };
+	packetStream.Clear();
+
+	// Packet을 MTU만큼 잘라 vector<Packet> 생성
+	vector<shared_ptr<Packet>> ret;
+	uint32_t offset = 0;
+	const uint32_t totalBitLength = static_cast<uint32_t>(payloadStream.GetBitLength());
+
+	constexpr size_t MAX_PAYLOAD_BIT_SIZE = (Constant::MAX_PACKET_SIZE << 3) - RUDPHeader::CountsHeaderBits();
+	constexpr size_t MAX_PAYLOAD_BYTE_SIZE = (MAX_PAYLOAD_BIT_SIZE + 7) >> 3;
+
+	unsigned char payloadChunk[MAX_PAYLOAD_BYTE_SIZE];
+	
+	while (offset < totalBitLength)
+	{
+		uint16_t dataBitLen = min(totalBitLength - offset, static_cast<uint32_t>(MAX_PAYLOAD_BIT_SIZE));
+		RUDPHeader header = { channelId, outSeqNum++, totalBitLength, offset, dataBitLen };
+
+		header.Write(packetStream);
+
+		payloadStream.ReadBits(payloadChunk, dataBitLen);
+		packetStream.WriteBits(payloadChunk, dataBitLen);
+
+		ret.push_back(make_shared<Packet>(packetStream.GetBufferPtr(), packetStream.GetByteLength()));
+		packetStream.Clear();
+
+		offset += dataBitLen;
+	}
+
+	return ret;
 }

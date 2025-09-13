@@ -20,7 +20,7 @@ public:
 		const uint8_t channelId,
 		uint8_t& outSeqNum,
 		const PacketType packetType,
-		OutputMemoryBitStream& inStream); // InputMemoryBitStream으로 변경 필요. 현재 미구현.
+		OutputMemoryBitStream& srcStream);
 
 private:
 	RUDPPacketizer() = default;

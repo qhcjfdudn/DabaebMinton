@@ -2,6 +2,8 @@
 #include "Game.h"
 
 #include "NetworkManagerServer.h"
+#include "OutputMemoryBitStream.h"
+#include "InputMemoryBitStream.h"
 #include "Constant.h"
 #include "ClientInfo.h"
 #include "RUDPPacketizer.h"
@@ -66,10 +68,14 @@ void Game::SendPacket(ClientInfo* client)
 	// channel [1, MAX_CHANNEL_COUNT)
 	for (channelId = 1; channelId < Constant::RUDP_MAX_CHANNEL_SIZE; ++channelId)
 	{
+		OutputMemoryBitStream& outStream = client->m_pendingStreamToSendingInChannels[channelId];
+
+		if (outStream.GetBitLength() == 0)
+			continue;
+		
 		uint8_t& seqNum = client->m_sequenceNoInChannels[channelId];
-		OutputMemoryBitStream& inStream = client->m_pendingStreamToSendingInChannels[channelId];
-		auto packets = rudpPacketizer.PacketizeReliable(channelId, seqNum, packetTypes[channelId], inStream);
-		inStream.Clear();
+		packets = rudpPacketizer.PacketizeReliable(channelId, seqNum, packetTypes[channelId], outStream);
+		outStream.Clear();
 
 		networkManagerServer.SendTo(client, packets);
 	}
