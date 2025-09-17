@@ -9,6 +9,7 @@
 
 PacketGenerator::PacketGenerator(DeliveryNotificationManager* deliveryNotificationManager, ReplicationManager* replicationManager, const PacketType packetType) :
 	_deliveryNotificationManager{ deliveryNotificationManager },
+	_replicationManager{ replicationManager },
 	_packetType{ packetType }
 {
 	GetNextPacket();
