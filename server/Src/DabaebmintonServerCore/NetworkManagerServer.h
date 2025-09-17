@@ -3,6 +3,7 @@
 #include "IOCPEvent.h"
 #include "Socket.h"
 #include "ReplicationManager.h"
+#include "LinkingContext.h"
 
 class GameObject;
 class ClientInfo;
@@ -80,6 +81,5 @@ private:
 	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
 	std::mutex _ipPortToClientInfoMapMutex;
 
-	unordered_map<NetworkId_t, shared_ptr<GameObject>> _networkIdToGameObjectMap;
-	NetworkId_t _nextNetworkId{ 1 };
+	LinkingContext _linkingContext{};
 };

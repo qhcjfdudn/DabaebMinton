@@ -1,54 +1,34 @@
 #include "ServerPCH.h"
 #include "LinkingContext.h"
 
+#include "GameObject.h"
+
 void LinkingContext::Clear()
 {
 	_networkIdToGameObjectMap.clear();
-	_gameObjectToNetworkIdMap.clear();
 	_nextNetworkId = 1;
 }
 
-NetworkId_t LinkingContext::GetNetworkId(const GameObject* gameObject) const
-{
-	if (_gameObjectToNetworkIdMap.find(gameObject) == _gameObjectToNetworkIdMap.end())
-	{
-		return 0;
-	}
-
-	return _gameObjectToNetworkIdMap.at(gameObject);
-}
-const GameObject* LinkingContext::GetGameObject(NetworkId_t networkId) const
+GameObject* LinkingContext::GetGameObject(NetworkId_t networkId) const
 {
 	if (_networkIdToGameObjectMap.find(networkId) == _networkIdToGameObjectMap.end())
 		return nullptr;
 
-	return _networkIdToGameObjectMap.at(networkId);
+	return _networkIdToGameObjectMap.at(networkId).get();
 }
-void LinkingContext::AddGameObject(const GameObject* gameObject)
+NetworkId_t LinkingContext::RegisterGameObject(shared_ptr<GameObject> gameObject)
 {
-	if (_gameObjectToNetworkIdMap.find(gameObject) != _gameObjectToNetworkIdMap.end())
-		return;
+	NetworkId_t networkId = _nextNetworkId++;
 
-	_networkIdToGameObjectMap[_nextNetworkId] = gameObject;
-	_gameObjectToNetworkIdMap[gameObject] = _nextNetworkId;
-	++_nextNetworkId;
+	gameObject->SetNetworkId(networkId);
+	_networkIdToGameObjectMap.emplace(networkId, gameObject);
+
+	return networkId;
 }
-void LinkingContext::RemoveGameObject(NetworkId_t networkId)
+void LinkingContext::UnregisterGameObject(NetworkId_t networkId)
 {
 	if (_networkIdToGameObjectMap.find(networkId) == _networkIdToGameObjectMap.end())
 		return;
 
-	auto gameObject = _networkIdToGameObjectMap[networkId];
 	_networkIdToGameObjectMap.erase(networkId);
-	_gameObjectToNetworkIdMap.erase(gameObject);
-}
-
-void LinkingContext::RemoveGameObject(const GameObject* gameObject)
-{
-	if (_gameObjectToNetworkIdMap.find(gameObject) == _gameObjectToNetworkIdMap.end())
-		return;
-
-	NetworkId_t networkId = _gameObjectToNetworkIdMap[gameObject];
-	_networkIdToGameObjectMap.erase(networkId);
-	_gameObjectToNetworkIdMap.erase(gameObject);
 }

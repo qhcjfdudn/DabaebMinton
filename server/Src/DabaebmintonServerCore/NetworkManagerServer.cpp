@@ -570,37 +570,22 @@ void NetworkManagerServer::SetLastPacketSendTimeToNow()
 
 GameObject* NetworkManagerServer::GetGameObject(const NetworkId_t networkId) const
 {
-	if (_networkIdToGameObjectMap.find(networkId) == _networkIdToGameObjectMap.end())
-	{
-		return nullptr;
-	}
-
-	return _networkIdToGameObjectMap.at(networkId).get();
+	return _linkingContext.GetGameObject(networkId);
 }
 
 NetworkId_t NetworkManagerServer::RegisterGameObject(shared_ptr<GameObject> gameObject)
 {
-	NetworkId_t networkId = _nextNetworkId++;
-	
-	gameObject->SetNetworkId(networkId);
-	_networkIdToGameObjectMap.emplace(networkId, gameObject);
-
-	return networkId;
+	return _linkingContext.RegisterGameObject(gameObject);
 }
 
 void NetworkManagerServer::UnregisterGameObject(const NetworkId_t networkId)
 {
-	if (_networkIdToGameObjectMap.find(networkId) == _networkIdToGameObjectMap.end())
-	{
-		return;
-	}
-
-	_networkIdToGameObjectMap.erase(networkId);
+	_linkingContext.UnregisterGameObject(networkId);
 }
 
 void NetworkManagerServer::ClearAllGameObjects()
 {
-	_networkIdToGameObjectMap.clear();
+	_linkingContext.Clear();
 }
 
 ClientInfo* NetworkManagerServer::CreateClientInfo(const string& ip, const unsigned int port)
