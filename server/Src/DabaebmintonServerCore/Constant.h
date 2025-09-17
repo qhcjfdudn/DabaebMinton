@@ -14,5 +14,6 @@ namespace Constant
 	constexpr float REPLICATION_PERIOD			= 1 / 20.f; // 20Hz
 #endif
 	constexpr uint16_t MAX_PACKET_SIZE		= 1'500 /* MTU */ - 8 /* UDP Header */ - 20 /* IP Header */;
-	constexpr uint8_t RUDP_MAX_CHANNEL_SIZE	= 3;
+	constexpr float PACKET_TIME_OUT			= 0.5f;
+	constexpr size_t RUDP_MAX_CHANNEL_SIZE = 3;
 }
