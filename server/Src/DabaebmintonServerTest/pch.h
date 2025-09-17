@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include <queue>
+#include <deque>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -41,6 +42,7 @@ using std::vector;
 using std::unordered_map;
 using std::unordered_set;
 using std::queue;
+using std::deque;
 
 using std::thread;
 using std::mutex;

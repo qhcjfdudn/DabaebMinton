@@ -9,8 +9,8 @@
 #include "ClientInfo.h"
 #include "InputMemoryBitStream.h"
 #include "OutputMemoryBitStream.h"
-#include "Packet.h"
-
+#include "GameObject.h"
+#include "PacketType.h"
 #include "GetRequiredBits.h"
 
 class PhysicsEngineFixture : public ::testing::Test {
@@ -75,7 +75,7 @@ TEST(MemoryBitStream, SerializeTest)
 {
 	float fBefore = 3.5f;
 	int iBefore = 17;
-	PacketType beforePacketType = PacketType::PT_RPC;
+	PacketType beforePacketType = PacketType::PT_Max;
 	char cBefore = 'A';
 
 	OutputMemoryBitStream outStream;
