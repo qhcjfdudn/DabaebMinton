@@ -83,6 +83,11 @@ void OutputMemoryBitStream::Write(float inData)
 	WriteBits(&inData, sizeof(float) << 3);
 }
 
+void OutputMemoryBitStream::Write(bool inData)
+{
+	WriteBits(&inData, 1);
+}
+
 void OutputMemoryBitStream::Write(std::string inData)
 {
 

@@ -36,6 +36,7 @@ public:
 	void Write(uint16_t inData);
 	void Write(uint8_t inData);
 	void Write(float inData);
+	void Write(bool inData);
 	void Write(std::string inData);
 	void Write(PxVec2 inData);
 

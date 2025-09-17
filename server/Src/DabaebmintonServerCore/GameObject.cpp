@@ -43,30 +43,59 @@ void GameObject::SetCurrentTransform()
 	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
 }
 
-uint32_t GameObject::GetClassId() const
+void GameObject::Write(OutputMemoryBitStream& inStream) const
 {
-	return 'GMOJ';
-}
-
-size_t GameObject::CountWriteBitSize(const uint8_t inDirtyState) const
-{
-	size_t totalBits = 0;
-
-	totalBits += BitSizeCounter::Count(_location);
-	totalBits += BitSizeCounter::Count(_velocity);
-
-	return totalBits;
+	inStream.Write(_location);
+	inStream.Write(_velocity);
 }
 
 uint8_t GameObject::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) const
 {
 	uint8_t writtenState = 0;
+
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Location))
+	{
+		inStream.Write(true);
+		inStream.Write(_location);
+		
+		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Location);
+	}
+	else
+	{
+		inStream.Write(false);
+	}
+
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Velocity))
+	{
+		inStream.Write(true);
+		inStream.Write(_velocity);
+		
+		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Velocity);
+	}
+	else
+	{
+		inStream.Write(false);
+	}
+
 	return writtenState;
 }
-void GameObject::Write(OutputMemoryBitStream& inStream) const
+size_t GameObject::CountWriteBitSize(const uint8_t inDirtyState) const
 {
-	inStream.Write(_location);
-	inStream.Write(_velocity);
+	size_t totalBits = 0;
+
+	totalBits += 1;
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Location))
+	{
+		totalBits += BitSizeCounter::Count(_location);
+	}
+
+	totalBits += 1;
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Velocity))
+	{
+		totalBits += BitSizeCounter::Count(_velocity);
+	}
+
+	return totalBits;
 }
 
 PxActor* GameObject::GetRigidbody() const
