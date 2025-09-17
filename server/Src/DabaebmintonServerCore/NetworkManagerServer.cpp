@@ -368,19 +368,22 @@ int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
 	return retCode;
 }
 
-int NetworkManagerServer::SendTo(ClientInfo* client, vector<shared_ptr<Packet>>& packets)
+int NetworkManagerServer::SendTo(ClientInfo* client, Packet packets)
 {
-	spdlog::debug("[NetworkManagerServer::SendTo] Client ({})", client->_ipPort);
-	for (auto& packet : packets)
-	{
-		spdlog::debug("[NetworkManagerServer::SendTo] data: {}", packet->GetInHex());
-	}
-
 	return 0;
 }
 
-int NetworkManagerServer::SendTo(ClientInfo* client, Packet packets)
+int NetworkManagerServer::SendTo(ClientInfo* client)
 {
+	// Check TimedOut Packets
+	client->GetDeliveryNotificationManager().ProcessTimedOutPackets();
+
+	// Replication State
+	SendReplicationStatePacketToClient(client);
+
+	// RPCs
+	SendRpcPacketToClient(client);
+
 	return 0;
 }
 
@@ -422,6 +425,12 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 
 void NetworkManagerServer::SendOutgoingPackets()
 {
+	// Check TimedOut Packets
+	for (auto [ipPort, clientInfo] : _ipPortToClientInfoMap)
+	{
+		clientInfo->GetDeliveryNotificationManager().ProcessTimedOutPackets();
+	}
+
 	// Replication State
 	for (auto [ipPort, clientInfo] : _ipPortToClientInfoMap)
 	{

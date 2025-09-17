@@ -2,6 +2,7 @@
 #include "ReplicationUpdateConsumer.h"
 
 #include "ServerEngine.h"
+#include "NetworkManagerServer.h"
 #include "GameManager.h"
 
 #include "Game.h"
@@ -25,6 +26,10 @@ void ReplicationUpdateConsumer::operator() ()
 		Game* game = gameManager._pendingReplicationQueue.front();
 		gameManager._pendingReplicationQueue.pop();
 		lk.unlock();
+
+		auto& networkManager = NetworkManagerServer::GetInstance();
+		networkManager.SendTo(game->p_player1);
+		networkManager.SendTo(game->p_player2);
 
 		game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
 	}

@@ -26,8 +26,9 @@ public:
 	int Send(shared_ptr<Socket> clientSocket, size_t len);
 	int Recv(shared_ptr<Socket> clientSocket);
 	int SendTo(shared_ptr<Socket> clientSocket, size_t len);
-	int SendTo(ClientInfo* client, vector<shared_ptr<Packet>>& packets);
 	int SendTo(ClientInfo* client, Packet packets);
+	int SendTo(ClientInfo* client);
+
 	int RecvFrom(shared_ptr<Socket> clientSocket);
 	void SendOutgoingPackets();
 	void SendReplicationStatePacketToClient(ClientInfo* client);
