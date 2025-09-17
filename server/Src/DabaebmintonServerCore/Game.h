@@ -27,9 +27,6 @@ public:
 	bool HasElapsedReplicationInterval();
 	void SetNextReplicationTimeFromNow();
 
-	void SendPacket();
-	void SendPacket(ClientInfo* client);
-
 	Level _level;
 	
 	GameController gameController;

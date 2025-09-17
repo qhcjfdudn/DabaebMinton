@@ -26,7 +26,6 @@ void ReplicationUpdateConsumer::operator() ()
 		gameManager._pendingReplicationQueue.pop();
 		lk.unlock();
 
-		game->SendPacket();
 		game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
 	}
 }

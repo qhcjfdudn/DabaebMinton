@@ -52,13 +52,3 @@ void Game::SetNextReplicationTimeFromNow()
 	std::chrono::duration<float> offset(Constant::REPLICATION_PERIOD);
 	_nextReplicationUpdatedTime = system_clock::now() + std::chrono::duration_cast<system_clock::duration>(offset);
 }
-
-void Game::SendPacket()
-{
-	SendPacket(p_player1);
-	SendPacket(p_player2);
-}
-
-void Game::SendPacket(ClientInfo* client)
-{
-}
