@@ -1,17 +1,12 @@
 #pragma once
 
-#include "OutputMemoryBitStream.h"
+#include "ReplicationAction.h"
+
+class OutputMemoryBitStream;
 
 class ReplicationHeader
 {
 public:
-	enum class ReplicationAction
-	{
-		RA_Create, 
-		RA_Update, 
-		RA_Delete, 
-		RA_Max
-	};
 
 	ReplicationHeader(ReplicationAction ra, NetworkId_t nid = 0, unsigned int cid = 0) :
 		_ra(ra), _nid(nid), _cid(cid) {}

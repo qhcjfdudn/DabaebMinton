@@ -1,6 +1,7 @@
 #include "ServerPCH.h"
 #include "ReplicationHeader.h"
 
+#include "OutputMemoryBitStream.h"
 #include "GetRequiredBits.h"
 
 void ReplicationHeader::Write(OutputMemoryBitStream& inStream)

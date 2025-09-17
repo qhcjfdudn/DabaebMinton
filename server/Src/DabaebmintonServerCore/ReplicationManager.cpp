@@ -17,7 +17,7 @@ void ReplicationManager::ReplicateCreate(OutputMemoryBitStream & outStream, Link
 {
 	linkingContext.AddGameObject(gameObject);
 
-	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Create,
+	ReplicationHeader rh(ReplicationAction::RA_Create,
 		linkingContext.GetNetworkId(gameObject),
 		gameObject->GetClassId());
 
@@ -27,7 +27,7 @@ void ReplicationManager::ReplicateCreate(OutputMemoryBitStream & outStream, Link
 
 void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& outStream, const LinkingContext& linkingContext, const GameObject* gameObject)
 {
-	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Update,
+	ReplicationHeader rh(ReplicationAction::RA_Update,
 		linkingContext.GetNetworkId(gameObject),
 		gameObject->GetClassId());
 
@@ -43,7 +43,7 @@ void ReplicationManager::ReplicateUpdate(OutputMemoryBitStream& outStream, const
 
 void ReplicationManager::ReplicateDelete(OutputMemoryBitStream& outStream, LinkingContext& linkingContext, const GameObject* gameObject)
 {
-	ReplicationHeader rh(ReplicationHeader::ReplicationAction::RA_Delete,
+	ReplicationHeader rh(ReplicationAction::RA_Destroy,
 		linkingContext.GetNetworkId(gameObject),
 		gameObject->GetClassId());
 	rh.Write(outStream);
