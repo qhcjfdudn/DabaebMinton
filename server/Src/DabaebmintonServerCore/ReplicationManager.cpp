@@ -11,7 +11,7 @@
 
 void ReplicationManager::ReplicateCreate(int inNetworkId, uint8_t inInitialDirtyState)
 {
-	mNetworkIdToReplicationCommand[inNetworkId] = ReplicationCommand(inInitialDirtyState);
+	mNetworkIdToReplicationCommand[inNetworkId] = ReplicationCommand{ inInitialDirtyState };
 }
 
 void ReplicationManager::ReplicateDestroy(int inNetworkId)
