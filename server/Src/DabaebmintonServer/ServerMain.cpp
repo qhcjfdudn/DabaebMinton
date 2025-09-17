@@ -108,27 +108,6 @@ int main()
 	for (int i = 0; i < 4; ++i)
 		gameReplicationUpdateConsumers.emplace_back(replicationUpdateConsumer);
 
-	// Level running - 이 thread가 없어도 되는 것 같다. 왜냐하면? level을 유지하지 않기 때문.
-	// 당장은 Worker를 만들어 Worker에서 별도로 동작하도록 구현 조치 필요.
-	//thread levelPlayThread([] {
-	//	auto& gameEngine = ServerEngine::GetInstance();
-
-	//	while (gameEngine.isRunning.load(std::memory_order_acquire))
-	//	{
-	//		for (auto& level : levels)
-	//		{
-	//			if (level.HasElapsedFixedUpdateInterval())
-	//			{
-	//				level.FixedUpdate();
-	//				level.SetLastFixedUpdateTimeToNow();
-	//			}
-	//		}
-	//	}
-
-	//	for (auto& level : levels)
-	//		level.Release();
-	//	});
-
 	// 서버 검증을 위한 커맨드 처리용 Thread
 	DeveloperCommandFunctor developerCommandFunctor;
 	thread developerInputThread(developerCommandFunctor);
