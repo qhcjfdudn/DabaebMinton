@@ -306,6 +306,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="OverlappedDto.h" />
     <ClInclude Include="Packet.h" />
     <ClInclude Include="PacketQueue.h" />
+    <ClInclude Include="PacketType.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="ReplicationAction.h" />
     <ClInclude Include="ReplicationFlag.h" />

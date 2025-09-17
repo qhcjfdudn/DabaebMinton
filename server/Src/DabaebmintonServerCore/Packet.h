@@ -17,12 +17,3 @@ private:
 	unsigned char* _buffer;
 	size_t _len;
 };
-
-enum class PacketType
-{
-	PT_Hello,
-	PT_ReplicationData,
-	PT_RPC,
-	PT_Disconnect,
-	PT_Max
-};
