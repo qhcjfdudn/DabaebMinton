@@ -26,14 +26,19 @@ public:
 	int Recv(shared_ptr<Socket> clientSocket);
 	int SendTo(shared_ptr<Socket> clientSocket, size_t len);
 	int SendTo(ClientInfo* client, vector<shared_ptr<Packet>>& packets);
+	int SendTo(ClientInfo* client, Packet packets);
 	int RecvFrom(shared_ptr<Socket> clientSocket);
+	void SendOutgoingPackets();
+	void SendReplicationStatePacketToClient(ClientInfo* client);
+	void SendRpcPacketToClient(ClientInfo* client);
 
 	bool HasElapsedPacketInterval();
 	void SetLastPacketSendTimeToNow();
 
-	//void AddGameObjectForReplication(GameObject* gameObject);
-	//void RemoveGameObjectForReplication(GameObject* gameObject);
-	//void RemoveAllGameObjectsForReplication();
+	GameObject* GetGameObject(const NetworkId_t networkId) const;
+	NetworkId_t RegisterGameObject(shared_ptr<GameObject> gameObject);
+	void UnregisterGameObject(const NetworkId_t networkId);
+	void ClearAllGameObjects();
 
 	ClientInfo* CreateClientInfo(const string& ip, const unsigned int port);
 	bool RemoveClientInfo(ClientInfo* clientInfo);
@@ -74,4 +79,7 @@ private:
 
 	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
 	std::mutex _ipPortToClientInfoMapMutex;
+
+	unordered_map<NetworkId_t, shared_ptr<GameObject>> _networkIdToGameObjectMap;
+	NetworkId_t _nextNetworkId{ 1 };
 };

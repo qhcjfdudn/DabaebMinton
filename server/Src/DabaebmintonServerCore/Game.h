@@ -22,6 +22,7 @@ class Game
 {
 public:
 	Game(ClientInfo* player1, ClientInfo* player2);
+	~Game();
 
 	bool HasElapsedReplicationInterval();
 	void SetNextReplicationTimeFromNow();
@@ -37,7 +38,6 @@ public:
 	unsigned long long _gameKey{ 0 };
 	ClientInfo* p_player1;
 	ClientInfo* p_player2;
-	LinkingContext _linkingContext;
 
 	system_clock::time_point _nextReplicationUpdatedTime;
 	atomic<GameReplicationState> _replicationState{ GameReplicationState::None };

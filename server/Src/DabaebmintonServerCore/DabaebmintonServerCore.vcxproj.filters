@@ -39,9 +39,6 @@
     <ClCompile Include="Shuttlecock.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicationManager.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="ServerEngine.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -106,6 +103,24 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="InputMemoryBitStream.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DeliveryNotificationManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="InFlightPacket.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketGenerator.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationCommand.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManager.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManagerTransmissionData.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="BitSizeCounter.cpp">
@@ -188,9 +203,6 @@
     <ClInclude Include="PhysicsEngine.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicationManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="LinkingContext.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -210,6 +222,27 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="InputMemoryBitStream.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DeliveryNotificationManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="InFlightPacket.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketGenerator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationCommand.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManager.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="TransmissionData.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManagerTransmissionData.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ReplicationAction.h">

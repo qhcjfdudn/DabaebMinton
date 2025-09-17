@@ -13,6 +13,9 @@ public:
 	void SetVelocity(PxVec2 velocity);
 	void SetRigidbody(PxRigidDynamic& rigidbody);
 
+	NetworkId_t GetNetworkId() const { return _networkId; }
+	void SetNetworkId(NetworkId_t networkId) { _networkId = networkId; }
+
 	virtual bool FixedUpdate();
 	void SetCurrentTransform();
 
@@ -38,4 +41,6 @@ protected:
 	PxVec2 _velocity;
 
 	PxRigidDynamic* _rigidbody = nullptr;
+	
+	NetworkId_t _networkId;
 };

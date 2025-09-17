@@ -200,9 +200,11 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClCompile Include="BadmintonNet.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="BitSizeCounter.cpp" />
     <ClCompile Include="ClientInfo.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="DeliveryNotificationManager.cpp" />
     <ClCompile Include="Game.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -214,6 +216,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="HttpServer.cpp" />
+    <ClCompile Include="InFlightPacket.cpp" />
     <ClCompile Include="InputMemoryBitStream.cpp" />
     <ClCompile Include="IOCPEvent.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
@@ -227,6 +230,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClCompile Include="NetworkManagerServer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="ReplicationManager.cpp" />
     <ClCompile Include="Observer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -239,21 +243,21 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClCompile Include="Packet.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="PacketGenerator.cpp" />
     <ClCompile Include="PacketQueue.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="PhysicsEngine.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="ReplicationCommand.cpp" />
     <ClCompile Include="ReplicationFlag.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="ReplicationHeader.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="ReplicationManager.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
-    </ClCompile>
+    <ClCompile Include="ReplicationManagerTransmissionData.cpp" />
     <ClCompile Include="ReplicationUpdateConsumer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -288,30 +292,36 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
   <ItemGroup>
     <ClInclude Include="BadmintonBottom.h" />
     <ClInclude Include="BadmintonNet.h" />
+    <ClInclude Include="BitSizeCounter.h" />
     <ClInclude Include="ClientInfo.h" />
     <ClInclude Include="Constant.h" />
+    <ClInclude Include="DeliveryNotificationManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameController.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GetRequiredBits.h" />
     <ClInclude Include="HttpServer.h" />
+    <ClInclude Include="InFlightPacket.h" />
     <ClInclude Include="InputMemoryBitStream.h" />
     <ClInclude Include="IOCPEvent.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="LinkingContext.h" />
     <ClInclude Include="NetworkManagerServer.h" />
+    <ClInclude Include="ReplicationManager.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OutputMemoryBitStream.h" />
     <ClInclude Include="OverlappedDto.h" />
     <ClInclude Include="Packet.h" />
+    <ClInclude Include="PacketGenerator.h" />
     <ClInclude Include="PacketQueue.h" />
     <ClInclude Include="PacketType.h" />
     <ClInclude Include="PhysicsEngine.h" />
     <ClInclude Include="ReplicationAction.h" />
+    <ClInclude Include="ReplicationCommand.h" />
     <ClInclude Include="ReplicationFlag.h" />
     <ClInclude Include="ReplicationHeader.h" />
-    <ClInclude Include="ReplicationManager.h" />
+    <ClInclude Include="ReplicationManagerTransmissionData.h" />
     <ClInclude Include="ReplicationUpdateConsumer.h" />
     <ClInclude Include="ReplicationUpdateProducer.h" />
     <ClInclude Include="RUDPHeader.h" />
@@ -321,6 +331,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="Shuttlecock.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="StaticGameObject.h" />
+    <ClInclude Include="TransmissionData.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

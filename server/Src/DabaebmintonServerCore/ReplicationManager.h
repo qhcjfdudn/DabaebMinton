@@ -1,19 +1,27 @@
 #pragma once
 
-class LinkingContext;
+#include "ReplicationCommand.h"
+
 class OutputMemoryBitStream;
-class GameObject;
+class PacketGenerator;
 
 class ReplicationManager
 {
 public:
-	static ReplicationManager GetInstance();
+	void ReplicateCreate(int inNetworkId, uint8_t inInitialDirtyState);
+	void ReplicateDestroy(int inNetworkId);
+	void SetStateDirty(int inNetworkId, uint8_t inDirtyState);
+	void HandleCreateAckd(int inNetworkId);
+	void RemoveFromReplication(int inNetworkId);
 
-	void ReplicateCreate(OutputMemoryBitStream & outStream, LinkingContext& linkingContext, const GameObject * gameObject);
-	void ReplicateUpdate(OutputMemoryBitStream & outStream, const LinkingContext& linkingContext, const GameObject * gameObject);
-	void ReplicateUpdate(OutputMemoryBitStream & outStream, const LinkingContext& linkingContext, const vector<shared_ptr<GameObject>>& gameObjects);
-	void ReplicateDelete(OutputMemoryBitStream & outStream, LinkingContext& linkingContext, const GameObject * gameObject);
+	void Write(PacketGenerator& packetGenerator);
 
 private:
-	ReplicationManager() = default;
+	size_t CountWriteBitSize(NetworkId_t networkId) const;
+
+	uint8_t WriteCreateAction(OutputMemoryBitStream& inOutputStream, int inNetworkId, uint8_t inDirtyState);
+	uint8_t WriteUpdateAction(OutputMemoryBitStream& inOutputStream, int inNetworkId, uint8_t inDirtyState);
+	uint8_t WriteDestroyAction(OutputMemoryBitStream& inOutputStream, int inNetworkId, uint8_t inDirtyState);
+
+	unordered_map<NetworkId_t, ReplicationCommand>	mNetworkIdToReplicationCommand;
 };

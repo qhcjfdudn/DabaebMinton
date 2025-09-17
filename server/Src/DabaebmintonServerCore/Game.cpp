@@ -18,18 +18,29 @@ Game::Game(ClientInfo* player1, ClientInfo* player2) :
 {
 	_level.InitLevel();
 
-	auto& player1Stream = p_player1->m_pendingStreamToSendingInChannels[1];
-	auto& player2Stream = p_player2->m_pendingStreamToSendingInChannels[1];
-
+	auto& networkManager = NetworkManagerServer::GetInstance();
 	for (auto gameObject : _level.gameObjects)
 	{
 		spdlog::debug("[Game::Game] object: {}", gameObject->GetClassId());
 
-		ReplicationManager::GetInstance().ReplicateCreate(player1Stream, _linkingContext, gameObject.get());
-		ReplicationManager::GetInstance().ReplicateCreate(player2Stream, _linkingContext, gameObject.get());
+		auto networkId = networkManager.RegisterGameObject(gameObject);		
+		player1->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
+		player2->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
 	}
 
 	SetNextReplicationTimeFromNow();
+}
+
+Game::~Game()
+{
+	auto& networkManager = NetworkManagerServer::GetInstance();
+	for (auto gameObject : _level.gameObjects)
+	{
+		auto networkId = gameObject->GetNetworkId();
+		networkManager.UnregisterGameObject(networkId);
+		p_player1->GetReplicationManager().ReplicateDestroy(networkId);
+		p_player2->GetReplicationManager().ReplicateDestroy(networkId);
+	}
 }
 
 bool Game::HasElapsedReplicationInterval()

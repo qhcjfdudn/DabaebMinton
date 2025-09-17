@@ -8,6 +8,8 @@
 #include "GetRequiredBits.h"
 #include "ClientInfo.h"
 
+#include "PacketGenerator.h"
+
 NetworkManagerServer& NetworkManagerServer::GetInstance() {
 	static NetworkManagerServer sInstance;
 	return sInstance;
@@ -377,6 +379,11 @@ int NetworkManagerServer::SendTo(ClientInfo* client, vector<shared_ptr<Packet>>&
 	return 0;
 }
 
+int NetworkManagerServer::SendTo(ClientInfo* client, Packet packets)
+{
+	return 0;
+}
+
 int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 {
 	clientSocket->lpFromLen = sizeof(clientSocket->m_remoteAddr);
@@ -411,6 +418,44 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 	}
 
 	return retCode;
+}
+
+void NetworkManagerServer::SendOutgoingPackets()
+{
+	// Replication State
+	for (auto [ipPort, clientInfo] : _ipPortToClientInfoMap)
+	{
+		SendReplicationStatePacketToClient(clientInfo.get());
+	}
+
+	// RPCs
+	for (auto [ipPort, clientInfo] : _ipPortToClientInfoMap)
+	{
+		SendRpcPacketToClient(clientInfo.get());
+	}
+}
+
+void NetworkManagerServer::SendReplicationStatePacketToClient(ClientInfo* client)
+{
+	DeliveryNotificationManager& dnm = client->GetDeliveryNotificationManager();
+	ReplicationManager& nrm = client->GetReplicationManager();
+
+	PacketGenerator packetGenerator{ &dnm, &nrm, PacketType::PT_ReplicationData };
+
+	client->GetReplicationManager().Write(packetGenerator);
+
+	for (auto& stream : packetGenerator.GetAllStreams())
+	{
+		SendTo(client, Packet{ stream.GetBufferPtr(), stream.GetByteLength() });
+	}
+}
+
+void NetworkManagerServer::SendRpcPacketToClient(ClientInfo* client)
+{
+	PacketGenerator packetGenerator{
+		&client->GetDeliveryNotificationManager(),
+		& client->GetReplicationManager(),
+		PacketType::PT_RPC };
 }
 
 NetworkManagerServer::NetworkManagerServer() :
@@ -523,54 +568,40 @@ void NetworkManagerServer::SetLastPacketSendTimeToNow()
 	lastPacketSendTime = system_clock::now();
 }
 
-//int NetworkManagerServer::ReplicateAllGameObjects()
-//{
-//	if (_gameObjectsForReplication.size() == 0)
-//		return 0;
-//
-//	OutputMemoryBitStream stream;
-//	// 0채널로 broadcast 예정
-//
-//	stream.WriteBits(static_cast<int>(PacketType::PT_ReplicationData),
-//		GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-//
-//	_replicationManager.ReplicateUpdate(stream, _gameObjectsForReplication);
-//	int cnt = static_cast<int>(_gameObjectsForReplication.size());
-//
-// //	cout << "outStream.GetBitLength(): " << stream.GetBitLength() << endl;
-//	//cout << "outStream.GetByteLength(): " << stream.GetByteLength() << endl;
-//
-//	Packet packet{ stream.GetBufferPtr(), stream.GetByteLength() };
-//
-//	packet.PrintInHex();
-//
-//	PacketQueue::GetSendStaticInstance()
-//		.PushCopy(packet);
-//
-//	SendPacketsIOCP();
-//
-//	return cnt;
-//}
-//
-//void NetworkManagerServer::AddGameObjectForReplication(GameObject* gameObject)
-//{
-//	_gameObjectsForReplication.push_back(gameObject);
-//	_replicationManager.linkingContext.AddGameObject(gameObject);
-//	_pendingCreatedGameObjectsForReplication.push(gameObject);
-//}
-//
-//void NetworkManagerServer::RemoveGameObjectForReplication(GameObject* gameObject)
-//{
-//	_gameObjectsForReplication.erase(
-//		std::remove(
-//			_gameObjectsForReplication.begin(),
-//			_gameObjectsForReplication.end(),
-//			gameObject),
-//		_gameObjectsForReplication.end());
-//
-//	_replicationManager.linkingContext.RemoveGameObject(gameObject);
-//	_pendingDeletedGameObjectsForReplication.push(gameObject);
-//}
+GameObject* NetworkManagerServer::GetGameObject(const NetworkId_t networkId) const
+{
+	if (_networkIdToGameObjectMap.find(networkId) == _networkIdToGameObjectMap.end())
+	{
+		return nullptr;
+	}
+
+	return _networkIdToGameObjectMap.at(networkId).get();
+}
+
+NetworkId_t NetworkManagerServer::RegisterGameObject(shared_ptr<GameObject> gameObject)
+{
+	NetworkId_t networkId = _nextNetworkId++;
+	
+	gameObject->SetNetworkId(networkId);
+	_networkIdToGameObjectMap.emplace(networkId, gameObject);
+
+	return networkId;
+}
+
+void NetworkManagerServer::UnregisterGameObject(const NetworkId_t networkId)
+{
+	if (_networkIdToGameObjectMap.find(networkId) == _networkIdToGameObjectMap.end())
+	{
+		return;
+	}
+
+	_networkIdToGameObjectMap.erase(networkId);
+}
+
+void NetworkManagerServer::ClearAllGameObjects()
+{
+	_networkIdToGameObjectMap.clear();
+}
 
 ClientInfo* NetworkManagerServer::CreateClientInfo(const string& ip, const unsigned int port)
 {
