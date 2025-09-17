@@ -108,6 +108,9 @@
     <ClCompile Include="InputMemoryBitStream.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="BitSizeCounter.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Level.h">
@@ -210,6 +213,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="ReplicationAction.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BitSizeCounter.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="PacketType.h">
