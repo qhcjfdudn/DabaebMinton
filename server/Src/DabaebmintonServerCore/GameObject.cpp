@@ -2,6 +2,7 @@
 #include "GameObject.h"
 
 #include "OutputMemoryBitStream.h"
+#include "BitSizeCounter.h"
 
 GameObject::GameObject(PxVec2 location, PxVec2 velocity) :
 	_location(location), _velocity(velocity) {
@@ -42,11 +43,26 @@ void GameObject::SetCurrentTransform()
 	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
 }
 
-unsigned int GameObject::GetClassId() const
+uint32_t GameObject::GetClassId() const
 {
 	return 'GMOJ';
 }
 
+size_t GameObject::CountWriteBitSize(const uint8_t inDirtyState) const
+{
+	size_t totalBits = 0;
+
+	totalBits += BitSizeCounter::Count(_location);
+	totalBits += BitSizeCounter::Count(_velocity);
+
+	return totalBits;
+}
+
+uint8_t GameObject::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) const
+{
+	uint8_t writtenState = 0;
+	return writtenState;
+}
 void GameObject::Write(OutputMemoryBitStream& inStream) const
 {
 	inStream.Write(_location);

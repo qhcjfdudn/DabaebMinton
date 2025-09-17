@@ -14,7 +14,11 @@ public:
 	virtual bool FixedUpdate();
 	void SetCurrentTransform();
 
-	virtual unsigned int GetClassId() const;
+	virtual uint32_t GetAllStateMask() const { return 0; }
+
+	virtual uint32_t GetClassId() const;
+	virtual size_t CountWriteBitSize(const uint8_t inDirtyState) const;
+	virtual uint8_t Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) const;
 	virtual void Write(OutputMemoryBitStream& inStream) const;
 
 	PxActor* GetRigidbody() const;
@@ -25,4 +29,3 @@ protected:
 
 	PxRigidDynamic* _rigidbody = nullptr;
 };
-

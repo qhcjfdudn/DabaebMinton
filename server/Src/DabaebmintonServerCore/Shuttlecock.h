@@ -11,8 +11,9 @@ public:
 
 	bool FixedUpdate() override;
 
-	unsigned int GetClassId() const override;
+	uint32_t GetClassId() const override;
 	void Write(OutputMemoryBitStream& inStream) const override;
+	size_t CountWriteBitSize(const uint8_t inState) const override;
 
 private:
 	float _radius = 1.5;
