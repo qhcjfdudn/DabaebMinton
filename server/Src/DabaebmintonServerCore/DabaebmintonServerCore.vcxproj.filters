@@ -96,12 +96,6 @@
     <ClCompile Include="GameController.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="RUDPPacketizer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="RUDPHeader.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="InputMemoryBitStream.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -213,12 +207,6 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="GameController.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="RUDPPacketizer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="RUDPHeader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="InputMemoryBitStream.h">
