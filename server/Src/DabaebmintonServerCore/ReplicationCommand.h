@@ -28,7 +28,7 @@ public:
 
 private:
 
-	uint32_t				mDirtyState;
-	ReplicationAction		mAction;
+	uint8_t			_dirtyState;
+	ReplicationAction	_action;
 };
 

@@ -2,48 +2,48 @@
 #include "ReplicationCommand.h"
 
 ReplicationCommand::ReplicationCommand(uint8_t inInitialDirtyState) :
-	mAction(ReplicationAction::RA_Create),
-	mDirtyState(inInitialDirtyState)
+	_action(ReplicationAction::RA_Create),
+	_dirtyState(inInitialDirtyState)
 {
 }
 
 void ReplicationCommand::HandleCreateAckd()
 {
-	if (mAction == ReplicationAction::RA_Create)
+	if (_action == ReplicationAction::RA_Create)
 	{
-		mAction = ReplicationAction::RA_Update;
+		_action = ReplicationAction::RA_Update;
 	}
 }
 void ReplicationCommand::AddDirtyState(uint8_t inState)
 {
-	mDirtyState |= inState;
+	_dirtyState |= inState;
 }
 void ReplicationCommand::SetDestroy()
 {
-	mAction = ReplicationAction::RA_Destroy;
+	_action = ReplicationAction::RA_Destroy;
 }
 
 bool ReplicationCommand::HasDirtyState() const
 {
-	return (mAction == ReplicationAction::RA_Destroy) || (mDirtyState != 0);
+	return (_action == ReplicationAction::RA_Destroy) || (_dirtyState != 0);
 }
 
 ReplicationAction	ReplicationCommand::GetAction()	const
 {
-	return mAction;
+	return _action;
 }
 uint8_t ReplicationCommand::GetDirtyState() const
 {
-	return mDirtyState;
+	return _dirtyState;
 }
 
 void ReplicationCommand::ClearDirtyState(uint8_t inStateToClear)
 {
-	mDirtyState &= ~inStateToClear;
+	_dirtyState &= ~inStateToClear;
 
 	// 분석 필요
-	if (mAction == ReplicationAction::RA_Destroy)
+	if (_action == ReplicationAction::RA_Destroy)
 	{
-		mAction = ReplicationAction::RA_Update;
+		_action = ReplicationAction::RA_Update;
 	}
 }

@@ -12,7 +12,6 @@ PacketGenerator::PacketGenerator(DeliveryNotificationManager* deliveryNotificati
 	_replicationManager{ replicationManager },
 	_packetType{ packetType }
 {
-	GetNextPacket();
 }
 
 OutputMemoryBitStream& PacketGenerator::GetLastStream()
@@ -27,6 +26,11 @@ InFlightPacketPtr PacketGenerator::GetInFlightPacket()
 
 OutputMemoryBitStream& PacketGenerator::GenerateNewPacketIfExceedExtraPayloadSize(const size_t sizeToAdd)
 {
+	if (_streams.empty())
+	{
+		GetNextPacket();
+	}
+
 	auto& stream = GetLastStream();
 	if (isOverflowed(sizeToAdd) == false)
 	{
