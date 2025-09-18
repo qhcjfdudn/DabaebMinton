@@ -29,7 +29,7 @@ Packet::~Packet()
 	free(_buffer);
 }
 
-const unsigned char* Packet::GetBuffer() const
+unsigned char* Packet::GetBuffer() const
 {
 	return _buffer;
 }

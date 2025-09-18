@@ -8,7 +8,7 @@ public:
 	Packet(Packet&& src) noexcept;
 	~Packet();
 
-	const unsigned char* GetBuffer() const;
+	unsigned char* GetBuffer() const;
 	size_t GetLength() const;
 
 	string GetInHex() const;
