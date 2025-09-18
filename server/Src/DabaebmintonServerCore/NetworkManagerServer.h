@@ -20,16 +20,16 @@ public:
 	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
 	bool ProcessAcceptedClientSocketIOCP();
-	HANDLE AddSocketIOCP(std::shared_ptr<Socket> socket, const ULONG_PTR completionKey);
-	void SendPacketsIOCP();
+	HANDLE AddSocketIOCP(std::shared_ptr<Socket> socket);
 	void ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket, unsigned int receivedBytes);
+	
 	int Send(shared_ptr<Socket> clientSocket, size_t len);
 	int Recv(shared_ptr<Socket> clientSocket);
-	int SendTo(shared_ptr<Socket> clientSocket, size_t len);
+	
 	int SendTo(ClientInfo* client, Packet packets);
 	int SendTo(ClientInfo* client);
-
-	int RecvFrom(shared_ptr<Socket> clientSocket);
+	int RecvFrom();
+	
 	void SendOutgoingPackets();
 	void SendReplicationStatePacketToClient(ClientInfo* client);
 	void SendRpcPacketToClient(ClientInfo* client);

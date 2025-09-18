@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Constant.h"
+#include "OverlappedDto.h"
 
 enum class SocketProtocolType {
 	NONE,
@@ -16,30 +17,23 @@ public:
 	
 	int Bind(const char* const ip, unsigned int port);
 	
-	void SetSendBuffer(const unsigned char* str, size_t len);
+	ULONG_PTR GetCompletionKey() const { return _completionKey; }
+	void SetCompletionKey(ULONG_PTR completionKey) { _completionKey = completionKey; }
 
 	SocketProtocolType GetProtocolType() const { return m_protocolType; }
 	void SetProtocolType(SocketProtocolType protocolType) { m_protocolType = protocolType; }
 
-	unsigned char m_receiveBuffer[Constant::MAX_PACKET_SIZE + 1] = { 0, };
-	DWORD m_numberOfBytesReceived{};
-	DWORD m_receiveFlags{};
-	OVERLAPPED m_receiveOverlappedStruct{};
-	
-	unsigned char m_sendBuffer[Constant::MAX_PACKET_SIZE + 1] = { 0, };
-	DWORD m_numberOfBytesSent{};
-	DWORD m_sendFlags{};
-	OVERLAPPED m_sendOverlappedStruct{};
+	void SetRemoteAddress(const sockaddr_in& remoteAddr) { m_remoteAddr = remoteAddr; }
+
+	OverlappedDto _sendOverlappedDto{};
+	OverlappedDto _recvOverlappedDto{};
 	
 	SOCKET m_socket{};
 
 	sockaddr_in m_remoteAddr;
-	int lpFromLen;
-
-	void SetRemoteAddress(const sockaddr_in& remoteAddr) {
-		m_remoteAddr = remoteAddr;
-	}
 
 private:
+	ULONG_PTR _completionKey;
+
 	SocketProtocolType m_protocolType = SocketProtocolType::NONE;
 };

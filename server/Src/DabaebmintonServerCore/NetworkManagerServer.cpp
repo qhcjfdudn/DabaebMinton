@@ -10,12 +10,14 @@
 
 #include "PacketGenerator.h"
 
-NetworkManagerServer& NetworkManagerServer::GetInstance() {
+NetworkManagerServer& NetworkManagerServer::GetInstance()
+{
 	static NetworkManagerServer sInstance;
 	return sInstance;
 }
 
-void NetworkManagerServer::InitIOCP() {
+void NetworkManagerServer::InitIOCP()
+{
 	// IOCP 생성
 	mh_iocp = CreateIoCompletionPort(
 		INVALID_HANDLE_VALUE, 
@@ -26,17 +28,18 @@ void NetworkManagerServer::InitIOCP() {
 	spdlog::info("[NetworkManagerServer::InitIOCP] IOCP creation complete.");
 
 	CreateListenSocket();
+	m_listenSocket.SetCompletionKey(0);
 
 	// listenSocket으로부터 AcceptEx, GetAcceptExSockAddrs 확장 함수 획득 위한 WSAIoctl 함수 호출
 	GetLPFN();
 
 	// IOCP에 listen socket 추가
-	// AddSocketIOCP()로 교체 가능해 보인다.
 	if (CreateIoCompletionPort(
 		reinterpret_cast<HANDLE>(m_listenSocket.m_socket),
-		mh_iocp, 
-		reinterpret_cast<ULONG_PTR>(nullptr), 
-		0) == nullptr) {
+		mh_iocp,
+		m_listenSocket.GetCompletionKey(),
+		0) == nullptr)
+	{
 		spdlog::error("[NetworkManagerServer::InitIOCP] Add IOCP error: {}", WSAGetLastError());
 		return;
 	}
@@ -47,20 +50,31 @@ void NetworkManagerServer::InitIOCP() {
 
 	CreateRUDPSocket();
 	const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(&m_rudpSocket);
-	shared_ptr<Socket> rudpSocketPtr = make_shared<Socket>(m_rudpSocket);
+	m_rudpSocket.SetCompletionKey(completionKey);
 
-	m_clientsMap.emplace(completionKey, rudpSocketPtr);
+	// IOCP에 RUDP socket 추가
+	if (CreateIoCompletionPort(
+		reinterpret_cast<HANDLE>(m_rudpSocket.m_socket),
+		mh_iocp,
+		m_rudpSocket.GetCompletionKey(),
+		0) == nullptr)
+	{
+		spdlog::error("[NetworkManagerServer::InitIOCP] Add IOCP error: {}", WSAGetLastError());
+		return;
+	}
 
-	spdlog::info("[NetworkManagerServer::InitIOCP] completionKey: {}", completionKey);
+	spdlog::info("[NetworkManagerServer::InitIOCP] RUDP Socket completionKey: {}", completionKey);
 
-	AddSocketIOCP(rudpSocketPtr, completionKey);
-	RecvFrom(rudpSocketPtr);
+	RecvFrom();
 
 	spdlog::info("[NetworkManagerServer::InitIOCP] RUDPSocket attach complete.");
 }
 void NetworkManagerServer::AcceptEx()
 {
 	m_clientCandidateSocket.m_socket = Socket::CreateWSASocketHandle(SocketProtocolType::SPT_TCP);
+
+	auto& overlapped = m_listenSocket._recvOverlappedDto;
+	ZeroMemory(&overlapped, sizeof(overlapped));
 
 	bool acceptExStatus = m_AcceptEx(
 		m_listenSocket.m_socket,					// listenSocket
@@ -72,7 +86,7 @@ void NetworkManagerServer::AcceptEx()
 		sizeof(sockaddr_in) + 16,					// 로컬 주소 정보를 위해 예약된 바이트 수. 전송 프로토콜의 최대 길이보다 16만큼 커야 한다.
 		sizeof(sockaddr_in) + 16,					// 원격 주소 정보를 위해 예약된 바이트 수. 위와 동일.
 		&m_dwBytes,									// 받은 바이트 수. 불필요.
-		&m_listenSocket.m_receiveOverlappedStruct);	// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
+		&overlapped._overlapped);	// lpOverlapped: 요청을 처리하는 데 사용되는 OVERLAPPED 구조체. NULL 불가!
 	// 에러가 없다면 ret은 TRUE이다.
 
 	if (acceptExStatus == false)
@@ -120,51 +134,68 @@ void NetworkManagerServer::ProcessIOCPEvent()
 	// 받은 이벤트 각각을 처리합니다.
 	for (int i = 0; i < m_iocpEvent.m_eventCount; i++)
 	{
-		//cout << m_iocpEvent.m_eventCount << " events received." << endl;
-
 		auto& readEvent = m_iocpEvent.m_events[i];
 		ULONG_PTR completionKey = readEvent.lpCompletionKey;
-		if (completionKey == 0) // listenSocket. AcceptEx에 의해 신규 client 접속
+		if (completionKey == m_listenSocket.GetCompletionKey()) // AcceptEx에 의해 신규 client 접속
 		{
 			if (ProcessAcceptedClientSocketIOCP() == false)
 				return;
 		}
+		else if (completionKey == m_rudpSocket.GetCompletionKey())
+		{
+			auto& recvOverlapped = m_rudpSocket._recvOverlappedDto;
+
+			if (readEvent.lpOverlapped != &recvOverlapped._overlapped)	// sendOverlapped의 완료 이벤트
+			{
+				continue;
+			}
+
+			// recv packet을 상위 수준으로 올린다.
+
+
+		}
 		else // clientSocket
 		{
 			shared_ptr<Socket> p_clientSocket = m_clientsMap[completionKey];
+			auto& sendOverlapped = p_clientSocket->_sendOverlappedDto;
+			auto& recvOverlapped = p_clientSocket->_recvOverlappedDto;
 
 			// event가 WSASend의 완료에 의해 발생했다면, 무시하자.
-			if (readEvent.lpOverlapped == &p_clientSocket->m_sendOverlappedStruct)
+			if (readEvent.lpOverlapped == &sendOverlapped._overlapped)
 			{
 				continue;
 			}
 
 			unsigned int receivedBytes = readEvent.dwNumberOfBytesTransferred;
-			
+
 			// 에러 발생 시 receivedBytes는 0일 수 있다. 종료 이외 대응 필요
 			if (receivedBytes == 0)
 			{
 				int recvBytes;
 				bool isDisconnection = WSAGetOverlappedResult(p_clientSocket->m_socket,
-					&p_clientSocket->m_receiveOverlappedStruct,
+					&recvOverlapped._overlapped,
 					reinterpret_cast<LPDWORD>(&recvBytes),
 					FALSE,
-					&p_clientSocket->m_receiveFlags);
+					&recvOverlapped._overlappedFlags);
 
-				if (isDisconnection) {
+				if (isDisconnection)
+				{
 					closesocket(p_clientSocket->m_socket);
 					m_clientsMap.erase(completionKey);
 
-					cout << "[ProcessIOCPEvent] close socket: " << completionKey << endl;
+					spdlog::info("[NetworkManagerServer::ProcessIOCPEvent] close socket: {}", completionKey);
+
+					continue;
 				}
-				else {
-					cout << "[ProcessIOCPEvent] 0 Bytes received. WSAErrorCode: " << WSAGetLastError() << endl;
+				else
+				{
+					spdlog::error("[NetworkManagerServer::ProcessIOCPEvent] 0 Bytes received. WSAErrorCode: {}", WSAGetLastError());
 				}
 
 				continue;
 			}
 
-			cout << "receivedBytes: " << receivedBytes << endl;
+			spdlog::info("[NetworkManagerServer::ProcessIOCPEvent] receivedBytes: {}", receivedBytes);
 
 			ReceivePacketsIOCP(p_clientSocket, receivedBytes);
 		}
@@ -200,7 +231,7 @@ bool NetworkManagerServer::GetCompletionStatus()
 }
 bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 {
-	cout << "listen Socket!!!" << endl;
+	spdlog::info("[NetworkManagerServer::ProcessAcceptedClientSocketIOCP] New Client accepted.");
 
 	// m_clientCandidateSocket로부터 신규 client socket을 iocp에 추가
 	// listenSocket과 동일한 context로 clientSocket을 최적화
@@ -222,9 +253,10 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 
 	// 신규 client를 IOCP에 추가
 	const ULONG_PTR completionKey = reinterpret_cast<ULONG_PTR>(clientSocket.get());
-	cout << "completionKey: " << completionKey << endl;
+	spdlog::info("[NetworkManagerServer::ProcessAcceptedClientSocketIOCP] completionKey: {}", completionKey);
 
-	if (AddSocketIOCP(clientSocket, completionKey) == nullptr) {
+	if (AddSocketIOCP(clientSocket) == nullptr)
+	{
 		cout << "Add IOCP error: " << WSAGetLastError() << endl;
 		return false;
 	}
@@ -241,56 +273,27 @@ bool NetworkManagerServer::ProcessAcceptedClientSocketIOCP()
 	if (clientSocket->GetProtocolType() == SocketProtocolType::SPT_TCP)
 		Recv(clientSocket);
 	else if (clientSocket->GetProtocolType() == SocketProtocolType::SPT_RUDP)
-		RecvFrom(clientSocket);
+		RecvFrom();
 	else
 	{
-		cout << "Invalid SocketProtocolType" << endl;
+		spdlog::error("[NetworkManagerServer::ProcessAcceptedClientSocketIOCP] Invalid SocketProtocolType.");
 		return false;
 	}
 
 	return true;
 }
-HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket> socket, const ULONG_PTR completionKey)
+HANDLE NetworkManagerServer::AddSocketIOCP(std::shared_ptr<Socket> socket)
 {
 	return CreateIoCompletionPort(
 		reinterpret_cast<HANDLE>(socket->m_socket),
 		mh_iocp,
-		completionKey,
+		socket->GetCompletionKey(),
 		0);
-}
-void NetworkManagerServer::SendPacketsIOCP()
-{
-	auto& sendQueue = PacketQueue::GetSendStaticInstance();
-
-	while (sendQueue.Empty() == false)
-	{
-		auto data = sendQueue.Front();
-		size_t sentBytes = data->GetLength();
-		cout << "sentBytes: " << sentBytes << endl;
-		
-		// broadcast
-		for (auto clientSocketPair : m_clientsMap)
-		{
-			auto clientSocket = clientSocketPair.second;
-			clientSocket->SetSendBuffer(data->GetBuffer(), sentBytes);
-
-			SocketProtocolType spt = clientSocket->GetProtocolType();
-			if (spt == SocketProtocolType::SPT_TCP)
-				Send(clientSocket, sentBytes);
-			else if (spt == SocketProtocolType::SPT_RUDP) {
-				//SendTo(clientSocket, sentBytes);
-			}
-			else
-			{
-				cout << "Invalid SocketProtocolType" << endl;
-				continue;
-			}
-		}
-	}
 }
 void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSocket, unsigned int receivedBytes)
 {
-	Packet packet{ p_clientSocket->m_receiveBuffer, receivedBytes };
+	auto& recvOverlapped = p_clientSocket->_recvOverlappedDto;
+	Packet packet{ recvOverlapped._Buffer, receivedBytes };
 	auto& receiveQueue = PacketQueue::GetReceiveStaticInstance();
 	receiveQueue.PushCopy(packet);
 
@@ -298,79 +301,79 @@ void NetworkManagerServer::ReceivePacketsIOCP(std::shared_ptr<Socket> p_clientSo
 	if (p_clientSocket->GetProtocolType() == SocketProtocolType::SPT_TCP)
 		Recv(p_clientSocket);
 	else if (p_clientSocket->GetProtocolType() == SocketProtocolType::SPT_RUDP)
-		RecvFrom(p_clientSocket);
+		RecvFrom();
 	else
-		cout << "Invalid SocketProtocolType" << endl;
+		spdlog::error("[NetworkManagerServer::ReceivePacketsIOCP] Invalid SocketProtocolType.");
 }
 int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 {
+	auto& sendOverlapped = clientSocket->_sendOverlappedDto;
+
 	WSABUF b;
-	b.buf = reinterpret_cast<CHAR*>(clientSocket->m_sendBuffer);
+	b.buf = reinterpret_cast<CHAR*>(sendOverlapped._Buffer);
 	b.len = static_cast<ULONG>(len);
+
+	ZeroMemory(&sendOverlapped._overlapped, sizeof(sendOverlapped._overlapped));
 
 	int retCode = WSASend(
 		clientSocket->m_socket,
 		&b,
 		1,
-		&clientSocket->m_numberOfBytesSent,
-		clientSocket->m_sendFlags,
-		&clientSocket->m_sendOverlappedStruct,
+		&sendOverlapped._numberOfBytesTransfered,
+		sendOverlapped._overlappedFlags,
+		&sendOverlapped._overlapped,
 		NULL);
 
 	return retCode;
 }
 int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 {
-	WSABUF b;
-	b.buf = reinterpret_cast<CHAR*>(clientSocket->m_receiveBuffer);
-	b.len = Constant::MAX_PACKET_SIZE;
+	auto& recvOverlapped = clientSocket->_recvOverlappedDto;
 
-	DWORD& numberOfBytesReceived = clientSocket->m_numberOfBytesReceived;
-	
-	// overlapped I/O가 진행되는 동안 여기 값이 채워집니다.
-	clientSocket->m_receiveFlags = 0;
+	WSABUF b;
+	b.buf = reinterpret_cast<CHAR*>(recvOverlapped._Buffer);
+	b.len = sizeof(recvOverlapped._Buffer);
+
+	ZeroMemory(&recvOverlapped, sizeof(recvOverlapped));
 
 	int retCode = WSARecv(
 		clientSocket->m_socket,
-		&b,										// lpBuffers.
-		1,										// dwBufferCount. lpBuffers 배열의 구조체 개수.
-		&numberOfBytesReceived,					// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
-		&clientSocket->m_receiveFlags,
-		&clientSocket->m_receiveOverlappedStruct,
-		NULL);									// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
-
-	return retCode;
-}
-int NetworkManagerServer::SendTo(shared_ptr<Socket> clientSocket, size_t len)
-{
-	WSABUF b;
-	b.buf = reinterpret_cast<CHAR*>(clientSocket->m_sendBuffer);
-	b.len = static_cast<ULONG>(len);
-
-	int retCode = WSASendTo(
-		clientSocket->m_socket,
-		&b,
-		1, /* lpBuffers 배열의 WSABUF 구조체 수. 이걸 여러 개 쓸 수가 있나? */
-		&clientSocket->m_numberOfBytesSent,
-		clientSocket->m_sendFlags,
-		reinterpret_cast<sockaddr*>(&clientSocket->m_remoteAddr),
-		sizeof(clientSocket->m_remoteAddr),
-		&clientSocket->m_receiveOverlappedStruct,
-		nullptr
-	);
-
-	if (retCode != 0) {
-		int errorCode = WSAGetLastError();
-
-		cout << "WSASendTo error: " << errorCode << endl;
-	}
+		&b,											// lpBuffers.
+		1,											// dwBufferCount. lpBuffers 배열의 구조체 개수.
+		&recvOverlapped._numberOfBytesTransfered,	// lpNumberOfBytesRecvd. TCP같은 연결지향형에서
+		&recvOverlapped._overlappedFlags,
+		&recvOverlapped._overlapped,
+		NULL);										// lpCompletionRoutine. 수신 작업 완료 루틴에 대한 포인터.
 
 	return retCode;
 }
 
 int NetworkManagerServer::SendTo(ClientInfo* client, Packet packets)
 {
-	return 0;
+	WSABUF b;
+	b.buf = reinterpret_cast<CHAR*>(packets.GetBuffer());
+	b.len = static_cast<ULONG>(packets.GetLength());
+
+	auto& overlapped = m_rudpSocket._sendOverlappedDto;
+	ZeroMemory(&overlapped, sizeof(overlapped));
+
+	int retCode = WSASendTo(m_rudpSocket.m_socket,
+		&b,
+		1,
+		&overlapped._numberOfBytesTransfered,
+		overlapped._overlappedFlags,
+		reinterpret_cast<sockaddr*>(client->GetSockAddr()),
+		sizeof(sockaddr_in),
+		&overlapped._overlapped,
+		nullptr
+	);
+
+	if (retCode != 0)
+	{
+		spdlog::error("[NetworkManagerServer::SendTo] WSASendTo error: {}", WSAGetLastError());
+	}
+
+	return retCode;
 }
 
 int NetworkManagerServer::SendTo(ClientInfo* client)
@@ -387,25 +390,27 @@ int NetworkManagerServer::SendTo(ClientInfo* client)
 	return 0;
 }
 
-int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
+int NetworkManagerServer::RecvFrom()
 {
-	clientSocket->lpFromLen = sizeof(clientSocket->m_remoteAddr);
+	auto& overlapped = m_rudpSocket._recvOverlappedDto;
 
 	WSABUF wsaBuf;
-	wsaBuf.buf = reinterpret_cast<CHAR*>(clientSocket->m_receiveBuffer);
-	wsaBuf.len = sizeof(clientSocket->m_receiveBuffer);
+	wsaBuf.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
+	wsaBuf.len = sizeof(overlapped._Buffer);
 
-	memset(&clientSocket->m_receiveOverlappedStruct, 0, sizeof(clientSocket->m_receiveOverlappedStruct));
+	ZeroMemory(&overlapped, sizeof(overlapped));
+
+	int lpFromLen = sizeof(m_rudpSocket.m_remoteAddr);
 
 	int retCode = WSARecvFrom(
-		clientSocket->m_socket,
+		m_rudpSocket.m_socket,
 		&wsaBuf,													// lpBuffers
 		1,															// dwBufferCount
-		&clientSocket->m_numberOfBytesReceived,						// lpNumberOfBytesRecvd
-		&clientSocket->m_receiveFlags,								// lpFlags
-		reinterpret_cast<sockaddr*>(&clientSocket->m_remoteAddr),
-		&clientSocket->lpFromLen,									// lpFromLen
-		&clientSocket->m_receiveOverlappedStruct,					// lpOverlapped
+		&overlapped._numberOfBytesTransfered,						// lpNumberOfBytesRecvd
+		&overlapped._overlappedFlags,								// lpFlags
+		reinterpret_cast<sockaddr*>(&m_rudpSocket.m_remoteAddr),
+		&lpFromLen,													// lpFromLen
+		&overlapped._overlapped,									// lpOverlapped
 		nullptr														// lpCompletionRoutine
 	);
 	
@@ -416,7 +421,7 @@ int NetworkManagerServer::RecvFrom(shared_ptr<Socket> clientSocket)
 			/* [정상]. host로 전달된 packet이 없어 pending */
 		}
 		else {
-			cout << "[RecvFrom] error: " << errorCode << endl;
+			spdlog::error("[NetworkManagerServer::RecvFrom] WSARecvFrom error: {}", errorCode);
 		}
 	}
 

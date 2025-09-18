@@ -40,9 +40,3 @@ int Socket::Bind(const char* const ip, unsigned int port) {
 
 	return bind(m_socket, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in));
 }
-
-void Socket::SetSendBuffer(const unsigned char* str, size_t len)
-{
-	memcpy(m_sendBuffer, str, len);
-	m_sendBuffer[len] = 0;
-}
