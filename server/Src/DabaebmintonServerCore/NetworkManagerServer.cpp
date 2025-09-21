@@ -353,15 +353,15 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 	return retCode;
 }
 
-int NetworkManagerServer::SendTo(ClientInfo* client, Packet packets)
+int NetworkManagerServer::SendTo(ClientInfo* client, const OutputMemoryBitStream& stream)
 {
 	auto& overlapped = GetNextSendOverlapped();
 	ZeroMemory(&overlapped, sizeof(overlapped));
-	memcpy(overlapped._Buffer, packets.GetBuffer(), packets.GetLength());
+	memcpy(overlapped._Buffer, stream.GetBufferPtr(), stream.GetByteLength());
 
 	WSABUF b;
 	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
-	b.len = static_cast<ULONG>(packets.GetLength());
+	b.len = static_cast<ULONG>(stream.GetByteLength());
 	
 	int retCode = WSASendTo(m_rudpSocket.m_socket,
 		&b,
@@ -466,7 +466,7 @@ void NetworkManagerServer::SendReplicationStatePacketToClient(ClientInfo* client
 
 	for (auto& stream : packetGenerator.GetAllStreams())
 	{
-		SendTo(client, Packet{ stream.GetBufferPtr(), stream.GetByteLength() });
+		SendTo(client, stream);
 	}
 }
 

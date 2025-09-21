@@ -26,7 +26,7 @@ public:
 	int Send(shared_ptr<Socket> clientSocket, size_t len);
 	int Recv(shared_ptr<Socket> clientSocket);
 	
-	int SendTo(ClientInfo* client, Packet packets);
+	int SendTo(ClientInfo* client, const OutputMemoryBitStream& stream);
 	int SendTo(ClientInfo* client);
 	int RecvFrom();
 	
