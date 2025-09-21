@@ -136,6 +136,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 	{
 		auto& readEvent = m_iocpEvent.m_events[i];
 		ULONG_PTR completionKey = readEvent.lpCompletionKey;
+		auto& lpOverlapped = readEvent.lpOverlapped;
 		if (completionKey == m_listenSocket.GetCompletionKey()) // AcceptEx에 의해 신규 client 접속
 		{
 			if (ProcessAcceptedClientSocketIOCP() == false)
@@ -145,8 +146,13 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		{
 			auto& recvOverlapped = m_rudpSocket._recvOverlappedDto;
 
-			if (readEvent.lpOverlapped != &recvOverlapped._overlapped)	// sendOverlapped의 완료 이벤트
+			if (lpOverlapped != &recvOverlapped._overlapped)	// sendOverlapped의 완료 이벤트
 			{
+				NotifySendOverlappedCompletionEvent(lpOverlapped);
+				
+				// sendOverlapped의 완료 결과에 오류가 발생한다면 여기에서 WSAGetOverlappedResult()
+				// 호출로 검출 가능
+
 				continue;
 			}
 
@@ -157,11 +163,10 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		else // clientSocket
 		{
 			shared_ptr<Socket> p_clientSocket = m_clientsMap[completionKey];
-			auto& sendOverlapped = p_clientSocket->_sendOverlappedDto;
 			auto& recvOverlapped = p_clientSocket->_recvOverlappedDto;
 
 			// event가 WSASend의 완료에 의해 발생했다면, 무시하자.
-			if (readEvent.lpOverlapped == &sendOverlapped._overlapped)
+			if (lpOverlapped != &recvOverlapped._overlapped)
 			{
 				continue;
 			}
@@ -350,13 +355,14 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 
 int NetworkManagerServer::SendTo(ClientInfo* client, Packet packets)
 {
-	WSABUF b;
-	b.buf = reinterpret_cast<CHAR*>(packets.GetBuffer());
-	b.len = static_cast<ULONG>(packets.GetLength());
-
-	auto& overlapped = m_rudpSocket._sendOverlappedDto;
+	auto& overlapped = GetNextSendOverlapped();
 	ZeroMemory(&overlapped, sizeof(overlapped));
+	memcpy(overlapped._Buffer, packets.GetBuffer(), packets.GetLength());
 
+	WSABUF b;
+	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
+	b.len = static_cast<ULONG>(packets.GetLength());
+	
 	int retCode = WSASendTo(m_rudpSocket.m_socket,
 		&b,
 		1,
@@ -482,10 +488,49 @@ NetworkManagerServer::NetworkManagerServer() :
 		return;
 	}
 	spdlog::info("[NetworkManagerServer::NetworkManagerServer] WSAStartup.");
+
+	InitRudpSendOverlappedPool();
 }
 NetworkManagerServer::~NetworkManagerServer() {
 	WSACleanup();
 	spdlog::info("[NetworkManagerServer::~NetworkManagerServer] WSACleanup.");
+}
+
+void NetworkManagerServer::InitRudpSendOverlappedPool()
+{
+	constexpr int size = sizeof(sendOverlappedDtoPool) / sizeof(OverlappedDto);
+	lpOverlappedToSendOverlappedDtoPoolIdxMap.reserve(size << 2);
+	for (int idx = 0; idx < size; ++idx)
+	{
+		ULONG_PTR key = reinterpret_cast<ULONG_PTR>(&sendOverlappedDtoPool[idx]._overlapped);
+		lpOverlappedToSendOverlappedDtoPoolIdxMap.emplace(key, idx);
+		sendOverlappedQueue.push(idx);
+	}
+}
+
+OverlappedDto& NetworkManagerServer::GetNextSendOverlapped()
+{
+	while (sendOverlappedQueue.empty())
+	{
+		spdlog::warn("[NetworkManagerServer::GetNextSendOverlapped] sendOverlappedQueue is empty. Wait Network send ok sign.");
+
+		// 추후 condition_variable 통한 접근으로 변경 필요
+		std::this_thread::sleep_for(100ms);
+	}
+	int idx = sendOverlappedQueue.front(); sendOverlappedQueue.pop();
+
+	spdlog::debug("[NetworkManagerServer::GetNextSendOverlapped] nextSendOverlappedDto: sendOverlappedDtoPool[{}]", idx);
+
+	return sendOverlappedDtoPool[idx];
+}
+
+void NetworkManagerServer::NotifySendOverlappedCompletionEvent(LPOVERLAPPED lpOverlapped)
+{
+	ULONG_PTR lpOverlappedKey = reinterpret_cast<ULONG_PTR>(lpOverlapped);
+	int idx = lpOverlappedToSendOverlappedDtoPoolIdxMap[lpOverlappedKey];
+	sendOverlappedQueue.push(idx);
+
+	spdlog::debug("[NetworkManagerServer::NotifySendOverlappedCompletionEvent] sendOverlappedDtoPool[{}] is complete.", idx);
 }
 
 void NetworkManagerServer::CreateListenSocket()

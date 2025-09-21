@@ -57,6 +57,10 @@ private:
 	NetworkManagerServer();
 	~NetworkManagerServer();
 
+	void InitRudpSendOverlappedPool();
+	OverlappedDto& GetNextSendOverlapped();
+	void NotifySendOverlappedCompletionEvent(LPOVERLAPPED lpOverlapped);
+
 	void CreateListenSocket();
 	void CreateRUDPSocket();
 	
@@ -76,6 +80,9 @@ private:
 	Socket m_clientCandidateSocket{}; // accept target TCP socket
 
 	Socket m_rudpSocket{};
+	OverlappedDto sendOverlappedDtoPool[1 << 3]; // arbitrary size.
+	unordered_map<ULONG_PTR, int> lpOverlappedToSendOverlappedDtoPoolIdxMap;
+	queue<int> sendOverlappedQueue; // mutex needed
 
 	system_clock::time_point lastPacketSendTime;
 
