@@ -32,11 +32,14 @@ SOCKET Socket::CreateWSASocketHandle(SocketProtocolType spt)
 }
 
 int Socket::Bind(const char* const ip, unsigned int port) {
-	sockaddr_in s_in = {};
+	sockaddr_in s_in{};
 	s_in.sin_family = AF_INET;
-	s_in.sin_addr.S_un.S_addr = inet_addr(ip);
 	s_in.sin_port = htons(port);
+	if (inet_pton(AF_INET, ip, &s_in.sin_addr) != 1)
+	{
+		spdlog::error("[Socket::Bind] inet_pton failed: {}", WSAGetLastError());
+		return -1;
+	}
 	
-
 	return bind(m_socket, reinterpret_cast<sockaddr*>(&s_in), sizeof(s_in));
 }
