@@ -63,7 +63,7 @@ bool GameManager::RemoveGame(ClientInfo* clientInfo)
 	{
 		_gamesMutex.unlock();
 
-		spdlog::info("[GameManager::RemoveGame] A game does not exist.");
+		spdlog::warn("[GameManager::RemoveGame] A game does not exist.");
 
 		return false;
 	}
