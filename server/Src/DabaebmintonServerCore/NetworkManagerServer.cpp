@@ -2,6 +2,7 @@
 #include "NetworkManagerServer.h"
 
 #include "OutputMemoryBitStream.h"
+#include "InputMemoryBitStream.h"
 #include "PacketQueue.h"
 
 #include "Constant.h"
@@ -137,6 +138,8 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		auto& readEvent = m_iocpEvent.m_events[i];
 		ULONG_PTR completionKey = readEvent.lpCompletionKey;
 		auto& lpOverlapped = readEvent.lpOverlapped;
+		unsigned int receivedBytes = readEvent.dwNumberOfBytesTransferred;
+
 		if (completionKey == m_listenSocket.GetCompletionKey()) // AcceptEx에 의해 신규 client 접속
 		{
 			if (ProcessAcceptedClientSocketIOCP() == false)
@@ -158,8 +161,19 @@ void NetworkManagerServer::ProcessIOCPEvent()
 
 			// recv packet을 처리하는 코드
 
+			if (receivedBytes == 0)
+			{
+				// DisconnectClient
+			}
+			else if (receivedBytes > 0)
+			{
+				// remote sockaddr을 받아서 ClientInfo를 알아야 한다.
 
+				auto inStreamPtr = make_shared<InputMemoryBitStream>(m_rudpSocket._sendOverlappedDto._Buffer, receivedBytes << 3);
+				_receivedQueue.push(inStreamPtr);
+			}
 
+			RecvFrom();
 		}
 		else // clientSocket
 		{
@@ -171,8 +185,6 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			{
 				continue;
 			}
-
-			unsigned int receivedBytes = readEvent.dwNumberOfBytesTransferred;
 
 			// 에러 발생 시 receivedBytes는 0일 수 있다. 종료 이외 대응 필요
 			if (receivedBytes == 0)
@@ -480,6 +492,15 @@ void NetworkManagerServer::SendRpcPacketToClient(ClientInfo* client)
 		PacketType::PT_RPC };
 }
 
+void NetworkManagerServer::ProcessReceivePacket()
+{
+	while (_receivedQueue.empty() == false)
+	{
+		auto inStream = _receivedQueue.front(); _receivedQueue.pop();
+		
+	}
+}
+
 NetworkManagerServer::NetworkManagerServer()
 {
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
@@ -499,39 +520,39 @@ NetworkManagerServer::~NetworkManagerServer() {
 
 void NetworkManagerServer::InitRudpSendOverlappedPool()
 {
-	constexpr int size = sizeof(sendOverlappedDtoPool) / sizeof(OverlappedDto);
-	lpOverlappedToSendOverlappedDtoPoolIdxMap.reserve(size << 2);
+	constexpr int size = sizeof(_sendOverlappedDtoPool) / sizeof(OverlappedDto);
+	_lpOverlappedToSendOverlappedDtoPoolIdxMap.reserve(size << 2);
 	for (int idx = 0; idx < size; ++idx)
 	{
-		ULONG_PTR key = reinterpret_cast<ULONG_PTR>(&sendOverlappedDtoPool[idx]._overlapped);
-		lpOverlappedToSendOverlappedDtoPoolIdxMap.emplace(key, idx);
-		sendOverlappedQueue.push(idx);
+		ULONG_PTR key = reinterpret_cast<ULONG_PTR>(&_sendOverlappedDtoPool[idx]._overlapped);
+		_lpOverlappedToSendOverlappedDtoPoolIdxMap.emplace(key, idx);
+		_sendOverlappedQueue.push(idx);
 	}
 }
 
 OverlappedDto& NetworkManagerServer::GetNextSendOverlapped()
 {
-	while (sendOverlappedQueue.empty())
+	while (_sendOverlappedQueue.empty())
 	{
-		spdlog::warn("[NetworkManagerServer::GetNextSendOverlapped] sendOverlappedQueue is empty. Wait Network send ok sign.");
+		spdlog::warn("[NetworkManagerServer::GetNextSendOverlapped] _sendOverlappedQueue is empty. Wait Network send ok sign.");
 
 		// 추후 condition_variable 통한 접근으로 변경 필요
 		std::this_thread::sleep_for(100ms);
 	}
-	int idx = sendOverlappedQueue.front(); sendOverlappedQueue.pop();
+	int idx = _sendOverlappedQueue.front(); _sendOverlappedQueue.pop();
 
-	spdlog::debug("[NetworkManagerServer::GetNextSendOverlapped] nextSendOverlappedDto: sendOverlappedDtoPool[{}]", idx);
+	spdlog::debug("[NetworkManagerServer::GetNextSendOverlapped] nextSendOverlappedDto: _sendOverlappedDtoPool[{}]", idx);
 
-	return sendOverlappedDtoPool[idx];
+	return _sendOverlappedDtoPool[idx];
 }
 
 void NetworkManagerServer::NotifySendOverlappedCompletionEvent(LPOVERLAPPED lpOverlapped)
 {
 	ULONG_PTR lpOverlappedKey = reinterpret_cast<ULONG_PTR>(lpOverlapped);
-	int idx = lpOverlappedToSendOverlappedDtoPoolIdxMap[lpOverlappedKey];
-	sendOverlappedQueue.push(idx);
+	int idx = _lpOverlappedToSendOverlappedDtoPoolIdxMap[lpOverlappedKey];
+	_sendOverlappedQueue.push(idx);
 
-	spdlog::debug("[NetworkManagerServer::NotifySendOverlappedCompletionEvent] sendOverlappedDtoPool[{}] is complete.", idx);
+	spdlog::debug("[NetworkManagerServer::NotifySendOverlappedCompletionEvent] _sendOverlappedDtoPool[{}] is complete.", idx);
 }
 
 void NetworkManagerServer::CreateListenSocket()

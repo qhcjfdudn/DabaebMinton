@@ -34,6 +34,8 @@ public:
 	void SendReplicationStatePacketToClient(ClientInfo* client);
 	void SendRpcPacketToClient(ClientInfo* client);
 
+	void ProcessReceivePacket();
+
 	GameObject* GetGameObject(const NetworkId_t networkId) const;
 	NetworkId_t RegisterGameObject(shared_ptr<GameObject> gameObject);
 	void UnregisterGameObject(const NetworkId_t networkId);
@@ -63,6 +65,7 @@ private:
 	
 	void GetLPFN();
 
+	// IOCP
 	WSADATA m_wsa;
 	HANDLE mh_iocp = nullptr;
 	int m_threadCount = 1;
@@ -74,12 +77,14 @@ private:
 	DWORD m_timeoutMs{ 100 };
 
 	Socket m_listenSocket{};
-	Socket m_clientCandidateSocket{}; // accept target TCP socket
+	Socket m_clientCandidateSocket{};	// accept target for TCP socket
+	Socket m_rudpSocket{};				// for RUDP
 
-	Socket m_rudpSocket{};
-	OverlappedDto sendOverlappedDtoPool[1 << 3]; // arbitrary size.
-	unordered_map<ULONG_PTR, int> lpOverlappedToSendOverlappedDtoPoolIdxMap;
-	queue<int> sendOverlappedQueue; // mutex needed
+	OverlappedDto _sendOverlappedDtoPool[1 << 3]; // arbitrary size.
+	unordered_map<ULONG_PTR, int> _lpOverlappedToSendOverlappedDtoPoolIdxMap;
+	queue<int> _sendOverlappedQueue; // mutex needed
+
+	queue<shared_ptr<InputMemoryBitStream>> _receivedQueue;
 
 	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
 	std::mutex _ipPortToClientInfoMapMutex;
