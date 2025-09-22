@@ -60,20 +60,12 @@ int main()
 
 	// Engine working
 	thread networkEngineRunningThread([] {
-		auto& networkManagerServer = NetworkManagerServer::GetInstance();
 		auto& serverEngine = ServerEngine::GetInstance();
+		auto& networkManagerServer = NetworkManagerServer::GetInstance();
 
 		while (serverEngine.isRunning.load(std::memory_order_acquire))
 		{
 			networkManagerServer.ProcessIOCPEvent();
-
-			if (networkManagerServer.HasElapsedPacketInterval())
-			{
-				//networkManagerServer.ReplicateAllGameObjects();
-
-				// 채널 별로 interval이 필요한 것인가.
-				networkManagerServer.SetLastPacketSendTimeToNow();
-			}
 		}
 		});
 

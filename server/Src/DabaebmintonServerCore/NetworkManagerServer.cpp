@@ -146,17 +146,18 @@ void NetworkManagerServer::ProcessIOCPEvent()
 		{
 			auto& recvOverlapped = m_rudpSocket._recvOverlappedDto;
 
-			if (lpOverlapped != &recvOverlapped._overlapped)	// sendOverlapped의 완료 이벤트
+			if (lpOverlapped != &recvOverlapped._overlapped)	// sendOverlapped의 완료 이벤트인가?
 			{
 				NotifySendOverlappedCompletionEvent(lpOverlapped);
 				
-				// sendOverlapped의 완료 결과에 오류가 발생한다면 여기에서 WSAGetOverlappedResult()
-				// 호출로 검출 가능
+				// sendOverlapped의 완료 결과에 오류가 발생한다면 여기에서
+				// WSAGetOverlappedResult() 호출로 검출 가능
 
 				continue;
 			}
 
-			// recv packet을 상위 수준으로 올린다.
+			// recv packet을 처리하는 코드
+
 
 
 		}
@@ -479,8 +480,7 @@ void NetworkManagerServer::SendRpcPacketToClient(ClientInfo* client)
 		PacketType::PT_RPC };
 }
 
-NetworkManagerServer::NetworkManagerServer() :
-	lastPacketSendTime{ system_clock::now() }
+NetworkManagerServer::NetworkManagerServer()
 {
 	if (WSAStartup(MAKEWORD(2, 2), &m_wsa) != 0)
 	{
@@ -613,19 +613,6 @@ void NetworkManagerServer::GetLPFN()
 	}
 
 	spdlog::info("[NetworkManagerServer::GetLPFN] Init GetAcceptExSockAddrs function complete.");
-}
-
-bool NetworkManagerServer::HasElapsedPacketInterval()
-{
-	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - lastPacketSendTime;
-
-	return elapsedTime.count() >= Constant::PACKET_PERIOD;
-}
-
-void NetworkManagerServer::SetLastPacketSendTimeToNow()
-{
-	lastPacketSendTime = system_clock::now();
 }
 
 GameObject* NetworkManagerServer::GetGameObject(const NetworkId_t networkId) const

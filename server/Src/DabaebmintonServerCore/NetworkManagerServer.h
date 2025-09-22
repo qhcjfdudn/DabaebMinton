@@ -34,9 +34,6 @@ public:
 	void SendReplicationStatePacketToClient(ClientInfo* client);
 	void SendRpcPacketToClient(ClientInfo* client);
 
-	bool HasElapsedPacketInterval();
-	void SetLastPacketSendTimeToNow();
-
 	GameObject* GetGameObject(const NetworkId_t networkId) const;
 	NetworkId_t RegisterGameObject(shared_ptr<GameObject> gameObject);
 	void UnregisterGameObject(const NetworkId_t networkId);
@@ -83,8 +80,6 @@ private:
 	OverlappedDto sendOverlappedDtoPool[1 << 3]; // arbitrary size.
 	unordered_map<ULONG_PTR, int> lpOverlappedToSendOverlappedDtoPoolIdxMap;
 	queue<int> sendOverlappedQueue; // mutex needed
-
-	system_clock::time_point lastPacketSendTime;
 
 	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
 	std::mutex _ipPortToClientInfoMapMutex;
