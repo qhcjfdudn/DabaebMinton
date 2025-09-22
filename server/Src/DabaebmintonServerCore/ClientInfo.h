@@ -1,6 +1,5 @@
 #pragma once
 
-#include "OverlappedDto.h"
 #include "ReplicationManager.h"
 #include "DeliveryNotificationManager.h"
 #include "SockAddress.h"

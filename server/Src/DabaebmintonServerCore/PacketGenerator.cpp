@@ -6,6 +6,7 @@
 #include "ClientInfo.h"
 
 #include "GetRequiredBits.h"
+#include "Constant.h"
 
 PacketGenerator::PacketGenerator(DeliveryNotificationManager* deliveryNotificationManager, ReplicationManager* replicationManager, const PacketType packetType) :
 	_deliveryNotificationManager{ deliveryNotificationManager },
