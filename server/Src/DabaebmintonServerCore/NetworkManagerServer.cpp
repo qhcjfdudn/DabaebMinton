@@ -8,6 +8,7 @@
 #include "Constant.h"
 #include "GetRequiredBits.h"
 #include "ClientInfo.h"
+#include "SockAddress.h"
 
 #include "PacketGenerator.h"
 
@@ -381,7 +382,7 @@ int NetworkManagerServer::SendTo(ClientInfo* client, const OutputMemoryBitStream
 		1,
 		&overlapped._numberOfBytesTransfered,
 		overlapped._overlappedFlags,
-		reinterpret_cast<sockaddr*>(client->GetSockAddr()),
+		reinterpret_cast<const sockaddr*>(&client->GetSockAddress().GetSockAddr()),
 		sizeof(sockaddr_in),
 		&overlapped._overlapped,
 		nullptr
@@ -451,20 +452,23 @@ int NetworkManagerServer::RecvFrom()
 void NetworkManagerServer::SendOutgoingPackets()
 {
 	// Check TimedOut Packets
-	for (auto [ipPort, clientInfo] : _ipPortToClientInfoMap)
+	for (auto& kv : _sockAddressToClientInfoMap)
 	{
+		auto clientInfo = kv.second;
 		clientInfo->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 	}
 
 	// Replication State
-	for (auto [ipPort, clientInfo] : _ipPortToClientInfoMap)
+	for (auto& kv : _sockAddressToClientInfoMap)
 	{
+		auto clientInfo = kv.second;
 		SendReplicationStatePacketToClient(clientInfo.get());
 	}
 
 	// RPCs
-	for (auto [ipPort, clientInfo] : _ipPortToClientInfoMap)
+	for (auto& kv : _sockAddressToClientInfoMap)
 	{
+		auto clientInfo = kv.second;
 		SendRpcPacketToClient(clientInfo.get());
 	}
 }
@@ -656,27 +660,27 @@ void NetworkManagerServer::ClearAllGameObjects()
 	_linkingContext.Clear();
 }
 
-ClientInfo* NetworkManagerServer::CreateClientInfo(const string& ip, const unsigned int port)
+ClientInfo* NetworkManagerServer::CreateClientInfo(std::string_view ip, const uint16_t port)
 {
 	ClientInfo* ret = nullptr;
 
-	string key = ip + ":" + std::to_string(port);
+	SockAddress key{ ip.data(), port };
 
-	_ipPortToClientInfoMapMutex.lock();
-	if (_ipPortToClientInfoMap.find(key) != _ipPortToClientInfoMap.end())
+	_sockAddressToClientInfoMapMutex.lock();
+	if (_sockAddressToClientInfoMap.find(key) != _sockAddressToClientInfoMap.end())
 	{
-		ret = _ipPortToClientInfoMap[key].get();
-		_ipPortToClientInfoMapMutex.unlock();
+		ret = _sockAddressToClientInfoMap[key].get();
+		_sockAddressToClientInfoMapMutex.unlock();
 		
-		spdlog::info("[NetworkManagerServer::CreateClientInfo] {} client already exists.", key);
+		spdlog::info("[NetworkManagerServer::CreateClientInfo] {}:{} client already exists.", ip, port);
 		
 		return ret;
 	}
 
-	shared_ptr<ClientInfo> ci = make_shared<ClientInfo>(ip, port);
+	shared_ptr<ClientInfo> ci = make_shared<ClientInfo>(key);
 
-	_ipPortToClientInfoMap.emplace(key, ci);
-	_ipPortToClientInfoMapMutex.unlock();
+	_sockAddressToClientInfoMap.emplace(key, ci);
+	_sockAddressToClientInfoMapMutex.unlock();
 
 	return ci.get();
 }
@@ -685,40 +689,41 @@ bool NetworkManagerServer::RemoveClientInfo(ClientInfo* clientInfo)
 {
 	if (clientInfo == nullptr)
 		return false;
-
-	string key = clientInfo->_ipPort;
 	
-	_ipPortToClientInfoMapMutex.lock();
-	if (_ipPortToClientInfoMap.find(key) == _ipPortToClientInfoMap.end())
+	const auto& key = clientInfo->GetSockAddress();
+
+	_sockAddressToClientInfoMapMutex.lock();
+	if (_sockAddressToClientInfoMap.find(key) == _sockAddressToClientInfoMap.end())
 	{
-		_ipPortToClientInfoMapMutex.unlock();
-		spdlog::info("[NetworkManagerServer::RemoveClientInfo] {} client does not exist.", key);
+		_sockAddressToClientInfoMapMutex.unlock();
+
+		spdlog::warn("[NetworkManagerServer::RemoveClientInfo] clientInfo is dangling pointer.");
 
 		return false;
 	}
 
-	_ipPortToClientInfoMap.erase(key);
-	_ipPortToClientInfoMapMutex.unlock();
+	_sockAddressToClientInfoMap.erase(key);
+	_sockAddressToClientInfoMapMutex.unlock();
 
 	return true;
 }
 
-ClientInfo* NetworkManagerServer::GetClientInfo(const string& ip, const unsigned int port)
+ClientInfo* NetworkManagerServer::GetClientInfo(std::string_view ip, const uint16_t port)
 {
-	const string key = ip + ":" + std::to_string(port);
+	const SockAddress key{ ip.data(), port };
 
-	_ipPortToClientInfoMapMutex.lock();
-	if (_ipPortToClientInfoMap.find(key) == _ipPortToClientInfoMap.end())
+	_sockAddressToClientInfoMapMutex.lock();
+	if (_sockAddressToClientInfoMap.find(key) == _sockAddressToClientInfoMap.end())
 	{
-		_ipPortToClientInfoMapMutex.unlock();
-		spdlog::info("[NetworkManagerServer::GetClientInfo] {} client does not exist.", key);
+		_sockAddressToClientInfoMapMutex.unlock();
+		spdlog::warn("[NetworkManagerServer::GetClientInfo] {}:{} client does not exist.", ip, port);
 
 		return nullptr;
 	}
 
-	ClientInfo* ret = _ipPortToClientInfoMap[key].get();
+	ClientInfo* ret = _sockAddressToClientInfoMap[key].get();
 
-	_ipPortToClientInfoMapMutex.unlock();
+	_sockAddressToClientInfoMapMutex.unlock();
 
 	return ret;
 }

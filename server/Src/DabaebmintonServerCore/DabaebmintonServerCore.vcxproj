@@ -280,6 +280,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClCompile Include="Shuttlecock.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="SockAddress.cpp" />
     <ClCompile Include="Socket.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -325,6 +326,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="Shuttlecock.h" />
+    <ClInclude Include="SockAddress.h" />
     <ClInclude Include="Socket.h" />
     <ClInclude Include="StaticGameObject.h" />
     <ClInclude Include="TransmissionData.h" />

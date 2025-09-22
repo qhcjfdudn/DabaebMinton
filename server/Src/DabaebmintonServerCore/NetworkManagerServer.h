@@ -4,6 +4,7 @@
 #include "Socket.h"
 #include "ReplicationManager.h"
 #include "LinkingContext.h"
+#include "SockAddress.h"
 
 class GameObject;
 class ClientInfo;
@@ -41,9 +42,9 @@ public:
 	void UnregisterGameObject(const NetworkId_t networkId);
 	void ClearAllGameObjects();
 
-	ClientInfo* CreateClientInfo(const string& ip, const unsigned int port);
+	ClientInfo* CreateClientInfo(std::string_view ip, const uint16_t port);
 	bool RemoveClientInfo(ClientInfo* clientInfo);
-	ClientInfo* GetClientInfo(const string& ip, const unsigned int port);
+	ClientInfo* GetClientInfo(std::string_view ip, const uint16_t port);
 
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;
@@ -86,8 +87,8 @@ private:
 
 	queue<shared_ptr<InputMemoryBitStream>> _receivedQueue;
 
-	unordered_map<std::string, shared_ptr<ClientInfo> > _ipPortToClientInfoMap;
-	std::mutex _ipPortToClientInfoMapMutex;
+	unordered_map<SockAddress, shared_ptr<ClientInfo> > _sockAddressToClientInfoMap;
+	std::mutex _sockAddressToClientInfoMapMutex;
 
 	LinkingContext _linkingContext{};
 };
