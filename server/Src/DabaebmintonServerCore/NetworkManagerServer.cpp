@@ -314,11 +314,11 @@ int NetworkManagerServer::Send(shared_ptr<Socket> clientSocket, size_t len)
 {
 	auto& sendOverlapped = clientSocket->_sendOverlappedDto;
 
-	WSABUF b;
+	ZeroMemory(&sendOverlapped._overlapped, sizeof(sendOverlapped._overlapped));
+	
+	WSABUF& b = sendOverlapped._wsabuf;
 	b.buf = reinterpret_cast<CHAR*>(sendOverlapped._Buffer);
 	b.len = static_cast<ULONG>(len);
-
-	ZeroMemory(&sendOverlapped._overlapped, sizeof(sendOverlapped._overlapped));
 
 	int retCode = WSASend(
 		clientSocket->m_socket,
@@ -335,11 +335,11 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 {
 	auto& recvOverlapped = clientSocket->_recvOverlappedDto;
 
-	WSABUF b;
+	ZeroMemory(&recvOverlapped, sizeof(recvOverlapped));
+	
+	WSABUF& b = recvOverlapped._wsabuf;
 	b.buf = reinterpret_cast<CHAR*>(recvOverlapped._Buffer);
 	b.len = sizeof(recvOverlapped._Buffer);
-
-	ZeroMemory(&recvOverlapped, sizeof(recvOverlapped));
 
 	int retCode = WSARecv(
 		clientSocket->m_socket,
@@ -359,7 +359,7 @@ int NetworkManagerServer::SendTo(ClientInfo* client, const OutputMemoryBitStream
 	ZeroMemory(&overlapped, sizeof(overlapped));
 	memcpy(overlapped._Buffer, stream.GetBufferPtr(), stream.GetByteLength());
 
-	WSABUF b;
+	WSABUF& b = overlapped._wsabuf;
 	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
 	b.len = static_cast<ULONG>(stream.GetByteLength());
 	
@@ -400,17 +400,18 @@ int NetworkManagerServer::RecvFrom()
 {
 	auto& overlapped = m_rudpSocket._recvOverlappedDto;
 
-	WSABUF wsaBuf;
-	wsaBuf.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
-	wsaBuf.len = sizeof(overlapped._Buffer);
-
 	ZeroMemory(&overlapped, sizeof(overlapped));
+	
+	WSABUF& b = overlapped._wsabuf;
+	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
+	b.len = sizeof(overlapped._Buffer);
+
 
 	int lpFromLen = sizeof(m_rudpSocket.m_remoteAddr);
 
 	int retCode = WSARecvFrom(
 		m_rudpSocket.m_socket,
-		&wsaBuf,													// lpBuffers
+		&b,													// lpBuffers
 		1,															// dwBufferCount
 		&overlapped._numberOfBytesTransfered,						// lpNumberOfBytesRecvd
 		&overlapped._overlappedFlags,								// lpFlags
