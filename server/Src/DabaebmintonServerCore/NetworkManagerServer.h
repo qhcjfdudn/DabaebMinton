@@ -5,6 +5,7 @@
 #include "ReplicationManager.h"
 #include "LinkingContext.h"
 #include "SockAddress.h"
+#include "ReceivedPacket.h"
 
 class GameObject;
 class ClientInfo;
@@ -34,7 +35,8 @@ public:
 	void SendReplicationStatePacketToClient(ClientInfo* client);
 	void SendRpcPacketToClient(ClientInfo* client);
 
-	void ProcessReceivePacket();
+	void ProcessQueuedPackets();
+	void ProcessPacket(InputMemoryBitStream& inStream, const SockAddress& clientSockAddress);
 
 	GameObject* GetGameObject(const NetworkId_t networkId) const;
 	NetworkId_t RegisterGameObject(shared_ptr<GameObject> gameObject);
@@ -84,7 +86,7 @@ private:
 	unordered_map<ULONG_PTR, int> _lpOverlappedToSendOverlappedDtoPoolIdxMap;
 	queue<int> _sendOverlappedQueue; // mutex needed
 
-	queue<shared_ptr<InputMemoryBitStream>> _receivedQueue;
+	queue<ReceivedPacket> _receivedQueue;
 
 	unordered_map<SockAddress, shared_ptr<ClientInfo> > _sockAddressToClientInfoMap;
 	std::mutex _sockAddressToClientInfoMapMutex;

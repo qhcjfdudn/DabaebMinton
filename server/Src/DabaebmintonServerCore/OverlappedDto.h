@@ -9,4 +9,6 @@ struct OverlappedDto
 	DWORD _numberOfBytesTransfered;
 	DWORD _overlappedFlags;
 	OVERLAPPED _overlapped;
+	sockaddr _remoteSockaddr;
+	int _fromLen;
 };

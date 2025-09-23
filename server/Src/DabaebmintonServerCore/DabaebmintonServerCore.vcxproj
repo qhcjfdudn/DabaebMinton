@@ -230,6 +230,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClCompile Include="NetworkManagerServer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="ReceivedPacket.cpp" />
     <ClCompile Include="ReplicationManager.cpp" />
     <ClCompile Include="Observer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
@@ -307,6 +308,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="Level.h" />
     <ClInclude Include="LinkingContext.h" />
     <ClInclude Include="NetworkManagerServer.h" />
+    <ClInclude Include="ReceivedPacket.h" />
     <ClInclude Include="ReplicationManager.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="OutputMemoryBitStream.h" />

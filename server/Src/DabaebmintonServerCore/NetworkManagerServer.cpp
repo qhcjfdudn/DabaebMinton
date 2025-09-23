@@ -148,10 +148,8 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			}
 			else if (receivedBytes > 0)
 			{
-				// remote sockaddr을 받아서 ClientInfo를 알아야 한다.
-
 				auto inStreamPtr = make_shared<InputMemoryBitStream>(m_rudpSocket._sendOverlappedDto._Buffer, receivedBytes << 3);
-				_receivedQueue.push(inStreamPtr);
+				_receivedQueue.emplace(inStreamPtr, recvOverlapped._remoteSockaddr);
 			}
 
 			RecvFrom();
@@ -357,7 +355,8 @@ int NetworkManagerServer::SendTo(ClientInfo* client, const OutputMemoryBitStream
 	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
 	b.len = static_cast<ULONG>(stream.GetByteLength());
 	
-	const sockaddr& remote = client->GetSockAddress().GetSockAddr();
+	auto& remote = overlapped._remoteSockaddr;
+	memcpy(&remote, &client->GetSockAddress().GetSockAddr(), sizeof(remote));
 	
 	int retCode = WSASendTo(m_rudpSocket.m_socket,
 		&b,
@@ -402,7 +401,8 @@ int NetworkManagerServer::RecvFrom()
 	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
 	b.len = sizeof(overlapped._Buffer);
 
-	int lpFromLen = sizeof(m_rudpSocket._remoteAddr.GetSockAddr());
+	auto& remote = overlapped._remoteSockaddr;
+	overlapped._fromLen = sizeof(remote);
 
 	int retCode = WSARecvFrom(
 		m_rudpSocket.m_socket,
@@ -410,8 +410,8 @@ int NetworkManagerServer::RecvFrom()
 		1,															// dwBufferCount
 		&overlapped._numberOfBytesTransfered,						// lpNumberOfBytesRecvd
 		&overlapped._overlappedFlags,								// lpFlags
-		&m_rudpSocket._remoteAddr.GetSockAddr(),
-		&lpFromLen,													// lpFromLen
+		&remote,
+		&overlapped._fromLen,													// lpFromLen
 		&overlapped._overlapped,									// lpOverlapped
 		nullptr														// lpCompletionRoutine
 	);
@@ -477,13 +477,21 @@ void NetworkManagerServer::SendRpcPacketToClient(ClientInfo* client)
 		PacketType::PT_RPC };
 }
 
-void NetworkManagerServer::ProcessReceivePacket()
+void NetworkManagerServer::ProcessQueuedPackets()
 {
 	while (_receivedQueue.empty() == false)
 	{
-		auto inStream = _receivedQueue.front(); _receivedQueue.pop();
-		
+		auto receivedPacket = _receivedQueue.front(); _receivedQueue.pop();
+		auto inStream = receivedPacket.GetStream();
+		auto& clientSockAddress = receivedPacket.GetSockAddress();
+
+		ProcessPacket(*inStream, clientSockAddress);
 	}
+}
+
+void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const SockAddress& clientSockAddress)
+{
+	spdlog::debug("[NetworkManagerServer::ProcessPacket] called successfully.");
 }
 
 NetworkManagerServer::NetworkManagerServer()
