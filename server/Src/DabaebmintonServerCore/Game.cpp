@@ -5,11 +5,11 @@
 #include "OutputMemoryBitStream.h"
 #include "InputMemoryBitStream.h"
 #include "Constant.h"
-#include "ClientInfo.h"
+#include "ClientProxy.h"
 #include "Packet.h"
 #include "GameObject.h"
 
-Game::Game(ClientInfo* player1, ClientInfo* player2) :
+Game::Game(ClientProxy* player1, ClientProxy* player2) :
 	p_player1{ player1 }, p_player2{ player2 },
 	_gamePlayState{ GamePlayState::Initializing },
 	_level{},

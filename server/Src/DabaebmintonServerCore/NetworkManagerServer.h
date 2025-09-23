@@ -8,7 +8,7 @@
 #include "ReceivedPacket.h"
 
 class GameObject;
-class ClientInfo;
+class ClientProxy;
 class Packet;
 
 class NetworkManagerServer
@@ -27,13 +27,13 @@ public:
 	int Send(shared_ptr<Socket> clientSocket, size_t len);
 	int Recv(shared_ptr<Socket> clientSocket);
 	
-	int SendTo(ClientInfo* client, const OutputMemoryBitStream& stream);
-	int SendTo(ClientInfo* client);
+	int SendTo(ClientProxy* client, const OutputMemoryBitStream& stream);
+	int SendTo(ClientProxy* client);
 	int RecvFrom();
 	
 	void SendOutgoingPackets();
-	void SendReplicationStatePacketToClient(ClientInfo* client);
-	void SendRpcPacketToClient(ClientInfo* client);
+	void SendReplicationStatePacketToClient(ClientProxy* client);
+	void SendRpcPacketToClient(ClientProxy* client);
 
 	void ProcessQueuedPackets();
 	void ProcessPacket(InputMemoryBitStream& inStream, const SockAddress& clientSockAddress);
@@ -43,9 +43,9 @@ public:
 	void UnregisterGameObject(const NetworkId_t networkId);
 	void ClearAllGameObjects();
 
-	ClientInfo* CreateClientInfo(std::string_view ip, const uint16_t port);
-	bool RemoveClientInfo(ClientInfo* clientInfo);
-	ClientInfo* GetClientInfo(std::string_view ip, const uint16_t port);
+	ClientProxy* CreateClientProxy(std::string_view ip, const uint16_t port);
+	bool RemoveClientProxy(ClientProxy* ClientProxy);
+	ClientProxy* GetClientProxy(std::string_view ip, const uint16_t port);
 
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;
@@ -88,8 +88,8 @@ private:
 
 	queue<ReceivedPacket> _receivedQueue;
 
-	unordered_map<SockAddress, shared_ptr<ClientInfo> > _sockAddressToClientInfoMap;
-	std::mutex _sockAddressToClientInfoMapMutex;
+	unordered_map<SockAddress, shared_ptr<ClientProxy> > _sockAddressToClientProxyMap;
+	std::mutex _sockAddressToClientProxyMapMutex;
 
 	LinkingContext _linkingContext{};
 };

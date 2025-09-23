@@ -5,7 +5,7 @@
 
 #include "GameController.h"
 
-class ClientInfo;
+class ClientProxy;
 
 enum class GamePlayState {
 	Initializing,
@@ -21,7 +21,7 @@ enum class GameReplicationState {
 class Game
 {
 public:
-	Game(ClientInfo* player1, ClientInfo* player2);
+	Game(ClientProxy* player1, ClientProxy* player2);
 	~Game();
 
 	bool HasElapsedReplicationInterval();
@@ -33,8 +33,8 @@ public:
 
 	// For Networking
 	unsigned long long _gameKey{ 0 };
-	ClientInfo* p_player1;
-	ClientInfo* p_player2;
+	ClientProxy* p_player1;
+	ClientProxy* p_player2;
 
 	system_clock::time_point _nextReplicationUpdatedTime;
 	atomic<GameReplicationState> _replicationState{ GameReplicationState::None };

@@ -201,7 +201,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="BitSizeCounter.cpp" />
-    <ClCompile Include="ClientInfo.cpp">
+    <ClCompile Include="ClientProxy.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="DeliveryNotificationManager.cpp" />
@@ -293,7 +293,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="BadmintonBottom.h" />
     <ClInclude Include="BadmintonNet.h" />
     <ClInclude Include="BitSizeCounter.h" />
-    <ClInclude Include="ClientInfo.h" />
+    <ClInclude Include="ClientProxy.h" />
     <ClInclude Include="Constant.h" />
     <ClInclude Include="DeliveryNotificationManager.h" />
     <ClInclude Include="Game.h" />

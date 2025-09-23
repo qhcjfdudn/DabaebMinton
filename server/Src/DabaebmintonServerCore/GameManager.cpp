@@ -3,7 +3,7 @@
 
 #include "NetworkManagerServer.h"
 #include "Game.h"
-#include "ClientInfo.h"
+#include "ClientProxy.h"
 
 GameManager& GameManager::GetInstance() {
 	static GameManager instance;
@@ -16,10 +16,10 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 
 	auto& networkManagerServer = NetworkManagerServer::GetInstance();
 
-	ClientInfo* ci1 = networkManagerServer.CreateClientInfo(clientIps[0], clientPorts[0]);
-	ClientInfo* ci2 = networkManagerServer.CreateClientInfo(clientIps[1], clientPorts[1]);
+	ClientProxy* ci1 = networkManagerServer.CreateClientProxy(clientIps[0], clientPorts[0]);
+	ClientProxy* ci2 = networkManagerServer.CreateClientProxy(clientIps[1], clientPorts[1]);
 	
-	auto& mp = _clientInfoToGameIdxMap;
+	auto& mp = _clientProxyToGameIdxMap;
 
 	_gamesMutex.lock();
 	if (mp.find(ci1) != mp.end())
@@ -48,18 +48,18 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 	size_t idx = _games.size();
 	_games.push_back(game);
 
-	_clientInfoToGameIdxMap.emplace(ci1, idx);
-	_clientInfoToGameIdxMap.emplace(ci2, idx);
+	_clientProxyToGameIdxMap.emplace(ci1, idx);
+	_clientProxyToGameIdxMap.emplace(ci2, idx);
 	
 	_gamesMutex.unlock();
 
 	return ret;
 }
 
-bool GameManager::RemoveGame(ClientInfo* clientInfo)
+bool GameManager::RemoveGame(ClientProxy* clientProxy)
 {
 	_gamesMutex.lock();
-	if (_clientInfoToGameIdxMap.find(clientInfo) == _clientInfoToGameIdxMap.end())
+	if (_clientProxyToGameIdxMap.find(clientProxy) == _clientProxyToGameIdxMap.end())
 	{
 		_gamesMutex.unlock();
 
@@ -68,11 +68,11 @@ bool GameManager::RemoveGame(ClientInfo* clientInfo)
 		return false;
 	}
 
-	size_t gameIdx = _clientInfoToGameIdxMap[clientInfo];
+	size_t gameIdx = _clientProxyToGameIdxMap[clientProxy];
 
 	shared_ptr<Game> game = _games[gameIdx];
-	_clientInfoToGameIdxMap.erase(game->p_player1);
-	_clientInfoToGameIdxMap.erase(game->p_player2);
+	_clientProxyToGameIdxMap.erase(game->p_player1);
+	_clientProxyToGameIdxMap.erase(game->p_player2);
 
 	swap(_games[gameIdx], _games[_games.size() - 1]);
 	_games.pop_back();
@@ -82,18 +82,18 @@ bool GameManager::RemoveGame(ClientInfo* clientInfo)
 	return true;
 }
 
-Game* GameManager::FindGame(ClientInfo* clientInfo)
+Game* GameManager::FindGame(ClientProxy* clientProxy)
 {
 	_gamesMutex.lock();
-	if (_clientInfoToGameIdxMap.find(clientInfo) == _clientInfoToGameIdxMap.end())
+	if (_clientProxyToGameIdxMap.find(clientProxy) == _clientProxyToGameIdxMap.end())
 	{
 		_gamesMutex.unlock();
 
-		cout << "[GameManager::FindGame] No game is found to use this clientInfo: " << clientInfo << endl;
+		cout << "[GameManager::FindGame] No game is found to use this clientProxy: " << clientProxy << endl;
 		return nullptr;
 	}
 	
-	Game* game = _games[_clientInfoToGameIdxMap[clientInfo]].get();
+	Game* game = _games[_clientProxyToGameIdxMap[clientProxy]].get();
 	
 	_gamesMutex.unlock();
 
@@ -106,7 +106,7 @@ int GameManager::RemoveAllGames()
 	
 	int ret = static_cast<int>(_games.size());
 	_games.clear();
-	_clientInfoToGameIdxMap.clear();
+	_clientProxyToGameIdxMap.clear();
 
 	_gamesMutex.unlock();
 

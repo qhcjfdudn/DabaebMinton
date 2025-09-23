@@ -6,7 +6,7 @@
 #include "GameObject.h"
 
 class ReplicationManager;
-class ClientInfo;
+class ClientProxy;
 
 class PacketGenerator
 {

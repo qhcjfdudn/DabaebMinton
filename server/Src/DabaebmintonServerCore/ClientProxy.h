@@ -4,11 +4,11 @@
 #include "DeliveryNotificationManager.h"
 #include "SockAddress.h"
 
-class ClientInfo
+class ClientProxy
 {
 public:
-	ClientInfo(std::string_view ip, const uint16_t port);
-	ClientInfo(const SockAddress& sockAddress);
+	ClientProxy(std::string_view ip, const uint16_t port);
+	ClientProxy(const SockAddress& sockAddress);
 
 	const SockAddress& GetSockAddress() const { return _sockAddress; }
 

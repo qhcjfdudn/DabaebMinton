@@ -30,7 +30,7 @@
     <ClCompile Include="NetworkManagerServer.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="ClientInfo.cpp">
+    <ClCompile Include="ClientProxy.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="OverlappedDto.cpp">
@@ -188,7 +188,7 @@
     <ClInclude Include="NetworkManagerServer.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="ClientInfo.h">
+    <ClInclude Include="ClientProxy.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Socket.h">

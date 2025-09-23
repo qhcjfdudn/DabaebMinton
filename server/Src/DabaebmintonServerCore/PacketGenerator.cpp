@@ -3,7 +3,7 @@
 
 #include "DeliveryNotificationManager.h"
 #include "ReplicationManagerTransmissionData.h"
-#include "ClientInfo.h"
+#include "ClientProxy.h"
 
 #include "GetRequiredBits.h"
 #include "Constant.h"

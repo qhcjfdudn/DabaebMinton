@@ -7,7 +7,7 @@
 
 #include "Constant.h"
 #include "GetRequiredBits.h"
-#include "ClientInfo.h"
+#include "ClientProxy.h"
 #include "SockAddress.h"
 
 #include "PacketGenerator.h"
@@ -345,7 +345,7 @@ int NetworkManagerServer::Recv(shared_ptr<Socket> clientSocket)
 	return retCode;
 }
 
-int NetworkManagerServer::SendTo(ClientInfo* client, const OutputMemoryBitStream& stream)
+int NetworkManagerServer::SendTo(ClientProxy* client, const OutputMemoryBitStream& stream)
 {
 	auto& overlapped = GetNextSendOverlapped();
 	ZeroMemory(&overlapped, sizeof(overlapped));
@@ -377,7 +377,7 @@ int NetworkManagerServer::SendTo(ClientInfo* client, const OutputMemoryBitStream
 	return retCode;
 }
 
-int NetworkManagerServer::SendTo(ClientInfo* client)
+int NetworkManagerServer::SendTo(ClientProxy* client)
 {
 	// Check TimedOut Packets
 	client->GetDeliveryNotificationManager().ProcessTimedOutPackets();
@@ -433,28 +433,28 @@ int NetworkManagerServer::RecvFrom()
 void NetworkManagerServer::SendOutgoingPackets()
 {
 	// Check TimedOut Packets
-	for (auto& kv : _sockAddressToClientInfoMap)
+	for (auto& kv : _sockAddressToClientProxyMap)
 	{
-		auto clientInfo = kv.second;
-		clientInfo->GetDeliveryNotificationManager().ProcessTimedOutPackets();
+		auto clientProxy = kv.second;
+		clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 	}
 
 	// Replication State
-	for (auto& kv : _sockAddressToClientInfoMap)
+	for (auto& kv : _sockAddressToClientProxyMap)
 	{
-		auto clientInfo = kv.second;
-		SendReplicationStatePacketToClient(clientInfo.get());
+		auto clientProxy = kv.second;
+		SendReplicationStatePacketToClient(clientProxy.get());
 	}
 
 	// RPCs
-	for (auto& kv : _sockAddressToClientInfoMap)
+	for (auto& kv : _sockAddressToClientProxyMap)
 	{
-		auto clientInfo = kv.second;
-		SendRpcPacketToClient(clientInfo.get());
+		auto clientProxy = kv.second;
+		SendRpcPacketToClient(clientProxy.get());
 	}
 }
 
-void NetworkManagerServer::SendReplicationStatePacketToClient(ClientInfo* client)
+void NetworkManagerServer::SendReplicationStatePacketToClient(ClientProxy* client)
 {
 	DeliveryNotificationManager& dnm = client->GetDeliveryNotificationManager();
 	ReplicationManager& nrm = client->GetReplicationManager();
@@ -469,7 +469,7 @@ void NetworkManagerServer::SendReplicationStatePacketToClient(ClientInfo* client
 	}
 }
 
-void NetworkManagerServer::SendRpcPacketToClient(ClientInfo* client)
+void NetworkManagerServer::SendRpcPacketToClient(ClientProxy* client)
 {
 	PacketGenerator packetGenerator{
 		&client->GetDeliveryNotificationManager(),
@@ -491,6 +491,8 @@ void NetworkManagerServer::ProcessQueuedPackets()
 
 void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const SockAddress& clientSockAddress)
 {
+	// 
+
 	spdlog::debug("[NetworkManagerServer::ProcessPacket] called successfully.");
 }
 
@@ -634,70 +636,70 @@ void NetworkManagerServer::ClearAllGameObjects()
 	_linkingContext.Clear();
 }
 
-ClientInfo* NetworkManagerServer::CreateClientInfo(std::string_view ip, const uint16_t port)
+ClientProxy* NetworkManagerServer::CreateClientProxy(std::string_view ip, const uint16_t port)
 {
-	ClientInfo* ret = nullptr;
+	ClientProxy* ret = nullptr;
 
 	SockAddress key{ ip.data(), port };
 
-	_sockAddressToClientInfoMapMutex.lock();
-	if (_sockAddressToClientInfoMap.find(key) != _sockAddressToClientInfoMap.end())
+	_sockAddressToClientProxyMapMutex.lock();
+	if (_sockAddressToClientProxyMap.find(key) != _sockAddressToClientProxyMap.end())
 	{
-		ret = _sockAddressToClientInfoMap[key].get();
-		_sockAddressToClientInfoMapMutex.unlock();
+		ret = _sockAddressToClientProxyMap[key].get();
+		_sockAddressToClientProxyMapMutex.unlock();
 		
-		spdlog::info("[NetworkManagerServer::CreateClientInfo] {}:{} client already exists.", ip, port);
+		spdlog::info("[NetworkManagerServer::CreateClientProxy] {}:{} client already exists.", ip, port);
 		
 		return ret;
 	}
 
-	shared_ptr<ClientInfo> ci = make_shared<ClientInfo>(key);
+	shared_ptr<ClientProxy> ci = make_shared<ClientProxy>(key);
 
-	_sockAddressToClientInfoMap.emplace(key, ci);
-	_sockAddressToClientInfoMapMutex.unlock();
+	_sockAddressToClientProxyMap.emplace(key, ci);
+	_sockAddressToClientProxyMapMutex.unlock();
 
 	return ci.get();
 }
 
-bool NetworkManagerServer::RemoveClientInfo(ClientInfo* clientInfo)
+bool NetworkManagerServer::RemoveClientProxy(ClientProxy* clientProxy)
 {
-	if (clientInfo == nullptr)
+	if (clientProxy == nullptr)
 		return false;
 	
-	const auto& key = clientInfo->GetSockAddress();
+	const auto& key = clientProxy->GetSockAddress();
 
-	_sockAddressToClientInfoMapMutex.lock();
-	if (_sockAddressToClientInfoMap.find(key) == _sockAddressToClientInfoMap.end())
+	_sockAddressToClientProxyMapMutex.lock();
+	if (_sockAddressToClientProxyMap.find(key) == _sockAddressToClientProxyMap.end())
 	{
-		_sockAddressToClientInfoMapMutex.unlock();
+		_sockAddressToClientProxyMapMutex.unlock();
 
-		spdlog::warn("[NetworkManagerServer::RemoveClientInfo] clientInfo is dangling pointer.");
+		spdlog::warn("[NetworkManagerServer::RemoveClientProxy] clientProxy is dangling pointer.");
 
 		return false;
 	}
 
-	_sockAddressToClientInfoMap.erase(key);
-	_sockAddressToClientInfoMapMutex.unlock();
+	_sockAddressToClientProxyMap.erase(key);
+	_sockAddressToClientProxyMapMutex.unlock();
 
 	return true;
 }
 
-ClientInfo* NetworkManagerServer::GetClientInfo(std::string_view ip, const uint16_t port)
+ClientProxy* NetworkManagerServer::GetClientProxy(std::string_view ip, const uint16_t port)
 {
 	const SockAddress key{ ip.data(), port };
 
-	_sockAddressToClientInfoMapMutex.lock();
-	if (_sockAddressToClientInfoMap.find(key) == _sockAddressToClientInfoMap.end())
+	_sockAddressToClientProxyMapMutex.lock();
+	if (_sockAddressToClientProxyMap.find(key) == _sockAddressToClientProxyMap.end())
 	{
-		_sockAddressToClientInfoMapMutex.unlock();
-		spdlog::warn("[NetworkManagerServer::GetClientInfo] {}:{} client does not exist.", ip, port);
+		_sockAddressToClientProxyMapMutex.unlock();
+		spdlog::warn("[NetworkManagerServer::GetClientProxy] {}:{} client does not exist.", ip, port);
 
 		return nullptr;
 	}
 
-	ClientInfo* ret = _sockAddressToClientInfoMap[key].get();
+	ClientProxy* ret = _sockAddressToClientProxyMap[key].get();
 
-	_sockAddressToClientInfoMapMutex.unlock();
+	_sockAddressToClientProxyMapMutex.unlock();
 
 	return ret;
 }
