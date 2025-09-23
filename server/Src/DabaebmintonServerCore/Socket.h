@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Constant.h"
+#include "SockAddress.h"
 #include "OverlappedDto.h"
 
 enum class SocketProtocolType {
@@ -22,15 +22,13 @@ public:
 
 	SocketProtocolType GetProtocolType() const { return m_protocolType; }
 	void SetProtocolType(SocketProtocolType protocolType) { m_protocolType = protocolType; }
-
-	void SetRemoteAddress(const sockaddr_in& remoteAddr) { m_remoteAddr = remoteAddr; }
-
-	OverlappedDto _sendOverlappedDto{};
-	OverlappedDto _recvOverlappedDto{};
 	
 	SOCKET m_socket{};
 
-	sockaddr_in m_remoteAddr;
+	SockAddress _remoteAddr{ "0.0.0.0", 0 };
+
+	OverlappedDto _sendOverlappedDto{};
+	OverlappedDto _recvOverlappedDto{};
 
 private:
 	ULONG_PTR _completionKey;

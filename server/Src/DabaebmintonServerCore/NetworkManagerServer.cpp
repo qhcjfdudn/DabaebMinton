@@ -357,13 +357,15 @@ int NetworkManagerServer::SendTo(ClientInfo* client, const OutputMemoryBitStream
 	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
 	b.len = static_cast<ULONG>(stream.GetByteLength());
 	
+	const sockaddr& remote = client->GetSockAddress().GetSockAddr();
+	
 	int retCode = WSASendTo(m_rudpSocket.m_socket,
 		&b,
 		1,
 		&overlapped._numberOfBytesTransfered,
 		overlapped._overlappedFlags,
-		reinterpret_cast<const sockaddr*>(&client->GetSockAddress().GetSockAddr()),
-		sizeof(sockaddr_in),
+		&remote,
+		sizeof(remote),
 		&overlapped._overlapped,
 		nullptr
 	);
@@ -400,8 +402,7 @@ int NetworkManagerServer::RecvFrom()
 	b.buf = reinterpret_cast<CHAR*>(overlapped._Buffer);
 	b.len = sizeof(overlapped._Buffer);
 
-
-	int lpFromLen = sizeof(m_rudpSocket.m_remoteAddr);
+	int lpFromLen = sizeof(m_rudpSocket._remoteAddr.GetSockAddr());
 
 	int retCode = WSARecvFrom(
 		m_rudpSocket.m_socket,
@@ -409,7 +410,7 @@ int NetworkManagerServer::RecvFrom()
 		1,															// dwBufferCount
 		&overlapped._numberOfBytesTransfered,						// lpNumberOfBytesRecvd
 		&overlapped._overlappedFlags,								// lpFlags
-		reinterpret_cast<sockaddr*>(&m_rudpSocket.m_remoteAddr),
+		&m_rudpSocket._remoteAddr.GetSockAddr(),
 		&lpFromLen,													// lpFromLen
 		&overlapped._overlapped,									// lpOverlapped
 		nullptr														// lpCompletionRoutine
