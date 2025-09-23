@@ -2,6 +2,8 @@
 
 #include "InFlightPacket.h"
 
+class InputMemoryBitStream;
+
 class DeliveryNotificationManager
 {
 public:
@@ -14,6 +16,11 @@ public:
 	InFlightPacketPtr GetNextInFlightPacket();
 
 	const deque<InFlightPacketPtr>& GetInFlightPackets() const { return mInFlightPackets; }
+
+	void ProcessAcks(InputMemoryBitStream& inStream);
+
+	void HandlePacketDeliverySuccess(InFlightPacket* inFlightPacket);
+	void HandlePacketDeliveryFailure(InFlightPacket* inFlightPacket);
 
 private:
 	void HandleDeliveryFailure(InFlightPacketPtr inFlightPacket);
