@@ -491,9 +491,32 @@ void NetworkManagerServer::ProcessQueuedPackets()
 
 void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const SockAddress& clientSockAddress)
 {
-	// 
+	_sockAddressToClientProxyMapMutex.lock_shared();
 
-	spdlog::debug("[NetworkManagerServer::ProcessPacket] called successfully.");
+	// clientMap에 없으면 잘못된 client로부터의 요청이므로 무시한다.
+	if (_sockAddressToClientProxyMap.find(clientSockAddress) == _sockAddressToClientProxyMap.end())
+	{
+		_sockAddressToClientProxyMapMutex.unlock_shared();
+		return;
+	}
+	
+	shared_ptr<ClientProxy> client = _sockAddressToClientProxyMap[clientSockAddress];
+	_sockAddressToClientProxyMapMutex.unlock_shared();
+
+	PacketType packetType{};
+	inStream.ReadBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
+
+	switch (packetType)
+	{
+	case PacketType::PT_Hello:
+		break;
+	case PacketType::PT_Disconnect:
+		break;
+	case PacketType::PT_ReplicationData:
+		break;
+	case PacketType::PT_RPC:
+		break;
+	}
 }
 
 NetworkManagerServer::NetworkManagerServer()

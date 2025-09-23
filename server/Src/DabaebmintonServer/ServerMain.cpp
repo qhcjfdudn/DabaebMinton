@@ -65,6 +65,7 @@ int main()
 
 		while (serverEngine.isRunning.load(std::memory_order_acquire))
 		{
+			networkManagerServer.ProcessQueuedPackets();
 			networkManagerServer.ProcessIOCPEvent();
 		}
 		});
