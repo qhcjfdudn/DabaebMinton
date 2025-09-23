@@ -7,6 +7,7 @@
 #include <deque>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 #include <atomic>
 #include <list>
@@ -39,6 +40,8 @@ using std::deque;
 
 using std::thread;
 using std::mutex;
+using std::shared_mutex;
+using std::shared_lock;
 using std::condition_variable;
 using std::atomic;
 

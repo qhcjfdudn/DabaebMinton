@@ -688,10 +688,10 @@ ClientProxy* NetworkManagerServer::GetClientProxy(std::string_view ip, const uin
 {
 	const SockAddress key{ ip.data(), port };
 
-	_sockAddressToClientProxyMapMutex.lock();
+	_sockAddressToClientProxyMapMutex.lock_shared();
 	if (_sockAddressToClientProxyMap.find(key) == _sockAddressToClientProxyMap.end())
 	{
-		_sockAddressToClientProxyMapMutex.unlock();
+		_sockAddressToClientProxyMapMutex.unlock_shared();
 		spdlog::warn("[NetworkManagerServer::GetClientProxy] {}:{} client does not exist.", ip, port);
 
 		return nullptr;
@@ -699,7 +699,7 @@ ClientProxy* NetworkManagerServer::GetClientProxy(std::string_view ip, const uin
 
 	ClientProxy* ret = _sockAddressToClientProxyMap[key].get();
 
-	_sockAddressToClientProxyMapMutex.unlock();
+	_sockAddressToClientProxyMapMutex.unlock_shared();
 
 	return ret;
 }

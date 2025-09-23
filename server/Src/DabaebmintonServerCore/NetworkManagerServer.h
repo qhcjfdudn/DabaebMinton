@@ -89,7 +89,7 @@ private:
 	queue<ReceivedPacket> _receivedQueue;
 
 	unordered_map<SockAddress, shared_ptr<ClientProxy> > _sockAddressToClientProxyMap;
-	std::mutex _sockAddressToClientProxyMapMutex;
+	shared_mutex _sockAddressToClientProxyMapMutex;
 
 	LinkingContext _linkingContext{};
 };
