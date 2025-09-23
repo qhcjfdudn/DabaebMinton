@@ -47,6 +47,8 @@ public:
 	bool RemoveClientProxy(ClientProxy* ClientProxy);
 	ClientProxy* GetClientProxy(std::string_view ip, const uint16_t port);
 
+	void SendWelcomePacket(ClientProxy* clientProxy);
+
 	LPFN_ACCEPTEX m_AcceptEx = nullptr;
 	LPFN_GETACCEPTEXSOCKADDRS m_GetAcceptExSockAddrs = nullptr;
 

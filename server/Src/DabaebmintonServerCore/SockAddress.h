@@ -26,7 +26,8 @@ public:
 		return h1 ^ (h2 << 1) ^ (h3 << 2);
 	}
 
-	uint32_t GetIP() const { return *reinterpret_cast<const uint32_t*>(&GetSockAddrIn()->sin_addr.S_un.S_addr); }
+	const char* GetIP() const { return inet_ntoa(reinterpret_cast<const sockaddr_in*>(&m_sockaddr)->sin_addr); }
+	const uint16_t GetPort() const { return ntohs(reinterpret_cast<const sockaddr_in*>(&m_sockaddr)->sin_port); }
 
 private:
 	const sockaddr_in* GetSockAddrIn() const { return reinterpret_cast<const sockaddr_in*>(&m_sockaddr); }

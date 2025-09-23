@@ -509,6 +509,7 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 	switch (packetType)
 	{
 	case PacketType::PT_Hello:
+		SendWelcomePacket(client.get());
 		break;
 	case PacketType::PT_Disconnect:
 		break;
@@ -725,4 +726,16 @@ ClientProxy* NetworkManagerServer::GetClientProxy(std::string_view ip, const uin
 	_sockAddressToClientProxyMapMutex.unlock_shared();
 
 	return ret;
+}
+
+void NetworkManagerServer::SendWelcomePacket(ClientProxy* clientProxy)
+{
+	const SockAddress& sockAddress = clientProxy->GetSockAddress();
+	spdlog::info("[NetworkManagerServer::SendWelcomePacket] Welcoming, client {}:{}.", sockAddress.GetIP(), sockAddress.GetPort());
+
+	OutputMemoryBitStream welcomePacket;
+
+	//welcomePacket.Write(kWelcomeCC);
+
+	SendTo(clientProxy, welcomePacket);
 }
