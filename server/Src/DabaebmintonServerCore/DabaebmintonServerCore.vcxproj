@@ -194,6 +194,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AckRange.cpp" />
     <ClCompile Include="BadmintonBottom.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -290,6 +291,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AckRange.h" />
     <ClInclude Include="BadmintonBottom.h" />
     <ClInclude Include="BadmintonNet.h" />
     <ClInclude Include="BitSizeCounter.h" />
