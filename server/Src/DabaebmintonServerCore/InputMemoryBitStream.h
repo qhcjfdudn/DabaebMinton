@@ -1,4 +1,9 @@
 #pragma once
+
+template<typename T>
+concept Primitive = std::integral<T>
+|| std::floating_point<T>;
+
 class InputMemoryBitStream
 {
 public:
@@ -19,6 +24,15 @@ public:
 		ReadBits(&data, inBitCount);
 		return data;
 	}
+
+	template<Primitive T>
+	void Read(T& outData)
+	{
+		ReadBits(&outData, sizeof(outData) << 3);
+	}
+
+	template<>
+	void Read(bool& outData) { ReadBits(&outData, 1); }
 
 private:
 	unsigned char* _buffer;
