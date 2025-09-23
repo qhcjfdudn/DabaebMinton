@@ -109,26 +109,6 @@ void NetworkManagerServer::AcceptEx()
 		cout << "m_AcceptEx 함수 수행 완료" << endl;
 	}
 }
-void NetworkManagerServer::GetAcceptExSockAddrs(shared_ptr<Socket> client)
-{
-	// UDP 통신을 하려면 remote의 addr 정보가 필요하다. socket으로부터 얻자.
-	sockaddr_in* localAddr = nullptr;
-	sockaddr_in* clientAddr = nullptr;
-	int localAddrLen, clientAddrLen;
-
-	m_GetAcceptExSockAddrs(
-		m_lpOutputBuf,
-		0,
-		sizeof(sockaddr_in) + 16,
-		sizeof(sockaddr_in) + 16,
-		reinterpret_cast<sockaddr**>(localAddr),
-		&localAddrLen,
-		reinterpret_cast<sockaddr**>(clientAddr),
-		&clientAddrLen
-	);
-
-	client->SetRemoteAddress(*clientAddr);
-}
 void NetworkManagerServer::ProcessIOCPEvent()
 {
 	GetCompletionStatus();
@@ -598,7 +578,6 @@ void NetworkManagerServer::CreateRUDPSocket()
 void NetworkManagerServer::GetLPFN()
 {
 	GUID guidAcceptEx = WSAID_ACCEPTEX;
-	GUID guidGetAcceptExSockAddrs = WSAID_GETACCEPTEXSOCKADDRS;
 	DWORD dwBytes;
 
 	if (WSAIoctl(
@@ -622,20 +601,6 @@ void NetworkManagerServer::GetLPFN()
 	}
 
 	spdlog::info("[NetworkManagerServer::GetLPFN] Init AcceptEx function complete.");
-
-	if (WSAIoctl(
-		m_listenSocket.m_socket,
-		SIO_GET_EXTENSION_FUNCTION_POINTER,
-		&guidGetAcceptExSockAddrs,
-		sizeof(guidGetAcceptExSockAddrs),
-		&m_GetAcceptExSockAddrs,
-		sizeof(m_GetAcceptExSockAddrs),
-		&dwBytes,
-		nullptr,
-		nullptr) == SOCKET_ERROR) {
-
-		spdlog::error("[NetworkManagerServer::GetLPFN] WSAIoctl error: {}", WSAGetLastError());
-	}
 
 	spdlog::info("[NetworkManagerServer::GetLPFN] Init GetAcceptExSockAddrs function complete.");
 }

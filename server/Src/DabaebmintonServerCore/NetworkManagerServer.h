@@ -17,7 +17,6 @@ public:
 
 	void InitIOCP();
 	void AcceptEx();
-	void GetAcceptExSockAddrs(shared_ptr<Socket> client);
 	void ProcessIOCPEvent();
 	bool GetCompletionStatus();
 	bool ProcessAcceptedClientSocketIOCP();
