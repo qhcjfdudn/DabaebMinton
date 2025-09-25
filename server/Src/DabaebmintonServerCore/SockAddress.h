@@ -12,7 +12,7 @@ public:
 	bool operator==(const SockAddress& other) const
 	{
 		return (m_sockaddr.sa_family == other.m_sockaddr.sa_family &&
-			GetIP() == other.GetIP() &&
+			GetSockAddrIn()->sin_addr.S_un.S_addr == other.GetSockAddrIn()->sin_addr.S_un.S_addr &&
 			GetSockAddrIn()->sin_port == other.GetSockAddrIn()->sin_port);
 	}
 
