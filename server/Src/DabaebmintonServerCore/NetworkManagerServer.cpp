@@ -506,6 +506,8 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 	PacketType packetType{};
 	inStream.ReadBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
 
+	auto& deli = client->GetDeliveryNotificationManager();
+
 	switch (packetType)
 	{
 	case PacketType::PT_Hello:
@@ -513,11 +515,13 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 		break;
 	case PacketType::PT_Disconnect:
 		break;
-	case PacketType::PT_ReplicationData:
-		break;
+	//case PacketType::PT_ReplicationData: // Client로부터 Replication Packet을 수신할 수 없다.
 	case PacketType::PT_RPC:
+		deli.ProcessAcks(inStream);
+		ProcessRPCs(inStream, client.get());
 		break;
 	}
+	
 }
 
 NetworkManagerServer::NetworkManagerServer()
@@ -738,4 +742,15 @@ void NetworkManagerServer::SendWelcomePacket(ClientProxy* clientProxy)
 	//welcomePacket.Write(kWelcomeCC);
 
 	SendTo(clientProxy, welcomePacket);
+}
+
+void NetworkManagerServer::ProcessRPCs(InputMemoryBitStream& inStream, ClientProxy* client)
+{
+	//while (inStream.isEndOfStream() == false)
+	{
+		// Get RPC 함수
+		// 
+		// RPC 함수 호출
+
+	}
 }

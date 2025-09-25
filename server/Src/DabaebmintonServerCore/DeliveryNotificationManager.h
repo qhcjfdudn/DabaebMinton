@@ -19,9 +19,6 @@ public:
 
 	void ProcessAcks(InputMemoryBitStream& inStream);
 
-	void HandlePacketDeliverySuccess(InFlightPacket* inFlightPacket);
-	void HandlePacketDeliveryFailure(InFlightPacket* inFlightPacket);
-
 private:
 	void HandleDeliveryFailure(InFlightPacketPtr inFlightPacket);
 	void HandleDeliverySuccess(InFlightPacketPtr inFlightPacket);

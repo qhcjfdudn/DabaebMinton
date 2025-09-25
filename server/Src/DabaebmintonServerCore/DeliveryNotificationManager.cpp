@@ -52,13 +52,13 @@ void DeliveryNotificationManager::ProcessAcks(InputMemoryBitStream& inStream)
 
 		if (curInFlightPacketSeqNumber == curAckedSeqNumber)
 		{
-			HandlePacketDeliverySuccess(curInFlightPacketPtr.get());
+			HandleDeliverySuccess(curInFlightPacketPtr);
 			mInFlightPackets.pop_front();
 			++curAckedSeqNumber;
 		}
 		else if (curInFlightPacketSeqNumber < curAckedSeqNumber)
 		{
-			HandlePacketDeliveryFailure(curInFlightPacketPtr.get());
+			HandleDeliveryFailure(curInFlightPacketPtr);
 			mInFlightPackets.pop_front();
 		}
 		else if (curInFlightPacketSeqNumber > curAckedSeqNumber)
