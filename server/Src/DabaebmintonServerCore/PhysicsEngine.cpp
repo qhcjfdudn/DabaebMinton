@@ -152,6 +152,21 @@ PxRigidDynamic * PhysicsEngine::CreateSphere2D(const PxVec2& location, const PxV
 	return body;
 }
 
+PxRigidDynamic* PhysicsEngine::CreateCapsule2D(const PxVec2& location, float radius, float halfHeight)
+{
+	PxRigidDynamic* rb = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
+	PxTransform relativePose(PxQuat(PxHalfPi, PxVec3(0, 0, 1)));
+	PxShape* aCapsuleShape = PxRigidActorExt::createExclusiveShape(*rb,
+		PxCapsuleGeometry(radius, halfHeight), *pxMaterial);
+	aCapsuleShape->setLocalPose(relativePose);
+
+	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
+	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, true);
+
+	return rb;
+}
+
 PxRigidDynamic * PhysicsEngine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
 	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);

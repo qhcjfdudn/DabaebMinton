@@ -29,6 +29,8 @@ public:
 
 	PxRigidDynamic* CreateSphere2D(const PxVec2& location, const PxVec2& velocity, float halfExtentRadius);
 
+	PxRigidDynamic* CreateCapsule2D(const PxVec2& location, float radius, float halfHeight);
+
 	PxRigidDynamic* createDynamic(const PxTransform& t,
 		const PxGeometry& geometry,
 		const PxVec3& velocity = PxVec3(0));
