@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="헤더 파일">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
@@ -13,252 +9,270 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{0ea5ad7c-3de7-4294-8e1c-a4e89e734a4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Networking">
+      <UniqueIdentifier>{eb1864e2-274d-46f7-9e37-00f4dbb8ae96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysX">
+      <UniqueIdentifier>{acf8b5d6-d0e8-4a41-bf21-354a02a6a9b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ServerEngine">
+      <UniqueIdentifier>{1d92e9a7-09d2-4aa5-8f77-2acc3779a7bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReplicationUpdateProducer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicationUpdateConsumer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GameManager.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="NetworkManagerServer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ClientProxy.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="OverlappedDto.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Shuttlecock.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ServerEngine.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsEngine.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="LinkingContext.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="BadmintonBottom.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="BadmintonNet.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Packet.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Socket.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Observer.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="OutputMemoryBitStream.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="PacketQueue.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="StaticGameObject.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicationFlag.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicationHeader.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="IOCPEvent.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ServerPCH.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="HttpServer.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="GameController.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="InputMemoryBitStream.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="DeliveryNotificationManager.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="InFlightPacket.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="PacketGenerator.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicationCommand.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicationManager.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReplicationManagerTransmissionData.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="BitSizeCounter.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="SockAddress.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="ReceivedPacket.cpp">
-      <Filter>소스 파일</Filter>
+    <ClCompile Include="Level.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
     <ClCompile Include="AckRange.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="BitSizeCounter.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientProxy.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="DeliveryNotificationManager.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="InFlightPacket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="InputMemoryBitStream.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="IOCPEvent.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="LinkingContext.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkManagerServer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Observer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="OutputMemoryBitStream.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="OverlappedDto.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Packet.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketGenerator.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketQueue.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReceivedPacket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationCommand.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationFlag.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationHeader.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManager.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManagerTransmissionData.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationUpdateConsumer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationUpdateProducer.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="SockAddress.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="Socket.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerPCH.cpp">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsEngine.cpp">
+      <Filter>PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticGameObject.cpp">
+      <Filter>PhysX</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerEngine.cpp">
+      <Filter>ServerEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="HttpServer.cpp">
+      <Filter>ServerEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Level.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketQueue.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Packet.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="BadmintonNet.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="BadmintonBottom.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Shuttlecock.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticGameObject.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationFlag.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GetRequiredBits.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Observer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="OutputMemoryBitStream.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationHeader.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="IOCPEvent.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationUpdateProducer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationUpdateConsumer.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="ServerPCH.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Constant.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="BadmintonBottom.h">
+      <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="NetworkManagerServer.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="BadmintonNet.h">
+      <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="ClientProxy.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Socket.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="OverlappedDto.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ServerEngine.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsEngine.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="LinkingContext.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="HttpServer.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Game.h">
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="GameController.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="InputMemoryBitStream.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="GameManager.h">
+      <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="DeliveryNotificationManager.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="GameObject.h">
+      <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="InFlightPacket.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Level.h">
+      <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="PacketGenerator.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationCommand.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="TransmissionData.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationManagerTransmissionData.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReplicationAction.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="BitSizeCounter.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="PacketType.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="SockAddress.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="ReceivedPacket.h">
-      <Filter>헤더 파일</Filter>
+    <ClInclude Include="Shuttlecock.h">
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="AckRange.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="BitSizeCounter.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientProxy.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="DeliveryNotificationManager.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="GetRequiredBits.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="InFlightPacket.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="InputMemoryBitStream.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="IOCPEvent.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkingContext.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkManagerServer.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Observer.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputMemoryBitStream.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="OverlappedDto.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Packet.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketGenerator.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketQueue.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketType.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReceivedPacket.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationAction.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationCommand.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationFlag.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationHeader.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManager.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManagerTransmissionData.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationUpdateConsumer.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationUpdateProducer.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="SockAddress.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="Socket.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="TransmissionData.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsEngine.h">
+      <Filter>PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="StaticGameObject.h">
+      <Filter>PhysX</Filter>
+    </ClInclude>
+    <ClInclude Include="Constant.h">
+      <Filter>ServerEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerEngine.h">
+      <Filter>ServerEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="HttpServer.h">
+      <Filter>ServerEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
