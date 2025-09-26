@@ -521,7 +521,6 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 		ProcessRPCs(inStream, client.get());
 		break;
 	}
-	
 }
 
 NetworkManagerServer::NetworkManagerServer()

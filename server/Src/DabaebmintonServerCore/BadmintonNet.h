@@ -10,6 +10,6 @@ public:
 	void Write(OutputMemoryBitStream& inStream) override;
 
 private:
-	float _halfX = 0.5f;
-	float _halfY = 2.5f;
+	float _halfX = 0.04f;
+	float _halfY = 0.77f;
 };

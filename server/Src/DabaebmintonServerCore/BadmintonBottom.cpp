@@ -7,7 +7,7 @@
 BadmintonBottom::BadmintonBottom(PxVec2 location) : StaticGameObject(location)
 {
 	auto& engineInstance = PhysicsEngine::GetInstance();
-	_rigidbody = engineInstance.CreatePlain(0.f, 1.f, 0.f, 0.f);
+	_rigidbody = engineInstance.CreatePlain(0.f, 1.f, 0.f, -location.y);
 }
 
 unsigned int BadmintonBottom::GetClassId()
