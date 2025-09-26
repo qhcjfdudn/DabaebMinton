@@ -11,6 +11,8 @@ public:
 	virtual uint32_t GetClassId() const { return 'GMOJ'; }
 	
 	void SetVelocity(PxVec2 velocity);
+	
+	PxActor* GetRigidbody() const;
 	void SetRigidbody(PxRigidDynamic& rigidbody);
 
 	NetworkId_t GetNetworkId() const { return _networkId; }
@@ -34,13 +36,11 @@ public:
 	virtual uint8_t Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) const;
 	virtual size_t CountWriteBitSize(const uint8_t inDirtyState) const;
 
-	PxActor* GetRigidbody() const;
-
 protected:
 	PxVec2 _location;
 	PxVec2 _velocity;
 
 	PxRigidDynamic* _rigidbody = nullptr;
 	
-	NetworkId_t _networkId;
+	NetworkId_t _networkId = 0;
 };

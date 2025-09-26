@@ -19,6 +19,11 @@ void GameObject::SetVelocity(PxVec2 velocity)
 	_velocity = velocity;
 }
 
+PxActor* GameObject::GetRigidbody() const
+{
+	return _rigidbody;
+}
+
 void GameObject::SetRigidbody(PxRigidDynamic& rigidbody)
 {
 	_rigidbody = &rigidbody;
@@ -96,9 +101,4 @@ size_t GameObject::CountWriteBitSize(const uint8_t inDirtyState) const
 	}
 
 	return totalBits;
-}
-
-PxActor* GameObject::GetRigidbody() const
-{
-	return _rigidbody;
 }
