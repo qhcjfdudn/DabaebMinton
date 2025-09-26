@@ -17,5 +17,5 @@ public:
 	size_t CountWriteBitSize(const uint8_t inState) const override;
 
 private:
-	float _radius = 1.5;
+	float _radius = 0.3f;
 };

@@ -1,16 +1,18 @@
 #include "ServerPCH.h"
 #include "Shuttlecock.h"
 
-#include "OutputMemoryBitStream.h"
 #include "PhysicsEngine.h"
+#include "OutputMemoryBitStream.h"
 
 Shuttlecock::Shuttlecock(PxVec2 location, PxVec2 velocity) :
 	GameObject(location, velocity)
 {
-	auto& engineInstance = PhysicsEngine::GetInstance();
+	auto& physicsEngine = PhysicsEngine::GetInstance();
 
-	_rigidbody = engineInstance.CreateSphere2D(location, velocity, _radius);
-	PxRigidBodyExt::updateMassAndInertia(*_rigidbody, 10.0f);
+	_rigidbody = physicsEngine.CreateSphere2D(location, velocity, _radius);
+	PxRigidBodyExt::updateMassAndInertia(*_rigidbody, 1.0f);
+
+	_rigidbody->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 }
 
 float Shuttlecock::GetRadius() const
