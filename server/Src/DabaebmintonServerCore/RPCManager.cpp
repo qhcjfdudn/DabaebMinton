@@ -14,7 +14,7 @@ RPCManager::RPCManager()
 	RegisterUnwrapRpc('MVPL', UnwrapMovePlayer);
 }
 
-void RPCManager::RegisterUnwrapRpc(uint32_t name, RPCFuncType func)
+void RPCManager::RegisterUnwrapRpc(RPCNameType name, RPCFuncType func)
 {
 	if (_nameToRpcMap.find(name) != _nameToRpcMap.end())
 	{
@@ -27,7 +27,7 @@ void RPCManager::RegisterUnwrapRpc(uint32_t name, RPCFuncType func)
 
 void RPCManager::ProcessRpc(const ClientProxy& clientProxy, InputMemoryBitStream& inStream)
 {
-	uint32_t name = 0;
+	RPCNameType name = 0;
 	inStream.Read(name);
 
 	if (_nameToRpcMap.find(name) == _nameToRpcMap.end())

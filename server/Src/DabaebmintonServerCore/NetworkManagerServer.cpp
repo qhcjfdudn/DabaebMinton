@@ -746,7 +746,7 @@ void NetworkManagerServer::SendWelcomePacket(ClientProxy* clientProxy)
 void NetworkManagerServer::ProcessRPCs(InputMemoryBitStream& inStream, ClientProxy* client)
 {
 	spdlog::debug("[NetworkManagerServer::ProcessRPCs] called.");
-	//while (inStream.isEndOfStream() == false)
+	while (inStream.GetBitsLeft() >= (sizeof(RPCNameType) << 3))
 	{
 		// Get RPC 함수
 		// 

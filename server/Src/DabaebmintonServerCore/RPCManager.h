@@ -3,6 +3,7 @@
 class ClientProxy;
 class InputMemoryBitStream;
 
+using RPCNameType = uint32_t;
 using RPCFuncType = std::function<void(const ClientProxy&, InputMemoryBitStream&)>;
 
 class RPCManager
@@ -10,7 +11,7 @@ class RPCManager
 public:
 	RPCManager();
 
-	void RegisterUnwrapRpc(uint32_t name, RPCFuncType func);
+	void RegisterUnwrapRpc(RPCNameType name, RPCFuncType func);
 
 	void ProcessRpc(const ClientProxy& clientProxy, InputMemoryBitStream& inStream);
 
