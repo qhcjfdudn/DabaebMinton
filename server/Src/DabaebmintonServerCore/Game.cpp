@@ -13,7 +13,7 @@ Game::Game(ClientProxy* player1, ClientProxy* player2) :
 	p_player1{ player1 }, p_player2{ player2 },
 	_gamePlayState{ GamePlayState::Initializing },
 	_level{},
-	gameController{}
+	_gameController{}
 {
 	_level.InitLevel();
 

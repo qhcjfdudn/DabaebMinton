@@ -6,6 +6,7 @@
 #include "LinkingContext.h"
 #include "SockAddress.h"
 #include "ReceivedPacket.h"
+#include "RPCManager.h"
 
 class GameObject;
 class ClientProxy;
@@ -46,6 +47,8 @@ public:
 	ClientProxy* CreateClientProxy(std::string_view ip, const uint16_t port);
 	bool RemoveClientProxy(ClientProxy* ClientProxy);
 	ClientProxy* GetClientProxy(std::string_view ip, const uint16_t port);
+
+	RPCManager& GetRpcManager() { return _rpcManager; }
 
 	void SendWelcomePacket(ClientProxy* clientProxy);
 	void ProcessRPCs(InputMemoryBitStream& inStream, ClientProxy* client);
@@ -95,4 +98,6 @@ private:
 	shared_mutex _sockAddressToClientProxyMapMutex;
 
 	LinkingContext _linkingContext{};
+
+	RPCManager _rpcManager{};
 };

@@ -267,6 +267,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClCompile Include="ReplicationUpdateProducer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="RPCManager.cpp" />
     <ClCompile Include="ServerEngine.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -329,6 +330,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="ReplicationManagerTransmissionData.h" />
     <ClInclude Include="ReplicationUpdateConsumer.h" />
     <ClInclude Include="ReplicationUpdateProducer.h" />
+    <ClInclude Include="RPCManager.h" />
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="ServerPCH.h" />
     <ClInclude Include="Shuttlecock.h" />

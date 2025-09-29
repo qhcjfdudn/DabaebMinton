@@ -10,7 +10,7 @@ public:
 
 	Game* CreateGame(const string clientIps[2], const unsigned int clientPorts[2]);
 	bool RemoveGame(ClientProxy * clientProxy);
-	Game* FindGame(ClientProxy * clientProxy);
+	Game* FindGame(const ClientProxy* clientProxy);
 
 	int RemoveAllGames();
 
@@ -22,5 +22,5 @@ public:
 	std::condition_variable _replicationCv;
 
 private:
-	std::unordered_map<ClientProxy*, size_t> _clientProxyToGameIdxMap;
+	std::unordered_map<const ClientProxy*, size_t> _clientProxyToGameIdxMap;
 };

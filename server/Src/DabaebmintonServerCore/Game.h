@@ -24,12 +24,12 @@ public:
 	Game(ClientProxy* player1, ClientProxy* player2);
 	~Game();
 
+	GameController& GetGameController() { return _gameController; }
+
 	bool HasElapsedReplicationInterval();
 	void SetNextReplicationTimeFromNow();
 
 	Level _level;
-	
-	GameController gameController;
 
 	// For Networking
 	unsigned long long _gameKey{ 0 };
@@ -41,4 +41,5 @@ public:
 
 private:
 	GamePlayState _gamePlayState;
+	GameController _gameController;
 };

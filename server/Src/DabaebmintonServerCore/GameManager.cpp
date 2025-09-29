@@ -82,7 +82,7 @@ bool GameManager::RemoveGame(ClientProxy* clientProxy)
 	return true;
 }
 
-Game* GameManager::FindGame(ClientProxy* clientProxy)
+Game* GameManager::FindGame(const ClientProxy* clientProxy)
 {
 	_gamesMutex.lock();
 	if (_clientProxyToGameIdxMap.find(clientProxy) == _clientProxyToGameIdxMap.end())

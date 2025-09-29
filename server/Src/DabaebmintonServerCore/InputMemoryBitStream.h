@@ -10,6 +10,8 @@ public:
 	InputMemoryBitStream(const unsigned char* src, uint32_t bitCount);
 	~InputMemoryBitStream();
 
+	const unsigned char* GetBuffer() const { return _buffer; }
+
 	bool isEndOfStream() const;
 	size_t GetBitLength() const;
 	size_t GetBitsLeft() const;
