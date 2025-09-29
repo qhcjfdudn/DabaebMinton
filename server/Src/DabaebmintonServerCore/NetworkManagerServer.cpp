@@ -148,7 +148,7 @@ void NetworkManagerServer::ProcessIOCPEvent()
 			}
 			else if (receivedBytes > 0)
 			{
-				auto inStreamPtr = make_shared<InputMemoryBitStream>(m_rudpSocket._sendOverlappedDto._Buffer, receivedBytes << 3);
+				auto inStreamPtr = make_shared<InputMemoryBitStream>(m_rudpSocket._recvOverlappedDto._Buffer, receivedBytes << 3);
 				_receivedQueue.emplace(inStreamPtr, recvOverlapped._remoteSockaddr);
 			}
 
