@@ -143,6 +143,9 @@
     <ClCompile Include="RPCManager.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
+    <ClCompile Include="SessionToken.cpp">
+      <Filter>Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerPCH.h">
@@ -278,6 +281,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="RPCManager.h">
+      <Filter>Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionToken.h">
       <Filter>Networking</Filter>
     </ClInclude>
   </ItemGroup>

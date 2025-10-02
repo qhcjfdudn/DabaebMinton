@@ -7,6 +7,7 @@
 #include "SockAddress.h"
 #include "ReceivedPacket.h"
 #include "RPCManager.h"
+#include "SessionToken.h"
 
 class GameObject;
 class ClientProxy;
@@ -100,4 +101,6 @@ private:
 	LinkingContext _linkingContext{};
 
 	RPCManager _rpcManager{};
+
+	unordered_map<uint64_t, SessionToken> tokenIdToSessionTokenMap;
 };

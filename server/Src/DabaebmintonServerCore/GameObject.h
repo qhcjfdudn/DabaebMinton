@@ -18,6 +18,9 @@ public:
 	NetworkId_t GetNetworkId() const { return _networkId; }
 	void SetNetworkId(NetworkId_t networkId) { _networkId = networkId; }
 
+	PlayerId_t GetOwnerId() const { return _ownerId; }
+	void SetOwnerId(PlayerId_t ownerId) { _ownerId = ownerId; }
+
 	virtual bool FixedUpdate();
 	void SetCurrentTransform();
 
@@ -43,4 +46,5 @@ protected:
 	PxRigidDynamic* _rigidbody = nullptr;
 	
 	NetworkId_t _networkId = 0;
+	PlayerId_t _ownerId;
 };

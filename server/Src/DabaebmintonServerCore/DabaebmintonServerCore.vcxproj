@@ -281,6 +281,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="SessionToken.cpp" />
     <ClCompile Include="Shuttlecock.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ServerPCH.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -333,6 +334,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="RPCManager.h" />
     <ClInclude Include="ServerEngine.h" />
     <ClInclude Include="ServerPCH.h" />
+    <ClInclude Include="SessionToken.h" />
     <ClInclude Include="Shuttlecock.h" />
     <ClInclude Include="SockAddress.h" />
     <ClInclude Include="Socket.h" />

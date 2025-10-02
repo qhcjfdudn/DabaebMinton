@@ -45,6 +45,7 @@ using std::shared_lock;
 using std::condition_variable;
 using std::atomic;
 
-using NetworkId_t = unsigned int;
+using NetworkId_t = uint32_t;
+using PlayerId_t = uint32_t;
 
 using namespace physx;
