@@ -748,7 +748,7 @@ uint64_t NetworkManagerServer::CreateSessionToken(ClientProxy* clientProxy)
 	do
 	{
 		std::uniform_int_distribution<PlayerId_t> distribution(0, (std::numeric_limits<PlayerId_t>::max)());
-		PlayerId_t playerId = distribution(engine);
+		playerId = distribution(engine);
 
 	} while (_isPlayerIdUsed.find(playerId) != _isPlayerIdUsed.end());
 
