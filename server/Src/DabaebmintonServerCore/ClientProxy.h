@@ -15,10 +15,14 @@ public:
 	ReplicationManager& GetReplicationManager() { return _replicationManager; }
 	DeliveryNotificationManager& GetDeliveryNotificationManager() { return _deliveryNotificationManager; }
 
+	void SetSessionTokenId(uint64_t sessionTokenId) { _sessionTokenId = sessionTokenId; }
+
 private:
 	SockAddress _sockAddress;
 
 	// for RUDP
 	ReplicationManager _replicationManager{};
 	DeliveryNotificationManager _deliveryNotificationManager{};
+
+	uint64_t _sessionTokenId;
 };

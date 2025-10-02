@@ -731,6 +731,49 @@ ClientProxy* NetworkManagerServer::GetClientProxy(std::string_view ip, const uin
 	return ret;
 }
 
+uint64_t NetworkManagerServer::CreateSessionToken(ClientProxy* clientProxy)
+{
+	std::random_device random;                                
+	std::mt19937 engine(random());
+
+	uint64_t tokenId = 0;
+	PlayerId_t playerId = 0;
+
+	do
+	{
+		std::uniform_int_distribution<uint64_t> distribution(0, (std::numeric_limits<uint64_t>::max)());
+		tokenId = distribution(engine);
+	} while (tokenIdToSessionTokenMap.find(tokenId) != tokenIdToSessionTokenMap.end());
+
+	do
+	{
+		std::uniform_int_distribution<PlayerId_t> distribution(0, (std::numeric_limits<PlayerId_t>::max)());
+		PlayerId_t playerId = distribution(engine);
+
+	} while (_isPlayerIdUsed.find(playerId) != _isPlayerIdUsed.end());
+
+	tokenIdToSessionTokenMap.emplace(tokenId, make_shared<SessionToken>(tokenId, playerId));
+	_isPlayerIdUsed.emplace(playerId, true);
+
+	clientProxy->SetSessionTokenId(tokenId);
+
+	return tokenId;
+}
+
+void NetworkManagerServer::RemoveSessionToken(uint64_t tokenId)
+{
+	if (tokenIdToSessionTokenMap.find(tokenId) == tokenIdToSessionTokenMap.end())
+	{
+		spdlog::debug("This tokenId doesn't exist. tokenId: {}", tokenId);
+		return;
+	}
+
+	PlayerId_t playerId = tokenIdToSessionTokenMap[tokenId]->GetPlayerId();
+
+	_isPlayerIdUsed.erase(playerId);
+	tokenIdToSessionTokenMap.erase(tokenId);
+}
+
 void NetworkManagerServer::SendWelcomePacket(ClientProxy* clientProxy)
 {
 	const SockAddress& sockAddress = clientProxy->GetSockAddress();

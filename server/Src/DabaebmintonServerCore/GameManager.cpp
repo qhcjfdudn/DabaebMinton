@@ -42,6 +42,9 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 		return ret;
 	}
 
+	networkManagerServer.CreateSessionToken(ci1);
+	networkManagerServer.CreateSessionToken(ci2);
+
 	shared_ptr<Game> game = make_shared<Game>(ci1, ci2);
 	ret = game.get();
 

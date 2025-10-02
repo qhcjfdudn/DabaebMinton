@@ -51,6 +51,9 @@ public:
 
 	RPCManager& GetRpcManager() { return _rpcManager; }
 
+	uint64_t CreateSessionToken(ClientProxy * clientProxy);
+	void RemoveSessionToken(uint64_t tokenId);
+
 	void SendWelcomePacket(ClientProxy* clientProxy);
 	void ProcessRPCs(InputMemoryBitStream& inStream, ClientProxy* client);
 
@@ -102,5 +105,6 @@ private:
 
 	RPCManager _rpcManager{};
 
-	unordered_map<uint64_t, SessionToken> tokenIdToSessionTokenMap;
+	unordered_map<uint64_t, shared_ptr<SessionToken>> tokenIdToSessionTokenMap;
+	unordered_map<PlayerId_t, bool> _isPlayerIdUsed;
 };
