@@ -78,6 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b70ab4d227bb1fc4ba6e1a561efb7d01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <PlayMode>k__BackingField: 0
 --- !u!1001 &2310672505134541802
 PrefabInstance:
   m_ObjectHideFlags: 0
