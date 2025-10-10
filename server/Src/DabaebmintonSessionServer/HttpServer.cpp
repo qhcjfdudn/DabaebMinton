@@ -19,6 +19,10 @@ bool HttpServer::ListenBlock()
 
 void HttpServer::Stop()
 {
+	if (_isStopping)
+		return;
+
+	_isStopping = true;
 	_server.stop();
 }
 
