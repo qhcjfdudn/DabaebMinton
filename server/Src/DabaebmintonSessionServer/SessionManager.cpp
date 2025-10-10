@@ -54,9 +54,7 @@ SessionManager::SessionManager()
 {
 #ifdef _DEBUG
 	// Client 접속 테스트를 편하게 하기 위한 개발 코드
-	SessionToken dummy1{ 0, 123 }, dummy2{ 1, 234 };
-	
-	_sessionMap.emplace(0, dummy1);
-	_sessionMap.emplace(1, dummy2);
+	_sessionMap.emplace(123123123, SessionToken{ 123123123, 123 });
+	_sessionMap.emplace(234234234, SessionToken{ 234234234, 234 });
 #endif
 }
