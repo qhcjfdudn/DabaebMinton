@@ -35,7 +35,7 @@
 .vs/
 server/Output
 server/Build
-server/Src/Client/Client.vcxproj.user
+server/Src/[Cc]lient/
 server/Src/UtilProject
 
 server/ExternalLibrary
