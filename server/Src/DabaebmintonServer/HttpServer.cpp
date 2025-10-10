@@ -53,6 +53,8 @@ void HttpServer::Init()
 	_server.Post("/stop", [&] (const httplib::Request& req, httplib::Response& res)
 		{
 			Observer::notify(ObserverEvent::EngineOff);
+
+			Stop();
 		});
 }
 

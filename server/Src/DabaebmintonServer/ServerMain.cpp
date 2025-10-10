@@ -111,7 +111,7 @@ int main()
 
 	developerInputThread.join();
 
-	//levelPlayThread.join();
+	HttpServer::GetInstance().Stop();
 	
 	replicationUpdateProducer.join();
 

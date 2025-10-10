@@ -134,9 +134,6 @@
     <ClCompile Include="ServerEngine.cpp">
       <Filter>ServerEngine</Filter>
     </ClCompile>
-    <ClCompile Include="HttpServer.cpp">
-      <Filter>ServerEngine</Filter>
-    </ClCompile>
     <ClCompile Include="Player.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -272,9 +269,6 @@
       <Filter>ServerEngine</Filter>
     </ClInclude>
     <ClInclude Include="ServerEngine.h">
-      <Filter>ServerEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="HttpServer.h">
       <Filter>ServerEngine</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">

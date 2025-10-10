@@ -21,13 +21,19 @@
     <ClCompile Include="DeveloperCommandFunctor.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="HttpServer.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ServerPCH.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="HttpServer.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
     <ClInclude Include="DeveloperCommandFunctor.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>소스 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
