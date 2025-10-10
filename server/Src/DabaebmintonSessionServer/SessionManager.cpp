@@ -33,7 +33,10 @@ SessionToken SessionManager::GetSession(SessionId_t sessionId)
 		return emptySession;
 	}
 
-	return _sessionMap.at(sessionId);
+	SessionToken session = _sessionMap.at(sessionId);
+	spdlog::info("[SessionManager::GetSession] Get SessionId: {}, PlayerId: {}", session.GetTokenId(), session.GetPlayerId());
+
+	return session;
 }
 
 void SessionManager::DeleteSession(SessionId_t sessionId)
