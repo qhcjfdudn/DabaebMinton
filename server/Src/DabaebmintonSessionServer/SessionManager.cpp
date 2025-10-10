@@ -49,3 +49,14 @@ void SessionManager::DeleteSession(SessionId_t sessionId)
 
 	_sessionMap.erase(sessionId);
 }
+
+SessionManager::SessionManager()
+{
+#ifdef _DEBUG
+	// Client 접속 테스트를 편하게 하기 위한 개발 코드
+	SessionToken dummy1{ 0, 123 }, dummy2{ 1, 234 };
+	
+	_sessionMap.emplace(0, dummy1);
+	_sessionMap.emplace(1, dummy2);
+#endif
+}

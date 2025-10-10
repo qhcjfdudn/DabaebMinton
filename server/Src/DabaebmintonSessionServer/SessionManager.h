@@ -12,7 +12,7 @@ public:
 	void DeleteSession(SessionId_t sessionId);
 
 private:
-	SessionManager() = default;
+	SessionManager();
 
 	unordered_map<SessionId_t, SessionToken> _sessionMap;
 
