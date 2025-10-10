@@ -96,12 +96,18 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\DabaebMintonServerCore.lib;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\spdlogd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <AdditionalOptions>utf-8/ %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -113,6 +119,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,12 +136,18 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\DabaebMintonServerCore.lib;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\spdlogd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Manifest>
+      <AdditionalOptions>utf-8/ %(AdditionalOptions)</AdditionalOptions>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -146,6 +159,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)InternalLibrary\$(Platform)\$(Configuration)\DabaebMintonServerCore\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\httplib\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\json-3.12.0\include;$(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\include</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
