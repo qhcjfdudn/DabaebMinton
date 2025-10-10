@@ -13,14 +13,19 @@
 #include <deque>
 #include <thread>
 #include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 #include <atomic>
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
 #include <chrono>
+#include <random>
+#include <limits>
+#include <functional>
 
 #include <WinSock2.h>
+#include <ws2tcpip.h>
 #include <mswsock.h>
 
 #include <PxPhysicsAPI.h>
@@ -33,10 +38,7 @@ using std::cout;
 using std::endl;
 using std::string;
 
-using std::chrono::system_clock;
-using std::chrono::local_time;
-using std::chrono::zoned_time;
-using std::chrono::current_zone;
+using namespace std::chrono;
 
 using std::vector;
 using std::unordered_map;
@@ -46,9 +48,12 @@ using std::deque;
 
 using std::thread;
 using std::mutex;
+using std::shared_mutex;
+using std::shared_lock;
 using std::condition_variable;
 using std::atomic;
 
-using NetworkId_t = unsigned int;
+using NetworkId_t = uint32_t;
+using PlayerId_t = uint32_t;
 
 using namespace physx;
