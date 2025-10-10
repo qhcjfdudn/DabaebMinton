@@ -15,5 +15,5 @@ private:
 	HttpServer();
 
 	httplib::Server _server;
+	bool _isStopping{ false };
 };
-

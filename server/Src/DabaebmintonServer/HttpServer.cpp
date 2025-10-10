@@ -1,6 +1,6 @@
 #include "ServerPCH.h"
-
 #include "HttpServer.h"
+
 #include "nlohmann/json.hpp"
 
 #include "ServerEngine.h"
@@ -65,6 +65,10 @@ bool HttpServer::ListenBlock()
 
 void HttpServer::Stop()
 {
+	if (_isStopping)
+		return;
+
+	_isStopping = true;
 	_server.stop();
 }
 
