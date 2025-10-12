@@ -23,3 +23,13 @@ SockAddress::SockAddress(const SockAddress& rhs) :
 	SockAddress(rhs.m_sockaddr)
 {
 }
+
+const char* SockAddress::GetIP() const
+{ 
+	return inet_ntoa(reinterpret_cast<const sockaddr_in*>(&m_sockaddr)->sin_addr);
+}
+
+const uint16_t SockAddress::GetPort() const
+{
+	return ntohs(reinterpret_cast<const sockaddr_in*>(&m_sockaddr)->sin_port);
+}

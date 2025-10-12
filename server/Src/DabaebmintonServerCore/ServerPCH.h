@@ -17,6 +17,10 @@
 #include <random>
 #include <limits>
 
+#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif // !_WINSOCK_DEPRECATED_NO_WARNINGS
+
 #include <WinSock2.h>
 #include <ws2tcpip.h>
 #include <mswsock.h>
