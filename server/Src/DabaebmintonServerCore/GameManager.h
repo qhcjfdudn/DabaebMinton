@@ -1,5 +1,7 @@
 #pragma once
 
+#include "SessionToken.h"
+
 class Game;
 class ClientProxy;
 
@@ -8,8 +10,8 @@ class GameManager
 public:
 	static GameManager& GetInstance();
 
-	Game* CreateGame(const string clientIps[2], const unsigned int clientPorts[2]);
-	bool RemoveGame(ClientProxy * clientProxy);
+	Game* CreateGame(const SessionToken (&sessions)[2]);
+	bool RemoveGame(ClientProxy* clientProxy);
 	Game* FindGame(const ClientProxy* clientProxy);
 
 	int RemoveAllGames();

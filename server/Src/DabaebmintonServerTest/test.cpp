@@ -29,40 +29,38 @@ protected:
 
 TEST(ClientProxy, CheckAfterClientProxyCreationAndElimination)
 {
-	string clientIp = "123.123.123.123";
-	const unsigned int clientPort = 12345;
-
 	auto& networkManagerServer = NetworkManagerServer::GetInstance();
+
+	SessionToken dummySession{ 123123123123, 123 };
 	
-	EXPECT_EQ(nullptr, networkManagerServer.GetClientProxy(clientIp, clientPort));
+	EXPECT_EQ(nullptr, networkManagerServer.GetClientProxy(dummySession.GetTokenId()));
 
-	ClientProxy* ci = networkManagerServer.CreateClientProxy(clientIp, clientPort);
-	EXPECT_EQ(ci, networkManagerServer.GetClientProxy(clientIp, clientPort));
+	ClientProxy* ci = networkManagerServer.CreateClientProxy(dummySession);
+	EXPECT_EQ(ci, networkManagerServer.GetClientProxy(dummySession.GetTokenId()));
 
-	networkManagerServer.RemoveClientProxy(ci);
+	networkManagerServer.RemoveClientProxy(dummySession.GetTokenId());
 	ci = nullptr;
 
-	EXPECT_EQ(nullptr, networkManagerServer.GetClientProxy(clientIp, clientPort));
+	EXPECT_EQ(nullptr, networkManagerServer.GetClientProxy(dummySession.GetTokenId()));
 }
 
 // Client 매칭이 성사되면 game을 만든다.
 TEST_F(PhysicsEngineFixture, CheckGamesSizeWhenGameCreatedAndDeleted)
 {
-	string clientIps[2] = { "123.123.123.123", "124.124.124.124" };
-	const unsigned int clientPorts[2] = { 12345, 23456 };
-
 	auto& networkManagerServer = NetworkManagerServer::GetInstance();
-	EXPECT_EQ(networkManagerServer.GetClientProxy(clientIps[0], clientPorts[0]), nullptr);
-	EXPECT_EQ(networkManagerServer.GetClientProxy(clientIps[1], clientPorts[1]), nullptr);
+
+	SessionToken dummySessions[] = { SessionToken{ 123123123123, 123 }, SessionToken{ 234234234234, 234 } };
+	EXPECT_EQ(nullptr, networkManagerServer.GetClientProxy(dummySessions[0].GetTokenId()));
+	EXPECT_EQ(nullptr, networkManagerServer.GetClientProxy(dummySessions[1].GetTokenId()));
 
 	GameManager& gm = GameManager::GetInstance();
 	EXPECT_EQ(gm._games.size(), 0);
 
-	gm.CreateGame(clientIps, clientPorts);
+	gm.CreateGame(dummySessions);
 	EXPECT_EQ(gm._games.size(), 1);
 
-	ClientProxy* c1 = networkManagerServer.GetClientProxy(clientIps[0], clientPorts[0]);
-	ClientProxy* c2 = networkManagerServer.GetClientProxy(clientIps[1], clientPorts[1]);
+	ClientProxy* c1 = networkManagerServer.GetClientProxy(dummySessions[0].GetTokenId());
+	ClientProxy* c2 = networkManagerServer.GetClientProxy(dummySessions[1].GetTokenId());
 
 	gm.RemoveGame(c1);
 	EXPECT_EQ(gm._games.size(), 0);
@@ -70,8 +68,8 @@ TEST_F(PhysicsEngineFixture, CheckGamesSizeWhenGameCreatedAndDeleted)
 	gm.RemoveGame(c2);
 	EXPECT_EQ(gm._games.size(), 0);
 
-	EXPECT_TRUE(networkManagerServer.RemoveClientProxy(c2));
-	EXPECT_FALSE(networkManagerServer.RemoveClientProxy(c2));
+	EXPECT_TRUE(networkManagerServer.RemoveClientProxy(dummySessions[1].GetTokenId()));
+	EXPECT_FALSE(networkManagerServer.RemoveClientProxy(dummySessions[1].GetTokenId()));
 }
 
 TEST(MemoryBitStream, SerializeTest)

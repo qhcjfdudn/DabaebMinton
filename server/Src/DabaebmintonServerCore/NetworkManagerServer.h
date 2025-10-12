@@ -45,14 +45,13 @@ public:
 	void UnregisterGameObject(const NetworkId_t networkId);
 	void ClearAllGameObjects();
 
-	ClientProxy* CreateClientProxy(std::string_view ip, const uint16_t port);
-	bool RemoveClientProxy(ClientProxy* ClientProxy);
-	ClientProxy* GetClientProxy(std::string_view ip, const uint16_t port);
+	ClientProxy* GetClientProxy(const SessionId_t sessionId);
+	ClientProxy* CreateClientProxy(const SessionToken session);
+	bool RemoveClientProxy(const SessionId_t sessionId);
+
+	SessionToken GetSessionToken(const SessionId_t sessionId) const;
 
 	RPCManager& GetRpcManager() { return _rpcManager; }
-
-	uint64_t CreateSessionToken(ClientProxy * clientProxy);
-	void RemoveSessionToken(uint64_t tokenId);
 
 	void SendWelcomePacket(ClientProxy* clientProxy);
 	void ProcessRPCs(InputMemoryBitStream& inStream, ClientProxy* client);
@@ -98,13 +97,10 @@ private:
 
 	queue<ReceivedPacket> _receivedQueue;
 
-	unordered_map<SockAddress, shared_ptr<ClientProxy> > _sockAddressToClientProxyMap;
-	shared_mutex _sockAddressToClientProxyMapMutex;
+	unordered_map<SessionId_t, shared_ptr<ClientProxy> > _sessionIdToClientProxyMap;
+	shared_mutex _sessionIdToClientProxyMapMutex;
 
 	LinkingContext _linkingContext{};
 
 	RPCManager _rpcManager{};
-
-	unordered_map<uint64_t, shared_ptr<SessionToken>> tokenIdToSessionTokenMap;
-	unordered_map<PlayerId_t, bool> _isPlayerIdUsed;
 };

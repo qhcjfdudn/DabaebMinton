@@ -3,6 +3,7 @@
 class SockAddress
 {
 public:
+	SockAddress() { ZeroMemory(&m_sockaddr, sizeof(m_sockaddr)); }
 	SockAddress(const char* ip, const uint16_t port);
 	SockAddress(const sockaddr& sockaddr);
 	SockAddress(const SockAddress& rhs);

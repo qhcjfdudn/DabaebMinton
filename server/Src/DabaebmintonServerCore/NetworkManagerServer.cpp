@@ -433,21 +433,21 @@ int NetworkManagerServer::RecvFrom()
 void NetworkManagerServer::SendOutgoingPackets()
 {
 	// Check TimedOut Packets
-	for (auto& kv : _sockAddressToClientProxyMap)
+	for (auto& kv : _sessionIdToClientProxyMap)
 	{
 		auto clientProxy = kv.second;
 		clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 	}
 
 	// Replication State
-	for (auto& kv : _sockAddressToClientProxyMap)
+	for (auto& kv : _sessionIdToClientProxyMap)
 	{
 		auto clientProxy = kv.second;
 		SendReplicationStatePacketToClient(clientProxy.get());
 	}
 
 	// RPCs
-	for (auto& kv : _sockAddressToClientProxyMap)
+	for (auto& kv : _sessionIdToClientProxyMap)
 	{
 		auto clientProxy = kv.second;
 		SendRpcPacketToClient(clientProxy.get());
@@ -491,17 +491,24 @@ void NetworkManagerServer::ProcessQueuedPackets()
 
 void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const SockAddress& clientSockAddress)
 {
-	_sockAddressToClientProxyMapMutex.lock_shared();
+	SessionId_t sessionId = 0;
+	inStream.Read(sessionId);
 
-	// clientMap에 없으면 잘못된 client로부터의 요청이므로 무시한다.
-	if (_sockAddressToClientProxyMap.find(clientSockAddress) == _sockAddressToClientProxyMap.end())
+	_sessionIdToClientProxyMapMutex.lock_shared();
+
+	if (_sessionIdToClientProxyMap.find(sessionId) == _sessionIdToClientProxyMap.end())
 	{
-		_sockAddressToClientProxyMapMutex.unlock_shared();
+		_sessionIdToClientProxyMapMutex.unlock_shared();
+		spdlog::warn("[NetworkManagerServer::ProcessPacket] Wrong session ID entered. session ID: {}", sessionId);
+
 		return;
 	}
-	
-	shared_ptr<ClientProxy> client = _sockAddressToClientProxyMap[clientSockAddress];
-	_sockAddressToClientProxyMapMutex.unlock_shared();
+
+	shared_ptr<ClientProxy> client = _sessionIdToClientProxyMap.at(sessionId);
+	_sessionIdToClientProxyMapMutex.unlock_shared();
+
+	// ClientProxy에 IP:Port가 셋팅돼 있지 않거나 변경됐을 수 있다. 새로운 IP:Port로 셋팅해주어야 한다.
+	client->SetSockAddressIfAddressModified(clientSockAddress);
 
 	PacketType packetType{};
 	inStream.ReadBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
@@ -663,115 +670,68 @@ void NetworkManagerServer::ClearAllGameObjects()
 	_linkingContext.Clear();
 }
 
-ClientProxy* NetworkManagerServer::CreateClientProxy(std::string_view ip, const uint16_t port)
+ClientProxy* NetworkManagerServer::GetClientProxy(const SessionId_t sessionId)
+{
+	_sessionIdToClientProxyMapMutex.lock_shared();
+	if (_sessionIdToClientProxyMap.find(sessionId) == _sessionIdToClientProxyMap.end())
+	{
+		_sessionIdToClientProxyMapMutex.unlock_shared();
+		spdlog::warn("The sessionId does not exist. sessionId: {}", sessionId);
+		return nullptr;
+	}
+
+	ClientProxy* ret = _sessionIdToClientProxyMap.at(sessionId).get();
+	_sessionIdToClientProxyMapMutex.unlock_shared();
+
+	return ret;
+}
+
+ClientProxy* NetworkManagerServer::CreateClientProxy(const SessionToken session)
 {
 	ClientProxy* ret = nullptr;
 
-	SockAddress key{ ip.data(), port };
+	SessionId_t sessionId = session.GetTokenId();
 
-	_sockAddressToClientProxyMapMutex.lock();
-	if (_sockAddressToClientProxyMap.find(key) != _sockAddressToClientProxyMap.end())
+	_sessionIdToClientProxyMapMutex.lock();
+	if (_sessionIdToClientProxyMap.find(sessionId) != _sessionIdToClientProxyMap.end())
 	{
-		ret = _sockAddressToClientProxyMap[key].get();
-		_sockAddressToClientProxyMapMutex.unlock();
-		
-		spdlog::info("[NetworkManagerServer::CreateClientProxy] {}:{} client already exists.", ip, port);
-		
+		ret = _sessionIdToClientProxyMap.at(sessionId).get();
+		_sessionIdToClientProxyMapMutex.unlock();
+
+		spdlog::info("[NetworkManagerServer::CreateClientProxy] client already exists. SessionID: {}", sessionId);
+
 		return ret;
 	}
 
-	shared_ptr<ClientProxy> ci = make_shared<ClientProxy>(key);
+	shared_ptr<ClientProxy> clientProxyPtr = make_shared<ClientProxy>(session);
 
-	_sockAddressToClientProxyMap.emplace(key, ci);
-	_sockAddressToClientProxyMapMutex.unlock();
+	_sessionIdToClientProxyMap.emplace(sessionId, clientProxyPtr);
+	_sessionIdToClientProxyMapMutex.unlock();
 
-	return ci.get();
+	return clientProxyPtr.get();
 }
 
-bool NetworkManagerServer::RemoveClientProxy(ClientProxy* clientProxy)
+bool NetworkManagerServer::RemoveClientProxy(const SessionId_t sessionId)
 {
-	if (clientProxy == nullptr)
-		return false;
-	
-	const auto& key = clientProxy->GetSockAddress();
-
-	_sockAddressToClientProxyMapMutex.lock();
-	if (_sockAddressToClientProxyMap.find(key) == _sockAddressToClientProxyMap.end())
+	_sessionIdToClientProxyMapMutex.lock();
+	if (_sessionIdToClientProxyMap.find(sessionId) == _sessionIdToClientProxyMap.end())
 	{
-		_sockAddressToClientProxyMapMutex.unlock();
+		_sessionIdToClientProxyMapMutex.unlock();
 
 		spdlog::warn("[NetworkManagerServer::RemoveClientProxy] clientProxy is dangling pointer.");
 
 		return false;
 	}
 
-	_sockAddressToClientProxyMap.erase(key);
-	_sockAddressToClientProxyMapMutex.unlock();
+	_sessionIdToClientProxyMap.erase(sessionId);
+	_sessionIdToClientProxyMapMutex.unlock();
 
 	return true;
 }
 
-ClientProxy* NetworkManagerServer::GetClientProxy(std::string_view ip, const uint16_t port)
+SessionToken NetworkManagerServer::GetSessionToken(const SessionId_t sessionId) const
 {
-	const SockAddress key{ ip.data(), port };
-
-	_sockAddressToClientProxyMapMutex.lock_shared();
-	if (_sockAddressToClientProxyMap.find(key) == _sockAddressToClientProxyMap.end())
-	{
-		_sockAddressToClientProxyMapMutex.unlock_shared();
-		spdlog::warn("[NetworkManagerServer::GetClientProxy] {}:{} client does not exist.", ip, port);
-
-		return nullptr;
-	}
-
-	ClientProxy* ret = _sockAddressToClientProxyMap[key].get();
-
-	_sockAddressToClientProxyMapMutex.unlock_shared();
-
-	return ret;
-}
-
-uint64_t NetworkManagerServer::CreateSessionToken(ClientProxy* clientProxy)
-{
-	std::random_device random;                                
-	std::mt19937 engine(random());
-
-	uint64_t tokenId = 0;
-	PlayerId_t playerId = 0;
-
-	do
-	{
-		std::uniform_int_distribution<uint64_t> distribution(0, (std::numeric_limits<uint64_t>::max)());
-		tokenId = distribution(engine);
-	} while (tokenIdToSessionTokenMap.find(tokenId) != tokenIdToSessionTokenMap.end());
-
-	do
-	{
-		std::uniform_int_distribution<PlayerId_t> distribution(0, (std::numeric_limits<PlayerId_t>::max)());
-		playerId = distribution(engine);
-
-	} while (_isPlayerIdUsed.find(playerId) != _isPlayerIdUsed.end());
-
-	tokenIdToSessionTokenMap.emplace(tokenId, make_shared<SessionToken>(tokenId, playerId));
-	_isPlayerIdUsed.emplace(playerId, true);
-
-	clientProxy->SetSessionTokenId(tokenId);
-
-	return tokenId;
-}
-
-void NetworkManagerServer::RemoveSessionToken(uint64_t tokenId)
-{
-	if (tokenIdToSessionTokenMap.find(tokenId) == tokenIdToSessionTokenMap.end())
-	{
-		spdlog::debug("This tokenId doesn't exist. tokenId: {}", tokenId);
-		return;
-	}
-
-	PlayerId_t playerId = tokenIdToSessionTokenMap[tokenId]->GetPlayerId();
-
-	_isPlayerIdUsed.erase(playerId);
-	tokenIdToSessionTokenMap.erase(tokenId);
+	return _sessionIdToClientProxyMap.at(sessionId)->GetSession();
 }
 
 void NetworkManagerServer::SendWelcomePacket(ClientProxy* clientProxy)

@@ -1,28 +1,28 @@
 #pragma once
 
+#include "SessionToken.h"
+#include "SockAddress.h"
 #include "ReplicationManager.h"
 #include "DeliveryNotificationManager.h"
-#include "SockAddress.h"
 
 class ClientProxy
 {
 public:
-	ClientProxy(std::string_view ip, const uint16_t port);
-	ClientProxy(const SockAddress& sockAddress);
+	ClientProxy(const SessionToken& session);
+
+	SessionToken GetSession() const { return _session; }
 
 	const SockAddress& GetSockAddress() const { return _sockAddress; }
+	void SetSockAddressIfAddressModified(const SockAddress& sockAddress);
 
 	ReplicationManager& GetReplicationManager() { return _replicationManager; }
 	DeliveryNotificationManager& GetDeliveryNotificationManager() { return _deliveryNotificationManager; }
 
-	void SetSessionTokenId(uint64_t sessionTokenId) { _sessionTokenId = sessionTokenId; }
-
 private:
-	SockAddress _sockAddress;
+	SessionToken _session;
+	SockAddress _sockAddress{};
 
 	// for RUDP
 	ReplicationManager _replicationManager{};
 	DeliveryNotificationManager _deliveryNotificationManager{};
-
-	uint64_t _sessionTokenId;
 };

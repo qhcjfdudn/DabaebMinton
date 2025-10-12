@@ -8,3 +8,11 @@ SessionToken::SessionToken(SessionId_t tokenId, PlayerId_t playerId) :
 	_isActive{ true }
 {
 }
+
+SessionToken::SessionToken(SessionId_t tokenId, PlayerId_t playerId, steady_clock::time_point lastActive) :
+	_tokenId{ tokenId },
+	_playerId{ playerId },
+	_lastActive{ lastActive },
+	_isActive{ true }
+{
+}

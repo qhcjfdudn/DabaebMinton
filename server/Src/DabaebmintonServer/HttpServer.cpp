@@ -6,6 +6,7 @@
 #include "ServerEngine.h"
 #include "GameManager.h"
 #include "Observer.h"
+#include "SessionToken.h"
 
 HttpServer& HttpServer::GetInstance()
 {
@@ -16,9 +17,17 @@ HttpServer& HttpServer::GetInstance()
 void HttpServer::Init()
 {
 	using json = nlohmann::json;
+	GameManager& gameManager = GameManager::GetInstance();
 
 	_server.Get("/hello", [] (const httplib::Request& req, httplib::Response& res) {
 		res.set_content("Hello Server!", "plain/text");
+		});
+
+	_server.Post("/stop", [&] (const httplib::Request& req, httplib::Response& res)
+		{
+			Observer::notify(ObserverEvent::EngineOff);
+
+			Stop();
 		});
 
 	_server.Post("/game", [&] (const httplib::Request& req, httplib::Response& res)
@@ -34,27 +43,33 @@ void HttpServer::Init()
 				return;
 			}
 
-			spdlog::info("[HttpServer/game] new Game request.");
+			// Get Session
 
-			string ips[2];
-			unsigned int ports[2];
+			const std::string_view sessionServerURL = "127.0.0.1:8081";
+			httplib::Client cli(sessionServerURL.data());
 
-			for (int i = 0; i < len; ++i) {
+			SessionToken sessions[2];
+
+			for (int i = 0; i < len; ++i)
+			{
 				json& client = clientList[i];
-				ips[i] = client["ip"];
-				ports[i] = client["port"];
+				SessionId_t sessionId = client["SessionId"];
+				auto getRes = cli.Get("/session/" + std::to_string(sessionId)); // GET 요청
 
-				spdlog::info("[HttpServer/game] Client{0:d}: {1}:{2:d}", i + 1, ips[i], ports[i]);
+				json sessionBody = json::parse(getRes.value().body);
+				
+				PlayerId_t playerId = sessionBody["PlayerId"];
+				steady_clock::time_point lastActive{ steady_clock::duration{ sessionBody["LastActive"] } };
+				
+				sessions[i] = SessionToken{ sessionId, playerId, lastActive };
+				
+				spdlog::info("[HttpServer::Post/game] SessionId: {}, PlayerId: {}, time_point: {}", sessionId, playerId, lastActive.time_since_epoch().count());
 			}
+			
+			gameManager.CreateGame(sessions);
 
-			Game* game = GameManager::GetInstance().CreateGame(ips, ports);
-		});
-
-	_server.Post("/stop", [&] (const httplib::Request& req, httplib::Response& res)
-		{
-			Observer::notify(ObserverEvent::EngineOff);
-
-			Stop();
+			spdlog::info("[HttpServer/game] new Game request.");
+			
 		});
 }
 

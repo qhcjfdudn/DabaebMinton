@@ -10,15 +10,15 @@ GameManager& GameManager::GetInstance() {
 	return instance;
 }
 
-Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clientPorts[2])
+Game* GameManager::CreateGame(const SessionToken(&sessions)[2])
 {
 	Game* ret = nullptr;
 
 	auto& networkManagerServer = NetworkManagerServer::GetInstance();
 
-	ClientProxy* ci1 = networkManagerServer.CreateClientProxy(clientIps[0], clientPorts[0]);
-	ClientProxy* ci2 = networkManagerServer.CreateClientProxy(clientIps[1], clientPorts[1]);
-	
+	ClientProxy* ci1 = networkManagerServer.CreateClientProxy(sessions[0]);
+	ClientProxy* ci2 = networkManagerServer.CreateClientProxy(sessions[1]);
+
 	auto& mp = _clientProxyToGameIdxMap;
 
 	_gamesMutex.lock();
@@ -26,9 +26,9 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 	{
 		ret = _games[mp[ci1]].get();
 		_gamesMutex.unlock();
-		
+
 		spdlog::info("[GameManager::CreateGame] A game already exists.");
-		
+
 		return ret;
 	}
 
@@ -38,12 +38,9 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 		_gamesMutex.unlock();
 
 		spdlog::info("[GameManager::CreateGame] A game already exists.");
-		
+
 		return ret;
 	}
-
-	networkManagerServer.CreateSessionToken(ci1);
-	networkManagerServer.CreateSessionToken(ci2);
 
 	shared_ptr<Game> game = make_shared<Game>(ci1, ci2);
 	ret = game.get();
@@ -53,7 +50,7 @@ Game* GameManager::CreateGame(const string clientIps[2], const unsigned int clie
 
 	_clientProxyToGameIdxMap.emplace(ci1, idx);
 	_clientProxyToGameIdxMap.emplace(ci2, idx);
-	
+
 	_gamesMutex.unlock();
 
 	return ret;
