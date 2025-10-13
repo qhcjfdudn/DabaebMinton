@@ -430,30 +430,6 @@ int NetworkManagerServer::RecvFrom()
 	return retCode;
 }
 
-void NetworkManagerServer::SendOutgoingPackets()
-{
-	// Check TimedOut Packets
-	for (auto& kv : _sessionIdToClientProxyMap)
-	{
-		auto clientProxy = kv.second;
-		clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
-	}
-
-	// Replication State
-	for (auto& kv : _sessionIdToClientProxyMap)
-	{
-		auto clientProxy = kv.second;
-		SendReplicationStatePacketToClient(clientProxy.get());
-	}
-
-	// RPCs
-	for (auto& kv : _sessionIdToClientProxyMap)
-	{
-		auto clientProxy = kv.second;
-		SendRpcPacketToClient(clientProxy.get());
-	}
-}
-
 void NetworkManagerServer::SendReplicationStatePacketToClient(ClientProxy* client)
 {
 	DeliveryNotificationManager& dnm = client->GetDeliveryNotificationManager();

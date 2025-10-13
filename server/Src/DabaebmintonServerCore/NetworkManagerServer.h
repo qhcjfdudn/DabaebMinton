@@ -33,7 +33,6 @@ public:
 	int SendTo(ClientProxy* client);
 	int RecvFrom();
 	
-	void SendOutgoingPackets();
 	void SendReplicationStatePacketToClient(ClientProxy* client);
 	void SendRpcPacketToClient(ClientProxy* client);
 
