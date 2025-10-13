@@ -32,7 +32,6 @@ public:
 	Level _level;
 
 	// For Networking
-	unsigned long long _gameKey{ 0 };
 	ClientProxy* p_player1;
 	ClientProxy* p_player2;
 
