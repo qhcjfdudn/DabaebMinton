@@ -14,17 +14,17 @@ void OutgoingPacketProcessConsumer::operator() ()
 
 	while (serverEngine.isRunning.load(std::memory_order_acquire))
 	{
-		std::unique_lock lk(gameManager._pendingReplicationMutex, std::defer_lock);
+		std::unique_lock lk(gameManager._pendingOutgoingPacketProcessMutex, std::defer_lock);
 		lk.lock();
-		gameManager._replicationCv.wait(lk, [&] {
+		gameManager._pendingOutgoingPacketProcessCv.wait(lk, [&] {
 			return serverEngine.isRunning.load(std::memory_order_acquire) == false
-				|| gameManager._pendingReplicationQueue.empty() == false; });
+				|| gameManager._pendingOutgoingPacketProcessQueue.empty() == false; });
 
 		if (serverEngine.isRunning.load(std::memory_order_acquire) == false)
 			break;
 
-		Game* game = gameManager._pendingReplicationQueue.front();
-		gameManager._pendingReplicationQueue.pop();
+		Game* game = gameManager._pendingOutgoingPacketProcessQueue.front();
+		gameManager._pendingOutgoingPacketProcessQueue.pop();
 		lk.unlock();
 
 		auto& networkManager = NetworkManagerServer::GetInstance();

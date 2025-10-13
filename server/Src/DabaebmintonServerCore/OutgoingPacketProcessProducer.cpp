@@ -22,13 +22,13 @@ void OutgoingPacketProcessProducer::operator() ()
 				game->_replicationState.store(GameReplicationState::Pending, std::memory_order_release);
 				game->SetNextReplicationTimeFromNow();
 				
-				gameManager._pendingReplicationMutex.lock();
-				gameManager._pendingReplicationQueue.push(game.get());
-				gameManager._pendingReplicationMutex.unlock();
+				gameManager._pendingOutgoingPacketProcessMutex.lock();
+				gameManager._pendingOutgoingPacketProcessQueue.push(game.get());
+				gameManager._pendingOutgoingPacketProcessMutex.unlock();
 				
-				gameManager._replicationCv.notify_one();
+				gameManager._pendingOutgoingPacketProcessCv.notify_one();
 			}
 		}
 	}
-	gameManager._replicationCv.notify_all();
+	gameManager._pendingOutgoingPacketProcessCv.notify_all();
 }

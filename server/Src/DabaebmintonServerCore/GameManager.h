@@ -19,9 +19,9 @@ public:
 	std::vector<std::shared_ptr<Game> > _games;
 	std::mutex _gamesMutex;
 
-	std::queue<Game*> _pendingReplicationQueue;
-	std::mutex _pendingReplicationMutex;
-	std::condition_variable _replicationCv;
+	std::queue<Game*> _pendingOutgoingPacketProcessQueue;
+	std::mutex _pendingOutgoingPacketProcessMutex;
+	std::condition_variable _pendingOutgoingPacketProcessCv;
 
 private:
 	std::unordered_map<const ClientProxy*, size_t> _clientProxyToGameIdxMap;
