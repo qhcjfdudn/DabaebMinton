@@ -6,7 +6,7 @@ ClientProxy::ClientProxy(const SessionToken& session) :
 {
 }
 
-void ClientProxy::SetSockAddressIfAddressModified(const SockAddress& sockAddress)
+void ClientProxy::SetSockAddressIfModified(const SockAddress& sockAddress)
 {
 	if (_sockAddress == sockAddress)
 		return;

@@ -508,7 +508,7 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 	_sessionIdToClientProxyMapMutex.unlock_shared();
 
 	// ClientProxy에 IP:Port가 셋팅돼 있지 않거나 변경됐을 수 있다. 새로운 IP:Port로 셋팅해주어야 한다.
-	client->SetSockAddressIfAddressModified(clientSockAddress);
+	client->SetSockAddressIfModified(clientSockAddress);
 
 	PacketType packetType{};
 	inStream.ReadBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));

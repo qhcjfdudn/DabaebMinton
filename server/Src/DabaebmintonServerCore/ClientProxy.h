@@ -13,7 +13,7 @@ public:
 	SessionToken GetSession() const { return _session; }
 
 	const SockAddress& GetSockAddress() const { return _sockAddress; }
-	void SetSockAddressIfAddressModified(const SockAddress& sockAddress);
+	void SetSockAddressIfModified(const SockAddress& sockAddress);
 
 	ReplicationManager& GetReplicationManager() { return _replicationManager; }
 	DeliveryNotificationManager& GetDeliveryNotificationManager() { return _deliveryNotificationManager; }
