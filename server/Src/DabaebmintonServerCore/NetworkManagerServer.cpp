@@ -492,10 +492,11 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 	// ClientProxy에 IP:Port가 셋팅돼 있지 않거나 변경됐을 수 있다. 새로운 IP:Port로 셋팅해주어야 한다.
 	client->SetSockAddressIfModified(clientSockAddress);
 
+	auto& deli = client->GetDeliveryNotificationManager();
+	deli.ProcessAcks(inStream);
+
 	PacketType packetType{};
 	inStream.ReadBits(&packetType, GetRequiredBits(static_cast<int>(PacketType::PT_Max)));
-
-	auto& deli = client->GetDeliveryNotificationManager();
 
 	switch (packetType)
 	{
@@ -506,7 +507,6 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 		break;
 	//case PacketType::PT_ReplicationData: // Client로부터 Replication Packet을 수신할 수 없다.
 	case PacketType::PT_RPC:
-		deli.ProcessAcks(inStream);
 		ProcessRPCs(inStream, client.get());
 		break;
 	}
