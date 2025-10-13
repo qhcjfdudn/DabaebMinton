@@ -1,7 +1,6 @@
 #pragma once
-class ReplicationUpdateProducer
+class OutgoingPacketProcessProducer
 {
 public:
 	void operator() ();
 };
-

@@ -1,5 +1,5 @@
 #pragma once
-class ReplicationUpdateConsumer
+class OutgoingPacketProcessConsumer
 {
 public:
 	void operator()();

@@ -1,5 +1,5 @@
 #include "ServerPCH.h"
-#include "ReplicationUpdateConsumer.h"
+#include "OutgoingPacketProcessConsumer.h"
 
 #include "ServerEngine.h"
 #include "NetworkManagerServer.h"
@@ -7,7 +7,7 @@
 
 #include "Game.h"
 
-void ReplicationUpdateConsumer::operator() ()
+void OutgoingPacketProcessConsumer::operator() ()
 {
 	auto& serverEngine = ServerEngine::GetInstance();
 	auto& gameManager = GameManager::GetInstance();

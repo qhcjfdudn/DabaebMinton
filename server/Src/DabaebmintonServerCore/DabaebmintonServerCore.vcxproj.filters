@@ -110,10 +110,10 @@
     <ClCompile Include="ReplicationManagerTransmissionData.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicationUpdateConsumer.cpp">
+    <ClCompile Include="OutgoingPacketProcessConsumer.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
-    <ClCompile Include="ReplicationUpdateProducer.cpp">
+    <ClCompile Include="OutgoingPacketProcessProducer.cpp">
       <Filter>Networking</Filter>
     </ClCompile>
     <ClCompile Include="SockAddress.cpp">
@@ -244,10 +244,10 @@
     <ClInclude Include="ReplicationManagerTransmissionData.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicationUpdateConsumer.h">
+    <ClInclude Include="OutgoingPacketProcessConsumer.h">
       <Filter>Networking</Filter>
     </ClInclude>
-    <ClInclude Include="ReplicationUpdateProducer.h">
+    <ClInclude Include="OutgoingPacketProcessProducer.h">
       <Filter>Networking</Filter>
     </ClInclude>
     <ClInclude Include="SockAddress.h">

@@ -12,8 +12,8 @@
 #include "Game.h"
 #include "Level.h"
 
-#include "ReplicationUpdateProducer.h"
-#include "ReplicationUpdateConsumer.h"
+#include "OutgoingPacketProcessProducer.h"
+#include "OutgoingPacketProcessConsumer.h"
 
 #include "DeveloperCommandFunctor.h"
 
@@ -74,6 +74,8 @@ int main()
 		auto& serverEngine = ServerEngine::GetInstance();
 		auto& physicsEngine = PhysicsEngine::GetInstance();
 
+		// game이 Playing 상태일 때만 물리 연산 수행하도록 변경 필요
+
 		auto& scenes = physicsEngine.scenes;
 		auto& lastTimes = physicsEngine._lastPhysXFixedUpdateTimeArray;
 
@@ -93,10 +95,10 @@ int main()
 		});
 
 	// Level replication update producer-consumer working
-	ReplicationUpdateProducer replicationUpdateProducerFunctor;
-	thread replicationUpdateProducer(replicationUpdateProducerFunctor);
+	OutgoingPacketProcessProducer outgoingPacketProcessProducerFunctor;
+	thread outgoingPacketProcessProducer(outgoingPacketProcessProducerFunctor);
 
-	ReplicationUpdateConsumer replicationUpdateConsumer;
+	OutgoingPacketProcessConsumer replicationUpdateConsumer;
 	vector<thread> gameReplicationUpdateConsumers;
 	for (int i = 0; i < 4; ++i)
 		gameReplicationUpdateConsumers.emplace_back(replicationUpdateConsumer);
@@ -113,7 +115,7 @@ int main()
 
 	HttpServer::GetInstance().Stop();
 	
-	replicationUpdateProducer.join();
+	outgoingPacketProcessProducer.join();
 
 	for (thread& gameReplicationUpdateConsumer : gameReplicationUpdateConsumers)
 		gameReplicationUpdateConsumer.join();
