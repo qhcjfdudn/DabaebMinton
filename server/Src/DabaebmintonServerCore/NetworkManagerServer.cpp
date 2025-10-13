@@ -379,6 +379,12 @@ int NetworkManagerServer::SendTo(ClientProxy* client, const OutputMemoryBitStrea
 
 int NetworkManagerServer::SendTo(ClientProxy* client)
 {
+	if (client->GetSockAddress().IsValid() == false)
+	{
+		spdlog::warn("[NetworkManagerServer::SendTo] Invalid SockAddress. session ID: {}", client->GetSession().GetTokenId());
+		return -1;
+	}
+
 	// Check TimedOut Packets
 	client->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 
@@ -432,12 +438,12 @@ int NetworkManagerServer::RecvFrom()
 
 void NetworkManagerServer::SendReplicationStatePacketToClient(ClientProxy* client)
 {
-	DeliveryNotificationManager& dnm = client->GetDeliveryNotificationManager();
-	ReplicationManager& nrm = client->GetReplicationManager();
+	DeliveryNotificationManager& deliNotiManager = client->GetDeliveryNotificationManager();
+	ReplicationManager& replManager = client->GetReplicationManager();
 
-	PacketGenerator packetGenerator{ &dnm, &nrm, PacketType::PT_ReplicationData };
+	PacketGenerator packetGenerator{ &deliNotiManager, &replManager, PacketType::PT_ReplicationData };
 
-	client->GetReplicationManager().Write(packetGenerator);
+	replManager.Write(packetGenerator);
 
 	for (auto& stream : packetGenerator.GetAllStreams())
 	{
@@ -715,11 +721,17 @@ void NetworkManagerServer::SendWelcomePacket(ClientProxy* clientProxy)
 	const SockAddress& sockAddress = clientProxy->GetSockAddress();
 	spdlog::info("[NetworkManagerServer::SendWelcomePacket] Welcoming, client {}:{}.", sockAddress.GetIP(), sockAddress.GetPort());
 
-	OutputMemoryBitStream welcomePacket;
+	DeliveryNotificationManager& deliNotiManager = clientProxy->GetDeliveryNotificationManager();
+	ReplicationManager& replManager = clientProxy->GetReplicationManager();
 
-	//welcomePacket.Write(kWelcomeCC);
+	PacketGenerator welcomePacketGenerator{ &deliNotiManager, &replManager, PacketType::PT_ReplicationData };
 
-	SendTo(clientProxy, welcomePacket);
+	replManager.Write(welcomePacketGenerator);
+
+	for (auto& stream : welcomePacketGenerator.GetAllStreams())
+	{
+		SendTo(clientProxy, stream);
+	}
 }
 
 void NetworkManagerServer::ProcessRPCs(InputMemoryBitStream& inStream, ClientProxy* client)

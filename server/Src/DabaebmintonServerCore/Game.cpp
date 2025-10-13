@@ -22,7 +22,9 @@ Game::Game(ClientProxy* player1, ClientProxy* player2) :
 	{
 		spdlog::debug("[Game::Game] object: {}", gameObject->GetClassId());
 
-		auto networkId = networkManager.RegisterGameObject(gameObject);		
+		auto networkId = networkManager.RegisterGameObject(gameObject);
+		player1->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
+		player2->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
 	}
 
 	SetNextReplicationTimeFromNow();

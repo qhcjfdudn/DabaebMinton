@@ -31,6 +31,8 @@ public:
 	const char* GetIP() const;
 	const uint16_t GetPort() const;
 
+	bool IsValid() const { return GetSockAddrIn()->sin_port != 0; }
+
 private:
 	const sockaddr_in* GetSockAddrIn() const { return reinterpret_cast<const sockaddr_in*>(&m_sockaddr); }
 	sockaddr_in* GetSockAddrIn() { return reinterpret_cast<sockaddr_in*>(&m_sockaddr); }
