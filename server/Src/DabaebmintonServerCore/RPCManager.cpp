@@ -3,7 +3,6 @@
 
 #include "GameManager.h"
 #include "Game.h"
-#include "GameController.h"
 #include "NetworkManagerServer.h"
 #include "ClientProxy.h"
 #include "InputMemoryBitStream.h"
@@ -43,15 +42,15 @@ void RPCManager::ProcessRpc(const ClientProxy& clientProxy, InputMemoryBitStream
 void UnwrapSetClientReady(const ClientProxy& clientProxy, InputMemoryBitStream& inStream)
 {
 	auto& gameManager = GameManager::GetInstance();
-	auto& gameController = gameManager.FindGame(&clientProxy)->GetGameController();
+	auto game = gameManager.FindGame(&clientProxy);
 
-	gameController.SetClientReady(clientProxy.GetSession().GetPlayerId());
+	game->SetClientReady(clientProxy.GetSession().GetPlayerId());
 }
 
 void UnwrapMovePlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inStream)
 {
 	auto& gameManager = GameManager::GetInstance();
-	auto& gameController = gameManager.FindGame(&clientProxy)->GetGameController();
+	auto game = gameManager.FindGame(&clientProxy);
 	
 	NetworkId_t networkId = 0;
 	inStream.Read(networkId);
@@ -62,5 +61,5 @@ void UnwrapMovePlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inSt
 	// 이동 데이터를 정의한다.
 	// 이동 데이터를 읽는다.
 
-	gameController.MovePlayer(playerCharacter /* , 이동 데이터 전달 */);
+	game->MovePlayer(playerCharacter /* , 이동 데이터 전달 */);
 }

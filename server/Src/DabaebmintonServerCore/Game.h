@@ -3,8 +3,6 @@
 #include "LinkingContext.h"
 #include "Level.h"
 
-#include "GameController.h"
-
 class ClientProxy;
 
 enum class GamePlayState {
@@ -14,25 +12,25 @@ enum class GamePlayState {
 	Size
 };
 
-enum class GameReplicationState {
-	None,
-	Pending
-};
-
 class Game
 {
 public:
+	static const int MAX_PLAYERS = 2;
+
 	Game(ClientProxy* player1, ClientProxy* player2);
 	~Game();
 
-	GameController& GetGameController() { return _gameController; }
-
 	GamePlayState GetGamePlayState() const { return _gamePlayState; }
 
-	void StartGame();
 
 	bool HasElapsedReplicationInterval();
 	void SetNextReplicationTimeFromNow();
+
+	void SetClientReady(const PlayerId_t playerId);
+
+	void StartGame();
+
+	void MovePlayer(GameObject* playerCharacter);
 
 	Level _level;
 
@@ -40,10 +38,15 @@ public:
 	ClientProxy* p_player1;
 	ClientProxy* p_player2;
 
-	system_clock::time_point _nextReplicationUpdatedTime;
-	atomic<GameReplicationState> _replicationState{ GameReplicationState::None };
+	system_clock::time_point _nextReplicationUpdateTime;
+	atomic<bool> IsPendingReplicationUpdate{ false };
 
 private:
 	GamePlayState _gamePlayState;
-	GameController _gameController;
+
+	unordered_map<PlayerId_t, int> _playerIdToPlayerIdxMap;
+
+	// game state 변경을 동기화하기 위해 사용
+	bool _isPlayerReadyToGoNextState[MAX_PLAYERS] = { false, false };
+	int _numPlayersReadyCount{ 0 };
 };

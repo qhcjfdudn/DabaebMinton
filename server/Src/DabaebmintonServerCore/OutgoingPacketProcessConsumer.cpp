@@ -31,6 +31,6 @@ void OutgoingPacketProcessConsumer::operator() ()
 		networkManager.SendTo(game->p_player1);
 		networkManager.SendTo(game->p_player2);
 
-		game->_replicationState.store(GameReplicationState::None, std::memory_order_release);
+		game->IsPendingReplicationUpdate.store(false, std::memory_order_release);
 	}
 }

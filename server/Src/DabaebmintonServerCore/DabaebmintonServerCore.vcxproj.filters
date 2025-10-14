@@ -35,9 +35,6 @@
     <ClCompile Include="Game.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="GameController.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
     <ClCompile Include="GameManager.cpp">
       <Filter>Game</Filter>
     </ClCompile>
@@ -155,9 +152,6 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="GameController.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="GameManager.h">

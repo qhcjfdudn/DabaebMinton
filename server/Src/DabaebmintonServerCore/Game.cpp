@@ -12,9 +12,11 @@
 Game::Game(ClientProxy* player1, ClientProxy* player2) :
 	p_player1{ player1 }, p_player2{ player2 },
 	_gamePlayState{ GamePlayState::Initializing },
-	_level{},
-	_gameController{ this, player1->GetSession().GetPlayerId(), player2->GetSession().GetPlayerId() }
+	_level{}
 {
+	_playerIdToPlayerIdxMap.emplace(player1->GetSession().GetPlayerId(), 0);
+	_playerIdToPlayerIdxMap.emplace(player2->GetSession().GetPlayerId(), 1);
+
 	_level.InitLevel();
 
 	auto& networkManager = NetworkManagerServer::GetInstance();
@@ -42,18 +44,47 @@ Game::~Game()
 	}
 }
 
+void Game::SetClientReady(const PlayerId_t playerId)
+{
+	int playerIdx = _playerIdToPlayerIdxMap[playerId];
+
+	if (_isPlayerReadyToGoNextState[playerIdx])
+	{
+		spdlog::warn("[Game::SetClientReady] player is already ready. playerId: {}", playerId);
+		return;
+	}
+
+	_isPlayerReadyToGoNextState[playerIdx] = true;
+
+	if (++_numPlayersReadyCount == MAX_PLAYERS)
+	{
+		memset(_isPlayerReadyToGoNextState, 0, sizeof(_isPlayerReadyToGoNextState));
+		_numPlayersReadyCount = 0;
+
+		StartGame();
+	}
+}
+
 void Game::StartGame()
 {
 	_gamePlayState = GamePlayState::Playing;
 }
 
+void Game::MovePlayer(GameObject* playerCharacter)
+{
+	// 이 player를 RPC를 요청한 유저가 소유권이 있을까? 하는 정보는
+	// NetworkManager에서 처리했고, 실제로 MovePlayer가 동작하는 과정을 구현
+
+	spdlog::debug("[Game::MovePlayer] called. player: {}", playerCharacter->GetClassId());
+}
+
 bool Game::HasElapsedReplicationInterval()
 {
-	return system_clock::now() >= _nextReplicationUpdatedTime;
+	return system_clock::now() >= _nextReplicationUpdateTime;
 }
 
 void Game::SetNextReplicationTimeFromNow()
 {
 	std::chrono::duration<float> offset(Constant::REPLICATION_PERIOD);
-	_nextReplicationUpdatedTime = system_clock::now() + std::chrono::duration_cast<system_clock::duration>(offset);
+	_nextReplicationUpdateTime = system_clock::now() + std::chrono::duration_cast<system_clock::duration>(offset);
 }

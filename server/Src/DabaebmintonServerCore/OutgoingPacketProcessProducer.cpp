@@ -16,10 +16,10 @@ void OutgoingPacketProcessProducer::operator() ()
 		std::lock_guard gamesLock(gameManager._gamesMutex);
 		for (auto game : gameManager._games)
 		{
-			if (game->_replicationState.load(std::memory_order_acquire) == GameReplicationState::None &&
+			if (game->IsPendingReplicationUpdate.load(std::memory_order_acquire) == false &&
 				game->HasElapsedReplicationInterval())
 			{
-				game->_replicationState.store(GameReplicationState::Pending, std::memory_order_release);
+				game->IsPendingReplicationUpdate.store(true, std::memory_order_release);
 				game->SetNextReplicationTimeFromNow();
 				
 				gameManager._pendingOutgoingPacketProcessMutex.lock();
