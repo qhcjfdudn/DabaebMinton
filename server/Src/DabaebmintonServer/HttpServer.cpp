@@ -8,6 +8,8 @@
 #include "Observer.h"
 #include "SessionToken.h"
 
+#include "GameConfig.h"
+
 HttpServer& HttpServer::GetInstance()
 {
 	static HttpServer instance;
@@ -36,9 +38,9 @@ void HttpServer::Init()
 			json& clientList = data["clientList"];
 			int len = static_cast<int>(clientList.size());
 
-			if (len != 2) {
+			if (len != GameConfig::MAX_PLAYERS) {
 				res.status = 405;
-				res.set_content("The size of clientList must be 2", "text/plain");
+				res.set_content("The size of clientList must be " + std::to_string(GameConfig::MAX_PLAYERS), "text/plain");
 
 				return;
 			}
@@ -48,7 +50,7 @@ void HttpServer::Init()
 			const std::string_view sessionServerURL = "127.0.0.1:8081";
 			httplib::Client cli(sessionServerURL.data());
 
-			SessionToken sessions[2];
+			SessionToken sessions[GameConfig::MAX_PLAYERS];
 
 			for (int i = 0; i < len; ++i)
 			{

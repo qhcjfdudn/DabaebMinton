@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameConfig.h"
 #include "SessionToken.h"
 
 class Game;
@@ -10,7 +11,7 @@ class GameManager
 public:
 	static GameManager& GetInstance();
 
-	Game* CreateGame(const SessionToken (&sessions)[2]);
+	Game* CreateGame(const SessionToken (&sessions)[GameConfig::MAX_PLAYERS]);
 	bool RemoveGame(ClientProxy* clientProxy);
 	Game* FindGame(const ClientProxy* clientProxy);
 

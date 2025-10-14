@@ -5,53 +5,49 @@
 #include "Game.h"
 #include "ClientProxy.h"
 
+using namespace GameConfig;
+
 GameManager& GameManager::GetInstance() {
 	static GameManager instance;
 	return instance;
 }
 
-Game* GameManager::CreateGame(const SessionToken(&sessions)[2])
+Game* GameManager::CreateGame(const SessionToken(&sessions)[GameConfig::MAX_PLAYERS])
 {
 	Game* ret = nullptr;
 
 	auto& networkManagerServer = NetworkManagerServer::GetInstance();
 
-	ClientProxy* ci1 = networkManagerServer.CreateClientProxy(sessions[0]);
-	ClientProxy* ci2 = networkManagerServer.CreateClientProxy(sessions[1]);
+	ClientProxy* clientProxies[MAX_PLAYERS];
 
 	auto& mp = _clientProxyToGameIdxMap;
-
 	_gamesMutex.lock();
-	if (mp.find(ci1) != mp.end())
+	for (int i = 0; i < MAX_PLAYERS; ++i)
 	{
-		ret = _games[mp[ci1]].get();
-		_gamesMutex.unlock();
+		clientProxies[i] = networkManagerServer.CreateClientProxy(sessions[i]);
 
-		spdlog::info("[GameManager::CreateGame] A game already exists.");
+		if (mp.find(clientProxies[i]) != mp.end())
+		{
+			ret = _games[mp[clientProxies[i]]].get();
+			_gamesMutex.unlock();
 
-		return ret;
+			spdlog::info("[GameManager::CreateGame] A game already exists.");
+
+			return ret;
+		}
 	}
 
-	if (mp.find(ci2) != mp.end())
-	{
-		ret = _games[mp[ci2]].get();
-		_gamesMutex.unlock();
-
-		spdlog::info("[GameManager::CreateGame] A game already exists.");
-
-		return ret;
-	}
-
-	shared_ptr<Game> game = make_shared<Game>(ci1, ci2);
+	shared_ptr<Game> game = make_shared<Game>(clientProxies);
 	ret = game.get();
 
-	size_t idx = _games.size();
+	size_t gameIdx = _games.size();
 	_games.push_back(game);
-
-	_clientProxyToGameIdxMap.emplace(ci1, idx);
-	_clientProxyToGameIdxMap.emplace(ci2, idx);
-
 	_gamesMutex.unlock();
+
+	for (int i = 0; i < MAX_PLAYERS; ++i)
+	{
+		_clientProxyToGameIdxMap.emplace(clientProxies[i], gameIdx);
+	}
 
 	return ret;
 }

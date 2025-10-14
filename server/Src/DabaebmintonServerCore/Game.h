@@ -17,7 +17,7 @@ enum class GamePlayState {
 class Game
 {
 public:
-	Game(ClientProxy* player1, ClientProxy* player2);
+	Game(ClientProxy* (&players)[GameConfig::MAX_PLAYERS]);
 	~Game();
 
 	ClientProxy* GetPlayerProxy(int idx) const { return _player[idx]; }
@@ -42,7 +42,7 @@ public:
 
 private:
 	// For Networking
-	ClientProxy* _player[2];
+	ClientProxy* _player[GameConfig::MAX_PLAYERS];
 
 	Level _level;
 	

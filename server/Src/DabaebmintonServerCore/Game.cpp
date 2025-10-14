@@ -11,19 +11,19 @@
 
 using namespace GameConfig;
 
-Game::Game(ClientProxy* player1, ClientProxy* player2) :
+Game::Game(ClientProxy* (&players)[GameConfig::MAX_PLAYERS]) :
 	_gamePlayState{ GamePlayState::Initializing },
 	_level{}
 {
-	PlayerId_t playerIds[MAX_PLAYERS] = {
-		player1->GetSession().GetPlayerId(),
-		player2->GetSession().GetPlayerId()
-	};
-
-	_playerIdToPlayerIdxMap.emplace(playerIds[0], 0);
-	_player[0] = player1;
-	_playerIdToPlayerIdxMap.emplace(playerIds[1], 1);
-	_player[1] = player2;
+	PlayerId_t playerIds[MAX_PLAYERS];
+	
+	for (int idx = 0; idx < MAX_PLAYERS; ++idx)
+	{
+		playerIds[idx] = players[idx]->GetSession().GetPlayerId();
+		
+		_playerIdToPlayerIdxMap.emplace(playerIds[idx], idx);
+		_player[idx] = players[idx];
+	}
 
 	_level.InitLevel(playerIds);
 
@@ -33,8 +33,11 @@ Game::Game(ClientProxy* player1, ClientProxy* player2) :
 		spdlog::debug("[Game::Game] object: {}", gameObject->GetClassId());
 
 		auto networkId = networkManager.RegisterGameObject(gameObject);
-		player1->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
-		player2->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
+
+		for (int idx = 0; idx < MAX_PLAYERS; ++idx)
+		{
+			players[idx]->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
+		}
 	}
 
 	SetNextReplicationTimeFromNow();
