@@ -300,6 +300,7 @@ robocopy $(SolutionDir)ExternalLibrary\$(Platform)\$(Configuration)\spdlog\inclu
     <ClInclude Include="Constant.h" />
     <ClInclude Include="DeliveryNotificationManager.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GetRequiredBits.h" />

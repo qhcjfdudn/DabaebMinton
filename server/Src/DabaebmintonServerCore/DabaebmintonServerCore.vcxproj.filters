@@ -274,5 +274,8 @@
     <ClInclude Include="SessionToken.h">
       <Filter>Networking</Filter>
     </ClInclude>
+    <ClInclude Include="GameConfig.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

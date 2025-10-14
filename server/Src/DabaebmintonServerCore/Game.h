@@ -3,6 +3,8 @@
 #include "LinkingContext.h"
 #include "Level.h"
 
+#include "GameConfig.h"
+
 class ClientProxy;
 
 enum class GamePlayState {
@@ -15,8 +17,6 @@ enum class GamePlayState {
 class Game
 {
 public:
-	static const int MAX_PLAYERS = 2;
-
 	Game(ClientProxy* player1, ClientProxy* player2);
 	~Game();
 
@@ -51,7 +51,7 @@ private:
 	unordered_map<PlayerId_t, int> _playerIdToPlayerIdxMap;
 
 	// game state 변경을 동기화하기 위해 사용
-	bool _isPlayerReadyToGoNextState[MAX_PLAYERS] = { false, false };
+	bool _isPlayerReadyToGoNextState[GameConfig::MAX_PLAYERS] = {};
 	int _numPlayersReadyCount{ 0 };
 	
 	system_clock::time_point _nextReplicationUpdateTime;

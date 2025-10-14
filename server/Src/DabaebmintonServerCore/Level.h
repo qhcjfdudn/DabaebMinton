@@ -2,6 +2,8 @@
 
 #include <PxScene.h>
 
+#include "GameConfig.h"
+
 class GameObject;
 class StaticGameObject;
 
@@ -11,7 +13,7 @@ public:
 	Level();
 	~Level();
 
-	void InitLevel();
+	void InitLevel(PlayerId_t (&playerIds)[GameConfig::MAX_PLAYERS]);
 	void ClearLevel();
 	void Release();
 
@@ -27,7 +29,6 @@ public:
 	void SetLastFixedUpdateTimeToNow();
 	void FixedUpdate();
 
-	
 private:
 	PxScene* _pxScene = nullptr;
 	

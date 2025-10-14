@@ -10,6 +10,8 @@
 #include "Shuttlecock.h"
 #include "Player.h"
 
+using namespace GameConfig;
+
 Level::Level()
 {
 	auto& physicsEngine = PhysicsEngine::GetInstance();
@@ -44,28 +46,34 @@ Level::~Level()
 	physicsEngine.Release(_pxScene);
 }
 
-void Level::InitLevel()
+void Level::InitLevel(PlayerId_t (&playerIds)[MAX_PLAYERS])
 {
 	auto& physicsEngine = PhysicsEngine::GetInstance();
 
 	// Replication 불필요한 static GameObjects
-	auto bottom = make_shared<BadmintonBottom>(PxVec2{ 0, 0.5f });
+	auto bottom = make_shared<BadmintonBottom>(defaultBadmintonBottomPosition);
 	_pxScene->addActor(*bottom->GetRigidbody());
 	_staticGameObjects.push_back(bottom);
 
-	auto net = make_shared<BadmintonNet>(PxVec2{ 0, 1.25f });
+	auto net = make_shared<BadmintonNet>(defaultBadmintonNetPosition);
 	_pxScene->addActor(*net->GetRigidbody());
 	_staticGameObjects.push_back(net);
 	
 	// Replication 필요한 Dynamic GameObjects
-	auto shuttlecock = make_shared<Shuttlecock>(PxVec2{ -2, 6.15f }, PxVec2{ 2, 1 });
+	auto shuttlecock = make_shared<Shuttlecock>(
+		defaultBadmintonShuttlecockPosition, 
+		defaultBadmintonShuttlecockVelocity);
 	_pxScene->addActor(*shuttlecock->GetRigidbody());
 	_gameObjects.push_back(shuttlecock);
 
-	// Player
-	auto player1 = make_shared<Player>(PxVec2{ -6, 5 });
-	_pxScene->addActor(*player1->GetRigidbody());
-	_gameObjects.push_back(player1);
+	// set player capsules position
+	for (int idx = 0; idx < MAX_PLAYERS; ++idx)
+	{
+		auto player = make_shared<Player>(defaultPlayersPosition[idx]);
+		player->SetOwnerId(playerIds[idx]);
+		_pxScene->addActor(*player->GetRigidbody());
+		_gameObjects.push_back(player);
+	}
 }
 
 void Level::ClearLevel()

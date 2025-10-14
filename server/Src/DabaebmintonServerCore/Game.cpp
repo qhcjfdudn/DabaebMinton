@@ -9,16 +9,23 @@
 #include "Packet.h"
 #include "GameObject.h"
 
+using namespace GameConfig;
+
 Game::Game(ClientProxy* player1, ClientProxy* player2) :
 	_gamePlayState{ GamePlayState::Initializing },
 	_level{}
 {
-	_playerIdToPlayerIdxMap.emplace(player1->GetSession().GetPlayerId(), 0);
+	PlayerId_t playerIds[MAX_PLAYERS] = {
+		player1->GetSession().GetPlayerId(),
+		player2->GetSession().GetPlayerId()
+	};
+
+	_playerIdToPlayerIdxMap.emplace(playerIds[0], 0);
 	_player[0] = player1;
-	_playerIdToPlayerIdxMap.emplace(player2->GetSession().GetPlayerId(), 1);
+	_playerIdToPlayerIdxMap.emplace(playerIds[1], 1);
 	_player[1] = player2;
 
-	_level.InitLevel();
+	_level.InitLevel(playerIds);
 
 	auto& networkManager = NetworkManagerServer::GetInstance();
 	for (auto gameObject : _level.GetGameObjects())
