@@ -13,7 +13,7 @@ Game::Game(ClientProxy* player1, ClientProxy* player2) :
 	p_player1{ player1 }, p_player2{ player2 },
 	_gamePlayState{ GamePlayState::Initializing },
 	_level{},
-	_gameController{}
+	_gameController{ this, player1->GetSession().GetPlayerId(), player2->GetSession().GetPlayerId() }
 {
 	_level.InitLevel();
 
@@ -40,6 +40,11 @@ Game::~Game()
 		p_player1->GetReplicationManager().ReplicateDestroy(networkId);
 		p_player2->GetReplicationManager().ReplicateDestroy(networkId);
 	}
+}
+
+void Game::StartGame()
+{
+	_gamePlayState = GamePlayState::Playing;
 }
 
 bool Game::HasElapsedReplicationInterval()

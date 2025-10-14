@@ -11,6 +11,7 @@
 RPCManager::RPCManager()
 {
 	// Unwrap rpc 나열
+	RegisterUnwrapRpc('CLRD', UnwrapSetClientReady);
 	RegisterUnwrapRpc('MVPL', UnwrapMovePlayer);
 }
 
@@ -32,11 +33,19 @@ void RPCManager::ProcessRpc(const ClientProxy& clientProxy, InputMemoryBitStream
 
 	if (_nameToRpcMap.find(name) == _nameToRpcMap.end())
 	{
-		spdlog::warn("{} rpc is not found.", name);
+		spdlog::warn("[RPCManager::ProcessRpc] {} RPCName is not found.", name);
 		return;
 	}
 
 	_nameToRpcMap[name](clientProxy, inStream);
+}
+
+void UnwrapSetClientReady(const ClientProxy& clientProxy, InputMemoryBitStream& inStream)
+{
+	auto& gameManager = GameManager::GetInstance();
+	auto& gameController = gameManager.FindGame(&clientProxy)->GetGameController();
+
+	gameController.SetClientReady(clientProxy.GetSession().GetPlayerId());
 }
 
 void UnwrapMovePlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inStream)

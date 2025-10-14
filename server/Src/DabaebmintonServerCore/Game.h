@@ -10,7 +10,8 @@ class ClientProxy;
 enum class GamePlayState {
 	Initializing,
 	Playing,
-	End
+	End,
+	Size
 };
 
 enum class GameReplicationState {
@@ -25,6 +26,10 @@ public:
 	~Game();
 
 	GameController& GetGameController() { return _gameController; }
+
+	GamePlayState GetGamePlayState() const { return _gamePlayState; }
+
+	void StartGame();
 
 	bool HasElapsedReplicationInterval();
 	void SetNextReplicationTimeFromNow();

@@ -16,7 +16,11 @@ public:
 	void ProcessRpc(const ClientProxy& clientProxy, InputMemoryBitStream& inStream);
 
 private:
-	unordered_map <uint32_t, RPCFuncType> _nameToRpcMap;
+	unordered_map <RPCNameType, RPCFuncType> _nameToRpcMap;
 };
 
+// Game State 변경 관련 RPC 함수
+void UnwrapSetClientReady(const ClientProxy& clientProxy, InputMemoryBitStream& inStream);
+
+// 캐릭터 조작 관련 RPC 함수
 void UnwrapMovePlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inStream);
