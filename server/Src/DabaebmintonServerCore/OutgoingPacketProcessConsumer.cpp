@@ -2,9 +2,7 @@
 #include "OutgoingPacketProcessConsumer.h"
 
 #include "ServerEngine.h"
-#include "NetworkManagerServer.h"
 #include "GameManager.h"
-
 #include "Game.h"
 
 void OutgoingPacketProcessConsumer::operator() ()
@@ -27,10 +25,7 @@ void OutgoingPacketProcessConsumer::operator() ()
 		gameManager._pendingOutgoingPacketProcessQueue.pop();
 		lk.unlock();
 
-		auto& networkManager = NetworkManagerServer::GetInstance();
-		networkManager.SendTo(game->p_player1);
-		networkManager.SendTo(game->p_player2);
-
+		game->SendOutgoingPacket();
 		game->IsPendingReplicationUpdate.store(false, std::memory_order_release);
 	}
 }

@@ -71,8 +71,10 @@ bool GameManager::RemoveGame(ClientProxy* clientProxy)
 	size_t gameIdx = _clientProxyToGameIdxMap[clientProxy];
 
 	shared_ptr<Game> game = _games[gameIdx];
-	_clientProxyToGameIdxMap.erase(game->p_player1);
-	_clientProxyToGameIdxMap.erase(game->p_player2);
+	for (int playerIdx = 0; playerIdx < game->MAX_PLAYERS; ++playerIdx)
+	{
+		_clientProxyToGameIdxMap.erase(game->GetPlayerProxy(playerIdx));
+	}
 
 	swap(_games[gameIdx], _games[_games.size() - 1]);
 	_games.pop_back();

@@ -26,7 +26,7 @@ void DeveloperCommandFunctor::operator()()
 				{
 					std::lock_guard<mutex> lk(gameManager._gamesMutex);
 					for (auto& game : games)
-						game->_level.RemoveAllGameObjects();
+						game->GetLevel().RemoveAllGameObjects();
 				}
 				else if (cmd == "s")
 				{

@@ -20,8 +20,11 @@ public:
 	Game(ClientProxy* player1, ClientProxy* player2);
 	~Game();
 
+	ClientProxy* GetPlayerProxy(int idx) const { return _player[idx]; }
+
 	GamePlayState GetGamePlayState() const { return _gamePlayState; }
 
+	Level& GetLevel() { return _level; }
 
 	bool HasElapsedReplicationInterval();
 	void SetNextReplicationTimeFromNow();
@@ -32,16 +35,16 @@ public:
 
 	void MovePlayer(GameObject* playerCharacter);
 
-	Level _level;
+	void SendOutgoingPacket();
 
-	// For Networking
-	ClientProxy* p_player1;
-	ClientProxy* p_player2;
-
-	system_clock::time_point _nextReplicationUpdateTime;
 	atomic<bool> IsPendingReplicationUpdate{ false };
 
 private:
+	// For Networking
+	ClientProxy* _player[2];
+
+	Level _level;
+	
 	GamePlayState _gamePlayState;
 
 	unordered_map<PlayerId_t, int> _playerIdToPlayerIdxMap;
@@ -49,4 +52,6 @@ private:
 	// game state 변경을 동기화하기 위해 사용
 	bool _isPlayerReadyToGoNextState[MAX_PLAYERS] = { false, false };
 	int _numPlayersReadyCount{ 0 };
+	
+	system_clock::time_point _nextReplicationUpdateTime;
 };

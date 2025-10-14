@@ -10,12 +10,13 @@
 #include "GameObject.h"
 
 Game::Game(ClientProxy* player1, ClientProxy* player2) :
-	p_player1{ player1 }, p_player2{ player2 },
 	_gamePlayState{ GamePlayState::Initializing },
 	_level{}
 {
 	_playerIdToPlayerIdxMap.emplace(player1->GetSession().GetPlayerId(), 0);
+	_player[0] = player1;
 	_playerIdToPlayerIdxMap.emplace(player2->GetSession().GetPlayerId(), 1);
+	_player[1] = player2;
 
 	_level.InitLevel();
 
@@ -39,8 +40,10 @@ Game::~Game()
 	{
 		auto networkId = gameObject->GetNetworkId();
 		networkManager.UnregisterGameObject(networkId);
-		p_player1->GetReplicationManager().ReplicateDestroy(networkId);
-		p_player2->GetReplicationManager().ReplicateDestroy(networkId);
+		for (int playerIdx = 0; playerIdx < MAX_PLAYERS; ++playerIdx)
+		{
+			_player[playerIdx]->GetReplicationManager().ReplicateDestroy(networkId);
+		}
 	}
 }
 
@@ -76,6 +79,16 @@ void Game::MovePlayer(GameObject* playerCharacter)
 	// NetworkManager에서 처리했고, 실제로 MovePlayer가 동작하는 과정을 구현
 
 	spdlog::debug("[Game::MovePlayer] called. player: {}", playerCharacter->GetClassId());
+}
+
+void Game::SendOutgoingPacket()
+{
+	auto& networkManagerServer = NetworkManagerServer::GetInstance();
+
+	for (int playerIdx = 0; playerIdx < MAX_PLAYERS; ++playerIdx)
+	{
+		networkManagerServer.SendTo(_player[playerIdx]);
+	}
 }
 
 bool Game::HasElapsedReplicationInterval()
