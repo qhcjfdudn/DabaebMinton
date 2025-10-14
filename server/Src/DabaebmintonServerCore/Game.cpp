@@ -21,7 +21,7 @@ Game::Game(ClientProxy* player1, ClientProxy* player2) :
 	_level.InitLevel();
 
 	auto& networkManager = NetworkManagerServer::GetInstance();
-	for (auto gameObject : _level.gameObjects)
+	for (auto gameObject : _level.GetGameObjects())
 	{
 		spdlog::debug("[Game::Game] object: {}", gameObject->GetClassId());
 
@@ -36,7 +36,7 @@ Game::Game(ClientProxy* player1, ClientProxy* player2) :
 Game::~Game()
 {
 	auto& networkManager = NetworkManagerServer::GetInstance();
-	for (auto gameObject : _level.gameObjects)
+	for (auto gameObject : _level.GetGameObjects())
 	{
 		auto networkId = gameObject->GetNetworkId();
 		networkManager.UnregisterGameObject(networkId);

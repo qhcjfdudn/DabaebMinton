@@ -11,12 +11,11 @@ public:
 	Level();
 	~Level();
 
-	vector<shared_ptr<GameObject>> gameObjects;
-	vector<shared_ptr<StaticGameObject>> staticGameObjects;
-
 	void InitLevel();
 	void ClearLevel();
 	void Release();
+
+	vector<shared_ptr<GameObject>>& GetGameObjects() { return _gameObjects; }
 
 	void RemoveAllGameObjects();
 	void RemoveGameObject(size_t idx);
@@ -27,9 +26,13 @@ public:
 	bool HasElapsedFixedUpdateInterval();
 	void SetLastFixedUpdateTimeToNow();
 	void FixedUpdate();
+
 	
-	PxScene* pxScene = nullptr;
-
-	system_clock::time_point lastFixedUpdateTime;
+private:
+	PxScene* _pxScene = nullptr;
+	
+	vector<shared_ptr<GameObject>> _gameObjects;
+	vector<shared_ptr<StaticGameObject>> _staticGameObjects;
+	
+	system_clock::time_point _lastFixedUpdateTime;
 };
-
