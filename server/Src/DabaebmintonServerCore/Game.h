@@ -32,6 +32,7 @@ public:
 	void SetClientReady(const PlayerId_t playerId);
 
 	void StartGame();
+	void EndGame();
 
 	void MovePlayer(GameObject* playerCharacter);
 

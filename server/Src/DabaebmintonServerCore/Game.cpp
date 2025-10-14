@@ -70,7 +70,13 @@ void Game::SetClientReady(const PlayerId_t playerId)
 
 void Game::StartGame()
 {
+	_level.SetLastFixedUpdateTimeToNow();
 	_gamePlayState = GamePlayState::Playing;
+}
+
+void Game::EndGame()
+{
+	_gamePlayState = GamePlayState::End;
 }
 
 void Game::MovePlayer(GameObject* playerCharacter)
