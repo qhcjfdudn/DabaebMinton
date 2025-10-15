@@ -70,23 +70,19 @@ int main()
 		}
 		});
 
-	thread physicsEngineRunningThread([] {
+	thread gameStepPhysicsThread([] {
 		auto& serverEngine = ServerEngine::GetInstance();
-		auto& physicsEngine = PhysicsEngine::GetInstance();
-
-		// game이 Playing 상태일 때만 물리 연산 수행하도록 변경 필요
-
-		auto& scenes = physicsEngine.scenes;
-		auto& lastTimes = physicsEngine._lastPhysXFixedUpdateTimeArray;
+		auto& gameManager = GameManager::GetInstance();
 
 		while (serverEngine.isRunning.load(std::memory_order_acquire))
 		{
-			std::lock_guard lk(physicsEngine.scenesMutex);
-			int len = static_cast<int>(scenes.size());
-			for (int i = 0; i < len; ++i)
-			{
-				physicsEngine.StepPhysicsIfHasElapsedPhysicsFixedUpdateInterval(scenes[i], lastTimes[i]);
+			auto& games = gameManager._games;
+			gameManager._gamesMutex.lock();
+			for (auto game : games)
+			{	
+				game->StepPhysicsIfPossible();
 			}
+			gameManager._gamesMutex.unlock();
 		}
 		});
 
@@ -124,7 +120,7 @@ int main()
 	GameManager::GetInstance().RemoveAllGames();
 
 	networkEngineRunningThread.join();
-	physicsEngineRunningThread.join();
+	gameStepPhysicsThread.join();
 
 	// Engine Turn Off with Garbage Collection
 	thread physicsEngineCleaupThread([] {

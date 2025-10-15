@@ -17,6 +17,7 @@ public:
 	void ClearLevel();
 	void Release();
 
+	PxScene* GetScene() const { return _pxScene; }
 	vector<shared_ptr<GameObject>>& GetGameObjects() { return _gameObjects; }
 
 	void RemoveAllGameObjects();

@@ -1,9 +1,7 @@
 #pragma once
 
-#include "LinkingContext.h"
-#include "Level.h"
-
 #include "GameConfig.h"
+#include "Level.h"
 
 class ClientProxy;
 
@@ -26,17 +24,24 @@ public:
 
 	Level& GetLevel() { return _level; }
 
-	bool HasElapsedReplicationInterval();
-	void SetNextReplicationTimeFromNow();
-
-	void SetClientReady(const PlayerId_t playerId);
-
 	void StartGame();
 	void EndGame();
 
-	void MovePlayer(GameObject* playerCharacter);
+	bool HasElapsedReplicationInterval() const;
+	void SetNextReplicationTimeFromNow();
+	
+	void SetNextStepPhysicsTime(const steady_clock::time_point& time);
+
+	bool StepPhysicsIfPossible();
+	bool HasElapsedStepPhysicsInterval(const steady_clock::time_point& time) const;
+	void StepPhysics(const steady_clock::time_point& curTime);
+	void fetchNextStepPhysicsTime();
 
 	void SendOutgoingPacket();
+	
+	// RPC
+	void SetClientReady(const PlayerId_t playerId);
+	void MovePlayer(GameObject* playerCharacter);
 
 	atomic<bool> IsPendingReplicationUpdate{ false };
 
@@ -55,4 +60,6 @@ private:
 	int _numPlayersReadyCount{ 0 };
 	
 	system_clock::time_point _nextReplicationUpdateTime;
+	steady_clock::time_point _nextStepPhysicsPeriod;
+	steady_clock::time_point _lastRealStepPhysicsTime;
 };

@@ -1,13 +1,11 @@
 #include "ServerPCH.h"
 #include "Game.h"
 
-#include "NetworkManagerServer.h"
-#include "OutputMemoryBitStream.h"
-#include "InputMemoryBitStream.h"
 #include "Constant.h"
-#include "ClientProxy.h"
-#include "Packet.h"
+#include "PhysicsEngine.h"
+#include "NetworkManagerServer.h"
 #include "GameObject.h"
+#include "ClientProxy.h"
 
 using namespace GameConfig;
 
@@ -41,6 +39,8 @@ Game::Game(ClientProxy* (&players)[GameConfig::MAX_PLAYERS]) :
 	}
 
 	SetNextReplicationTimeFromNow();
+
+	SetNextStepPhysicsTime(steady_clock::now() + 1min);
 }
 
 Game::~Game()
@@ -54,6 +54,85 @@ Game::~Game()
 		{
 			_player[playerIdx]->GetReplicationManager().ReplicateDestroy(networkId);
 		}
+	}
+}
+
+void Game::StartGame()
+{
+	_level.SetLastFixedUpdateTimeToNow();
+
+	SetNextStepPhysicsTime(steady_clock::now());
+	
+	_gamePlayState = GamePlayState::Playing;
+}
+
+void Game::EndGame()
+{
+	_gamePlayState = GamePlayState::End;
+}
+
+bool Game::HasElapsedReplicationInterval() const
+{
+	return system_clock::now() >= _nextReplicationUpdateTime;
+}
+
+void Game::SetNextReplicationTimeFromNow()
+{
+	std::chrono::duration<float> offset(Constant::REPLICATION_PERIOD);
+	_nextReplicationUpdateTime = system_clock::now() + std::chrono::duration_cast<system_clock::duration>(offset);
+}
+
+void Game::SetNextStepPhysicsTime(const steady_clock::time_point& time)
+{
+	_lastRealStepPhysicsTime = time;
+
+	duration<float> offset{ Constant::PHYSX_FIXED_UPDATE_TIMESTEP };
+	_nextStepPhysicsPeriod = time + duration_cast<steady_clock::duration>(offset);
+}
+
+bool Game::StepPhysicsIfPossible()
+{
+	if (_gamePlayState != GamePlayState::Playing)
+		return false;
+
+	const auto now = steady_clock::now();
+	if (HasElapsedStepPhysicsInterval(now) == false)
+	{
+		return false;
+	}
+
+	StepPhysics(now);
+
+	return true;
+}
+
+bool Game::HasElapsedStepPhysicsInterval(const steady_clock::time_point& time) const
+{
+	return time >= _nextStepPhysicsPeriod;
+}
+
+void Game::StepPhysics(const steady_clock::time_point& curTime)
+{
+	PxReal elapsed = duration_cast<duration<float>>(curTime - _lastRealStepPhysicsTime).count();
+	PhysicsEngine::GetInstance().StepPhysics(_level.GetScene(), elapsed);
+
+	_lastRealStepPhysicsTime = curTime;
+	fetchNextStepPhysicsTime();
+}
+
+void Game::fetchNextStepPhysicsTime()
+{
+	duration<float> offset{ Constant::PHYSX_FIXED_UPDATE_TIMESTEP };
+	_nextStepPhysicsPeriod += duration_cast<steady_clock::duration>(offset);
+}
+
+void Game::SendOutgoingPacket()
+{
+	auto& networkManagerServer = NetworkManagerServer::GetInstance();
+
+	for (int playerIdx = 0; playerIdx < MAX_PLAYERS; ++playerIdx)
+	{
+		networkManagerServer.SendTo(_player[playerIdx]);
 	}
 }
 
@@ -78,42 +157,10 @@ void Game::SetClientReady(const PlayerId_t playerId)
 	}
 }
 
-void Game::StartGame()
-{
-	_level.SetLastFixedUpdateTimeToNow();
-	_gamePlayState = GamePlayState::Playing;
-}
-
-void Game::EndGame()
-{
-	_gamePlayState = GamePlayState::End;
-}
-
 void Game::MovePlayer(GameObject* playerCharacter)
 {
 	// 이 player를 RPC를 요청한 유저가 소유권이 있을까? 하는 정보는
 	// NetworkManager에서 처리했고, 실제로 MovePlayer가 동작하는 과정을 구현
 
 	spdlog::debug("[Game::MovePlayer] called. player: {}", playerCharacter->GetClassId());
-}
-
-void Game::SendOutgoingPacket()
-{
-	auto& networkManagerServer = NetworkManagerServer::GetInstance();
-
-	for (int playerIdx = 0; playerIdx < MAX_PLAYERS; ++playerIdx)
-	{
-		networkManagerServer.SendTo(_player[playerIdx]);
-	}
-}
-
-bool Game::HasElapsedReplicationInterval()
-{
-	return system_clock::now() >= _nextReplicationUpdateTime;
-}
-
-void Game::SetNextReplicationTimeFromNow()
-{
-	std::chrono::duration<float> offset(Constant::REPLICATION_PERIOD);
-	_nextReplicationUpdateTime = system_clock::now() + std::chrono::duration_cast<system_clock::duration>(offset);
 }

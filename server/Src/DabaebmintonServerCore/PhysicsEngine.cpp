@@ -59,7 +59,6 @@ PxScene* PhysicsEngine::CreateScene(PxSceneDesc sceneDesc)
 	
 	std::lock_guard lk(scenesMutex);
 	scenes.push_back(pxScene);
-	_lastPhysXFixedUpdateTimeArray.push_back(system_clock::now());
 	
 	return pxScene;
 }
@@ -182,29 +181,6 @@ void PhysicsEngine::StepPhysics(PxScene* scene, PxReal elapsedTime)
 	scene->simulate(elapsedTime);
 	scene->fetchResults(true);
 	scene->unlockWrite();
-
-	spdlog::info("[PhysicsEngine::StepPhysics] update scene.");
-}
-
-void PhysicsEngine::SetLastUpdateTimeToNow(system_clock::time_point& lastUpdateTime)
-{
-	lastUpdateTime = system_clock::now();
-}
-
-bool PhysicsEngine::StepPhysicsIfHasElapsedPhysicsFixedUpdateInterval(PxScene* scene, system_clock::time_point& lastUpdateTime)
-{
-	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - lastUpdateTime;
-
-	if (elapsedTime.count() >= Constant::PHYSX_FIXED_UPDATE_TIMESTEP)
-	{
-		StepPhysics(scene, static_cast<PxReal>(elapsedTime.count()));
-		lastUpdateTime = currentTime;
-
-		return true;
-	}
-
-	return false;
 }
 
 PhysicsEngineRunningState PhysicsEngine::GetEngineRunningState()

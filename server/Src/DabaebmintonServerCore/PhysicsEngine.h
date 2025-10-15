@@ -36,13 +36,10 @@ public:
 		const PxVec3& velocity = PxVec3(0));
 
 	void StepPhysics(PxScene* scene, PxReal elapsedTime);
-	void SetLastUpdateTimeToNow(system_clock::time_point& lastUpdateTime);
-	bool StepPhysicsIfHasElapsedPhysicsFixedUpdateInterval(PxScene* scene, system_clock::time_point& lastUpdateTime);
 
 	PhysicsEngineRunningState GetEngineRunningState();
 
 	std::vector<PxScene*> scenes;
-	std::vector<system_clock::time_point> _lastPhysXFixedUpdateTimeArray;
 	std::mutex scenesMutex;
 
 private:
