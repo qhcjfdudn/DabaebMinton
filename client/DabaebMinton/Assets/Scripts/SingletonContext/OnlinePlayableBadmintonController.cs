@@ -36,9 +36,11 @@ public class OnlinePlayableBadmintonController : BadmintonController
         _networkManager.OnlinePlayServerIp = PlayerPrefs.GetString("OnlinePlayServerIp");
         _networkManager.OnlinePlayServerPort = UInt16.Parse(PlayerPrefs.GetString("OnlinePlayServerPort"));
         _networkManager.OnlinePlaySessionId = UInt32.Parse(PlayerPrefs.GetString("OnlinePlaySessionId"));
+        Debug.Log($"[OnlinePlayableBadmintonController] OnlinePlayServerIp: {_networkManager.OnlinePlayServerIp}");
+        Debug.Log($"[OnlinePlayableBadmintonController] OnlinePlayServerPort: {_networkManager.OnlinePlayServerPort}");
+        Debug.Log($"[OnlinePlayableBadmintonController] OnlinePlaySessionId: {_networkManager.OnlinePlaySessionId}");
 
         _networkManager.ConnectToOnlinePlayServer();
-
         _networkManager.SendHello();
     }
 
