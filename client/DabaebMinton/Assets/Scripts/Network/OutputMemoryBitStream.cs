@@ -5,7 +5,7 @@ using UnityEngine;
 public class OutputMemoryBitStream
 {
     //private const int INITIAL_BUFFER_SIZE = 1_024;
-    private const int INITIAL_BUFFER_SIZE = 4;  // °ËÁõ¿ë
+    private const int INITIAL_BUFFER_SIZE = 4;  // ê²€ì¦ìš©
 
     private byte[] _streamBuffer = new byte[INITIAL_BUFFER_SIZE];
     public byte[] StreamBuffer { get { return _streamBuffer; } }
@@ -19,9 +19,14 @@ public class OutputMemoryBitStream
         _bitHead = 0;
     }
 
+    public void Clear()
+    {
+        _bitHead = 0;
+    }
+
     private void ReAllocate(int newCapacity)
     {
-        // ¿ØÁö.. 2ÀÇ Á¦°ö¼ö ¸¸Å­ Capacity¸¦ °ü¸®ÇÏ°í ½Í´Ù..
+        // ì™ ì§€.. 2ì˜ ì œê³±ìˆ˜ ë§Œí¼ Capacityë¥¼ ê´€ë¦¬í•˜ê³  ì‹¶ë‹¤..
         _capacity = GetNextCapacity(newCapacity);
 
         byte[] newBuffer = new byte[_capacity];
@@ -94,14 +99,14 @@ public class OutputMemoryBitStream
         _bitHead = nextBitHead;
     }
 
-    public void Write(int inData)
-    {
-        WriteBits(BitConverter.GetBytes(inData), 32);
-    }
-
     public void WriteBits(int inData, int inCount)
     {
         WriteBits(BitConverter.GetBytes(inData), inCount);
+    }
+
+    public void Write(int inData)
+    {
+        WriteBits(BitConverter.GetBytes(inData), 32);
     }
 
     public void Write(string inData)
@@ -109,5 +114,15 @@ public class OutputMemoryBitStream
         byte[] encodedInData = Encoding.UTF8.GetBytes(inData);
 
         WriteBits(encodedInData, encodedInData.Length * 8);
+    }
+
+    public void Write(bool inData)
+    {
+        WriteBits(inData ? 1 : 0, 1);
+    }
+
+    public void Write(uint inData)
+    {
+        WriteBits(BitConverter.GetBytes(inData), 32);
     }
 }
