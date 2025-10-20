@@ -16,7 +16,6 @@ public enum PacketType
 public class NetworkManager : MonoBehaviour
 {
     private static NetworkManager _instance;
-    // private NetworkManagerUI _networkManagerUI;
 
     public static NetworkManager Instance
     {
@@ -24,77 +23,61 @@ public class NetworkManager : MonoBehaviour
         {
             if (_instance == null)
             {
-                Debug.Log("NetworkManager GameObject°¡ ¾ÆÁ÷ »ı¼ºµÇÁö ¾Ê¾Ò½À´Ï´Ù. instance´Â nullÀ» returnÇÕ´Ï´Ù.");
+                Debug.Log("NetworkManager GameObjectê°€ ì•„ì§ ìƒì„±ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. instanceëŠ” nullì„ returní•©ë‹ˆë‹¤.");
             }
             return _instance;
         }
     }
 
     private TcpClient _client;
+    private UdpClient _udpClient;
     private NetworkStream _stream;
     private byte[] _receiveBuffer = new byte[1024];
     private OutputMemoryBitStream _outBuffer = new OutputMemoryBitStream();
     public OutputMemoryBitStream OutBuffer { get { return _outBuffer; } }
 
-    public string _serverIP = "127.0.0.1"; // ¼­¹ö IP ÁÖ¼Ò
-    public int _serverPort = 50000;       // ¼­¹ö Æ÷Æ® ¹øÈ£
+    public string _serverIP = "127.0.0.1"; // ì„œë²„ IP ì£¼ì†Œ
+    public int _serverPort = 50000;       // ì„œë²„ í¬íŠ¸ ë²ˆí˜¸
 
     private ReplicationManager _replicationManager;
 
     private NetworkManager() { }
 
-    void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        _instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        _replicationManager = ReplicationManager.Instance;
-    }
-
-    private void Start()
-    {
-        //_networkManagerUI = NetworkManagerUI.Instance;
-        //_networkManagerUI.gameObject.transform.SetParent(transform);
-
-        ConnectToServer();
-    }
-
-    // ¿¬°á Á¾·á
-    private void OnApplicationQuit()
-    {
-        if (_client != null)
-        {
-            _stream?.Close();
-            _client?.Close();
-        }
-    }
-
-    // ¿¬°á ½ÃÀÛ
-    public void ConnectToServer()
+    // ì—°ê²° ì‹œì‘
+    public void ConnectToServerTcp()
     {
         try
         {
             _client = new TcpClient();
-            _client.Connect(_serverIP, _serverPort); // ¼­¹ö¿¡ ¿¬°á
+            _client.Connect(_serverIP, _serverPort); // ì„œë²„ì— ì—°ê²°
             _stream = _client.GetStream();
 
-            Debug.Log("¼­¹ö¿¡ ¿¬°áµÇ¾ú½À´Ï´Ù.");
+            Debug.Log("ì„œë²„ì— ì—°ê²°ë˜ì—ˆìŠµë‹ˆë‹¤.");
 
-            StartListening(); // µ¥ÀÌÅÍ ¼ö½Å ´ë±â
+            StartListening(); // ë°ì´í„° ìˆ˜ì‹  ëŒ€ê¸°
         }
         catch (Exception ex)
         {
-            Debug.LogError("¼­¹ö ¿¬°á ½ÇÆĞ: " + ex.Message);
+            Debug.LogError("ì„œë²„ ì—°ê²° ì‹¤íŒ¨: " + ex.Message);
         }
     }
 
-    // µ¥ÀÌÅÍ ¼ö½Å ´ë±â
+    public void ConnectToServerUdp()
+    {
+        try
+        {
+            _udpClient = new UdpClient();
+            _udpClient.Connect(_serverIP, _serverPort); // ì„œë²„ì— ì—°ê²°
+
+            // ìˆ˜ì‹  ëŒ€ê¸° ì‹œì‘
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("ì„œë²„ ì—°ê²° ì‹¤íŒ¨: " + ex.Message);
+        }
+    }
+
+    // ë°ì´í„° ìˆ˜ì‹  ëŒ€ê¸°
     private async void StartListening()
     {
         try
@@ -102,7 +85,7 @@ public class NetworkManager : MonoBehaviour
             while (_client != null && _client.Connected)
             {
                 int bytesRead = await _stream.ReadAsync(_receiveBuffer, 0, _receiveBuffer.Length);
-                // bytesRead°¡ ÀÖ±â ¶§¹®¿¡, ÇöÀç±îÁö ÀĞ¾î µéÀÎ bytes¸¦ ¼¼¸é ¸¶Áö¸· µ¥ÀÌÅÍ·Î 0À» ÁÖÁö ¾Ê¾Æµµ µÈ´Ù.
+                // bytesReadê°€ ìˆê¸° ë•Œë¬¸ì—, í˜„ì¬ê¹Œì§€ ì½ì–´ ë“¤ì¸ bytesë¥¼ ì„¸ë©´ ë§ˆì§€ë§‰ ë°ì´í„°ë¡œ 0ì„ ì£¼ì§€ ì•Šì•„ë„ ëœë‹¤.
                 if (bytesRead > 0)
                 {
                     Debug.Log($"bytesRead: {bytesRead}");
@@ -134,7 +117,7 @@ public class NetworkManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError("¼­¹ö¿ÍÀÇ ¿¬°áÀÌ Á¾·áµÇ¾ú½À´Ï´Ù: " + ex.Message);
+            Debug.LogError("ì„œë²„ì™€ì˜ ì—°ê²°ì´ ì¢…ë£Œë˜ì—ˆìŠµë‹ˆë‹¤: " + ex.Message);
             Debug.Log(ex.StackTrace.ToString());
         }
     }
@@ -173,18 +156,18 @@ public class NetworkManager : MonoBehaviour
             Debug.Log($"before _outBuffer.ToString(): {BitConverter.ToString(_outBuffer.StreamBuffer)}");
             _outBuffer.WriteBits(0, 2);
             Debug.Log($"after _outBuffer.ToString(): {BitConverter.ToString(_outBuffer.StreamBuffer)}");
-            _stream.Write(_outBuffer.StreamBuffer, 0, _outBuffer.Count); // ¸Ş½ÃÁö Àü¼Û
+            _stream.Write(_outBuffer.StreamBuffer, 0, _outBuffer.Count); // ë©”ì‹œì§€ ì „ì†¡
             _outBuffer.InitBuffer();
         }
         catch (Exception ex)
         {
-            Debug.LogError("¸Ş½ÃÁö Àü¼Û ½ÇÆĞ: " + ex.Message);
+            Debug.LogError("ë©”ì‹œì§€ ì „ì†¡ ì‹¤íŒ¨: " + ex.Message);
         }
     }
 
     private void PrintNotConnectedToServerMessage()
     {
-        Debug.LogError("¼­¹ö¿¡ ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+        Debug.LogError("ì„œë²„ì— ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
     }
 
     private void UnwrapAddNewChat(InputMemoryBitStream inputBitStream)
@@ -204,5 +187,34 @@ public class NetworkManager : MonoBehaviour
         string newUsername = Encoding.UTF8.GetString(inputBitStream.ReadBits(stringLength * 8));
         Debug.Log($"newUsername: {newUsername}");
         FindAnyObjectByType<UIController>().SetUsername(newUsername);
+    }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        _instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        _replicationManager = ReplicationManager.Instance;
+    }
+
+    private void Start()
+    {
+
+    }
+
+    // ì—°ê²° ì¢…ë£Œ
+    private void OnApplicationQuit()
+    {
+        if (_client != null)
+        {
+            _stream?.Close();
+            _client?.Close();
+        }
     }
 }
