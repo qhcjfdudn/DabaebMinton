@@ -79,19 +79,6 @@ public class InputMemoryBitStream
 
     public int ReadInt()
     {
-        int ret = 0;
-
-        byte[] bytes = ReadBits(sizeof(int) << 3);
-        for (int i = 0; i < bytes.Length; ++i)
-        {
-            ret |= bytes[i] << (i * 8);
-        }
-
-        return ret;
-    }
-
-    public int ReadInt2()
-    {
         byte[] bytes = ReadBits(sizeof(int) << 3);
 
         if (bytes.Length < 4)

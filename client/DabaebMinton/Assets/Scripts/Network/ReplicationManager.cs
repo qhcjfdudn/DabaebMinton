@@ -16,7 +16,7 @@ public class ReplicationManager : MonoBehaviour
         {
             if (_instance == null)
             {
-                Debug.Log("ReplicationManager GameObject°¡ ¾ÆÁ÷ »ı¼ºµÇÁö ¾Ê¾Ò½À´Ï´Ù. instance´Â nullÀ» returnÇÕ´Ï´Ù.");
+                Debug.Log("ReplicationManager GameObjectê°€ ì•„ì§ ìƒì„±ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. instanceëŠ” nullì„ returní•©ë‹ˆë‹¤.");
             }
             return _instance;
         }
@@ -25,15 +25,22 @@ public class ReplicationManager : MonoBehaviour
 
     public void ProcessReplicationAction(InputMemoryBitStream inStream)
     {
+        // ëª¨ë“  íŒ¨í‚·ì´ [NetworkId, ReplicationAction] ìœ¼ë¡œ ì‹œì‘
+        // ìƒì„±: ClassId, dirty State(All Mask)
+        // ìˆ˜ì •: dirty State
+        // ì‚­ì œ: ì—†ìŒ.
+
+
+        // inStreamì´ ë¹Œ ë•Œê¹Œì§€ ë°˜ë³µ ì²˜ë¦¬ í•„ìš”
         ReplicationHeader rh = new ReplicationHeader();
         rh.Read(inStream);
 
-        Debug.Log($"rh.Ra: {rh.Ra}, rh.Nid: {rh.Nid}, rh.Cid: {rh.Cid}");
+        Debug.Log($"rh.Ra: {rh.Ra}, rh.Nid: {rh.Nid}");
 
         switch (rh.Ra)
         {
             case ReplicationAction.RA_Create:
-                ReplicationCreate();
+                ReplicationCreate(rh, inStream);
                 break;
 
             case ReplicationAction.RA_Update:
@@ -46,33 +53,46 @@ public class ReplicationManager : MonoBehaviour
         }
     }
 
-    public void ReplicationCreate()
+    public void ReplicationCreate(ReplicationHeader rh, InputMemoryBitStream inStream)
     {
-        Debug.Log("RA_Create µµ´Ş ¿Ï·á!");
+        Debug.Log("RA_Create ë„ë‹¬ ì™„ë£Œ!");
+        
+        uint networkId = rh.Nid;
+        uint classId = (uint)inStream.ReadInt();
+
+        if (classId == NetworkUtils.GetClassId("PLYR"))
+        {
+            byte dirtyState = inStream.ReadByte(8);
+
+            Debug.Log("ReplicationCreate: PLYR ìƒì„± ìš”ì²­ ë„ë‹¬!");
+            Debug.Log($"dirtyState: {dirtyState}");
+        }
     }
+
     public void ReplicationUpdate(ReplicationHeader rh, InputMemoryBitStream inStream)
     {
-        uint networkId = rh.Nid, classId = rh.Cid;
+        Debug.Log("RA_Update ë„ë‹¬ ì™„ë£Œ!");
+        
+        uint networkId = rh.Nid;
 
-        Debug.Log("RA_Update µµ´Ş ¿Ï·á!");
-        // LinkingContext ÇÊ¿ä. networkId¿¡ ÇØ´çÇÏ´Â µ¥ÀÌÅÍ Ã£±â
+        // LinkingContext í•„ìš”. networkIdì— í•´ë‹¹í•˜ëŠ” ë°ì´í„° ì°¾ê¸°
 
         GameObject gameObject = _linkingContext.GetGameObject(networkId);
         if (null == gameObject)
         {
-            // »õ·Î¿î gameObject¸¦ »ı¼ºÇØ¼­ Àü´ŞÇØ¾ß ÇÏ´Âµ¥, 
-            // classID¸¦ ±âÁØÀ¸·Î ¸¸µå´Â Factory ÇÔ¼ö? °¡ ÀÖ¾î¾ß ÇÑ´Ù.
+            // ìƒˆë¡œìš´ gameObjectë¥¼ ìƒì„±í•´ì„œ ì „ë‹¬í•´ì•¼ í•˜ëŠ”ë°, 
+            // classIDë¥¼ ê¸°ì¤€ìœ¼ë¡œ ë§Œë“œëŠ” Factory í•¨ìˆ˜? ê°€ ìˆì–´ì•¼ í•œë‹¤.
             gameObject = Instantiate(Resources.Load<GameObject>("Prefabs/Shuttlecock"));
             _linkingContext.AddGameObject(networkId, gameObject);
         }
         
-        // gameObjectÀÇ Read È£Ãâ
+        // gameObjectì˜ Read í˜¸ì¶œ
         NetAction netAction = gameObject.GetComponent<NetAction>();
         netAction.Read(inStream);
     }
     public void ReplicationDelete()
     {
-        Debug.Log("RA_Delete µµ´Ş ¿Ï·á!");
+        Debug.Log("RA_Delete ë„ë‹¬ ì™„ë£Œ!");
     }
 
     private LinkingContext _linkingContext;
