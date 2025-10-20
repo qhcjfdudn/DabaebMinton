@@ -66,6 +66,18 @@ public class MainMenuSceneController : MonoBehaviour
         // Add logic to start online play
         _mainButtonPanel.gameObject.SetActive(false);
 
+        if (Application.isEditor)
+        {
+            PlayerPrefs.SetString("OnlinePlayServerIp", "127.0.0.1");
+            PlayerPrefs.SetString("OnlinePlayServerPort", "60000");     // 멀티스레드로 게임 진행 시 port가 겹칠 수 있으므로
+                                                                        // port 번호는 추후 동적 할당하는 것으로 변경 필요.
+            PlayerPrefs.SetString("OnlinePlaySessionId", "123123123");
+        }
+        else
+        {
+            // release에서는 MM서버로부터 serverIP:PORT, sessionId를 받은 뒤 PlayBadmintonScene으로 이동
+        }
+
         SceneManager.LoadScene("PlayBadmintonScene");
     }
 

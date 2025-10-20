@@ -5,6 +5,7 @@ using UnityEngine;
 
 using static NetworkUtils;
 
+using PacketSequenceNumber = System.UInt16;
 public enum PacketType
 {
     PT_Hello,
@@ -39,7 +40,12 @@ public class NetworkManager : MonoBehaviour
     public string _serverIP = "127.0.0.1"; // 서버 IP 주소
     public int _serverPort = 50000;       // 서버 포트 번호
 
+    public string OnlinePlayServerIp { get; set; } = "";
+    public UInt16 OnlinePlayServerPort { get; set; } = 0;
+    public UInt32 OnlinePlaySessionId { get; set; } = 0;
+
     private ReplicationManager _replicationManager;
+    private DeliveryNotificationManager _delivertyNotificationManager;
 
     private NetworkManager() { }
 
@@ -62,14 +68,16 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public void ConnectToServerUdp()
+    public void ConnectToOnlinePlayServer()
     {
         try
         {
             _udpClient = new UdpClient();
-            _udpClient.Connect(_serverIP, _serverPort); // 서버에 연결
+            _udpClient.Connect(OnlinePlayServerIp, OnlinePlayServerPort); // 서버에 연결
 
             // 수신 대기 시작
+            RecvFromOnlinePlayServer();
+
         }
         catch (Exception ex)
         {
@@ -122,6 +130,71 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    private async void RecvFromOnlinePlayServer()
+    {
+        try
+        {
+            while (true)
+            {
+                UdpReceiveResult result = await _udpClient.ReceiveAsync();
+                byte[] receivedData = result.Buffer;
+                if (receivedData.Length > 0)
+                {
+                    InputMemoryBitStream inStream = new InputMemoryBitStream(receivedData, receivedData.Length);
+
+                    ProcessPacket(inStream);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("서버와의 연결이 종료되었습니다: " + ex.Message);
+            Debug.Log(ex.StackTrace.ToString());
+        }
+    }
+
+    void ProcessPacket(InputMemoryBitStream inStream)
+    {
+        PacketType packetType = (PacketType)inStream.ReadBits(GetRequiredBits((int)PacketType.PT_Max))[0];
+        Debug.Log($"Packet Type: {packetType.ToString()}");
+
+        PacketSequenceNumber packetSequenceNumber = BitConverter.ToUInt16(inStream.ReadBits(16));
+        Debug.Log($"PacketSequenceNumber: {packetSequenceNumber}");
+
+        _delivertyNotificationManager.AddPendingAck(packetSequenceNumber);
+
+        switch (packetType)
+        {
+            case PacketType.PT_Hello:
+                break;
+            case PacketType.PT_ReplicationData:
+                _replicationManager.ProcessReplicationAction(inStream);
+                break;
+            case PacketType.PT_Disconnect:
+                break;
+            default: break;
+        }
+    }
+
+    private async void SendToOnlinePlayServer()
+    {
+        try
+        {
+            int len = (_outBuffer.Count + 7) / 8;
+            byte[] dataToSend = new byte[len];
+            Buffer.BlockCopy(_outBuffer.StreamBuffer, 0, dataToSend, 0, len);
+
+            _outBuffer.Clear();
+
+            await _udpClient.SendAsync(dataToSend, len);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("서버에 메시지 전송 실패: " + ex.Message);
+            Debug.Log(ex.StackTrace.ToString());
+        }
+    }
+
     private void ProcessIncomingDataTest(InputMemoryBitStream inputBitStream)
     {
         while (true)
@@ -165,6 +238,22 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    public void SendHello()
+    {
+        _outBuffer.Clear();
+
+        // Session
+        _outBuffer.Write(OnlinePlaySessionId);
+
+        // Acks
+        _outBuffer.Write(false);
+
+        // Packet Type
+        _outBuffer.WriteBits((int)PacketType.PT_Hello, GetRequiredBits(PacketType.PT_Max));
+
+        SendToOnlinePlayServer();
+    }
+
     private void PrintNotConnectedToServerMessage()
     {
         Debug.LogError("서버에 연결되지 않았습니다.");
@@ -201,11 +290,7 @@ public class NetworkManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         _replicationManager = ReplicationManager.Instance;
-    }
-
-    private void Start()
-    {
-
+        _delivertyNotificationManager = new DeliveryNotificationManager();
     }
 
     // 연결 종료

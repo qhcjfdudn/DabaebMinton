@@ -596,7 +596,7 @@ void NetworkManagerServer::CreateRUDPSocket()
 
 	spdlog::info("[NetworkManagerServer::CreateRUDPSocket] RUDP Socket Creation Complete.");
 	
-	if (m_rudpSocket.Bind("0.0.0.0", 50000) == SOCKET_ERROR) {
+	if (m_rudpSocket.Bind("0.0.0.0", 60000) == SOCKET_ERROR) {
 		spdlog::error("[NetworkManagerServer::CreateRUDPSocket] bind error: {}", WSAGetLastError());
 		return;
 	}
