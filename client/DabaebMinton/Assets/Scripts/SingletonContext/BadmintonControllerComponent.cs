@@ -158,21 +158,25 @@ public class BadmintonControllerComponent : MonoBehaviour
             PlayerPrefs.DeleteKey("PlayMode");
         }
 
-        _playerCount = PlayerPrefs.GetInt("PlayerCount", 1);
-        PlayerPrefs.DeleteKey("PlayerCount");
-
-        _positionOf1P = PlayerPrefs.GetInt("PositionOf1P", 0);
-        PlayerPrefs.DeleteKey("PositionOf1P");
-
         Debug.Log($"[BadmintonControllerComponent] PlayMode: {PlayMode}");
+
+        if (PlayMode == EPlayMode.Local)
+        {
+            _playerCount = PlayerPrefs.GetInt("PlayerCount", 1);
+            PlayerPrefs.DeleteKey("PlayerCount");
+
+            _positionOf1P = PlayerPrefs.GetInt("PositionOf1P", 0);
+            PlayerPrefs.DeleteKey("PositionOf1P");
+        }
+        else if (PlayMode == EPlayMode.Online)
+        {
+        }
     }
 
     private BadmintonController GetController()
     {
         if (PlayMode == EPlayMode.Local)
         {
-            // 추후 1P, 2P 모드로 확장 예정. 현재는 2P 모드로 고정.
-
             BadmintonPlayUIController uiController =
                 FindFirstObjectByType<BadmintonPlayUIController>()
                 .GetComponent<BadmintonPlayUIController>();
@@ -184,14 +188,27 @@ public class BadmintonControllerComponent : MonoBehaviour
 
             var controller = BadmintonControllerFactory.GetPlayableBadmintonController(uiController);
 
-            Debug.Log("[BadmintonControllerComponent] Initialized with BadmintonPlayUIController.");
+            Debug.Log("[BadmintonControllerComponent] Initialized PlayableBadmintonController with BadmintonPlayUIController.");
 
             return controller;
         }
 
         if (PlayMode == EPlayMode.Online)
         {
-            return BadmintonControllerFactory.GetDefaultBadmintonController();
+            BadmintonPlayUIController uiController =
+                FindFirstObjectByType<BadmintonPlayUIController>()
+                .GetComponent<BadmintonPlayUIController>();
+
+            if (uiController == null)
+            {
+                Debug.LogError("[BadmintonControllerComponent] BadmintonPlayUIController not found!");
+            }
+
+            var controller = BadmintonControllerFactory.GetOnlinePlayableBadmintonController(uiController);
+
+            Debug.Log("[BadmintonControllerComponent] Initialized OnlinePlayableBadmintonController with BadmintonPlayUIController.");
+
+            return controller;
         }
 
         // 학습 모드
@@ -209,12 +226,13 @@ public class BadmintonControllerComponent : MonoBehaviour
     private void Awake()
     {
         InitSetting();
-
         Controller = GetController();
     }
 
     private void Start()
     {
+        _inputManager.SetActionMapBy(PlayMode);
+
         Initialize();
     }
 
@@ -243,6 +261,12 @@ public static class BadmintonControllerFactory
     {
         return new PlayableBadmintonController(badmintonPlayUIController);
     }
+
+    public static BadmintonController GetOnlinePlayableBadmintonController(BadmintonPlayUIController badmintonPlayUIController)
+    {
+        return new OnlinePlayableBadmintonController(badmintonPlayUIController);
+    }
+
     public static BadmintonController GetTrainingController()
     {
         return new TrainingController();

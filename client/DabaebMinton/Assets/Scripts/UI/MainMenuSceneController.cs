@@ -64,6 +64,9 @@ public class MainMenuSceneController : MonoBehaviour
         PlayerPrefs.SetInt("PlayMode", (int)EPlayMode.Online);
 
         // Add logic to start online play
+        _mainButtonPanel.gameObject.SetActive(false);
+
+        SceneManager.LoadScene("PlayBadmintonScene");
     }
 
     public void OnSelectSettingsButton()
@@ -123,7 +126,6 @@ public class MainMenuSceneController : MonoBehaviour
 
     private void Start()
     {
-        _onlinePlayButton.interactable = false; // 동작 미구현
         _settingsButton.interactable = false; // 동작 미구현
 
         _score = 21;

@@ -5,7 +5,7 @@ public class InputManager : MonoBehaviour
 {
     PlayerInput _playerInput;
 
-    void Start()
+    private void Awake()
     {
         _playerInput = GetComponent<PlayerInput>();
     }
