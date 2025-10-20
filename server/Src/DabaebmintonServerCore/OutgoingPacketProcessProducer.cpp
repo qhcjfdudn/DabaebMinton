@@ -19,8 +19,12 @@ void OutgoingPacketProcessProducer::operator() ()
 			if (game->IsPendingReplicationUpdate.load(std::memory_order_acquire) == false &&
 				game->HasElapsedReplicationInterval())
 			{
-				game->IsPendingReplicationUpdate.store(true, std::memory_order_release);
 				game->SetNextReplicationTimeFromNow();
+				
+				if (game->GetGamePlayState() != GamePlayState::Playing)
+					continue;
+				
+				game->IsPendingReplicationUpdate.store(true, std::memory_order_release);
 				
 				gameManager._pendingOutgoingPacketProcessMutex.lock();
 				gameManager._pendingOutgoingPacketProcessQueue.push(game.get());
