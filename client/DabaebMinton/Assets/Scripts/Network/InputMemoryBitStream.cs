@@ -19,23 +19,26 @@ public class InputMemoryBitStream
         _bitHead = 0;
     }
 
+    public int GetRemainingBitCount()
+    {
+        return _capacity - _bitHead;
+    }
+
     public byte ReadByte(byte inCount)
     {
-        byte outData = 0;
-
         int byteOffset = _bitHead >> 3;
         int bitOffset = _bitHead & 7;
 
-        int mask = ~(0xff << inCount);
-        outData = (byte)((_streamBuffer[byteOffset] >> bitOffset) & mask);
+        byte outData = (byte)(_streamBuffer[byteOffset] >> bitOffset);
 
         // 읽어야할 bit가 남았는지 확인
         byte bitsRead = (byte)(8 - bitOffset);
         if (bitsRead < inCount)
         {
-            mask = ~(0xff << bitOffset);
-            outData |= (byte)((_streamBuffer[byteOffset + 1] & mask) << bitsRead);
+            outData |= (byte)(_streamBuffer[byteOffset + 1] << bitsRead);
         }
+
+        outData &= (byte)~(0xff << inCount);
 
         _bitHead += inCount;
 
