@@ -108,8 +108,18 @@ public class OutputMemoryBitStream
         WriteBits(inData ? 1 : 0, 1);
     }
 
-    public void Write(uint inData)
+    public void Write(UInt16 inData)
     {
-        WriteBits(BitConverter.GetBytes(inData), 32);
+        WriteBits(BitConverter.GetBytes(inData), sizeof(UInt16) << 3);
+    }
+
+    public void Write(UInt32 inData)
+    {
+        WriteBits(BitConverter.GetBytes(inData), sizeof(UInt32) << 3);
+    }
+
+    public void Write(UInt64 inData)
+    {
+        WriteBits(BitConverter.GetBytes(inData), sizeof(UInt64) << 3);
     }
 }

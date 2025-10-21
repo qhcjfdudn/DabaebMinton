@@ -42,7 +42,7 @@ public class NetworkManager : MonoBehaviour
 
     public string OnlinePlayServerIp { get; set; } = "";
     public UInt16 OnlinePlayServerPort { get; set; } = 0;
-    public UInt32 OnlinePlaySessionId { get; set; } = 0;
+    public UInt64 OnlinePlaySessionId { get; set; } = 0;
 
     private ReplicationManager _replicationManager;
     private DeliveryNotificationManager _delivertyNotificationManager;
