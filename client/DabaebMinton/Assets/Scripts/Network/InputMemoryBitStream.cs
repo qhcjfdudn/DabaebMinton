@@ -74,7 +74,7 @@ public class InputMemoryBitStream
 
     public int ReadInt()
     {
-        return BitConverter.ToInt32(ReadBits(sizeof(int) << 3), 0);
+        return BitConverter.ToInt32(ReadBits(sizeof(int) << 3));
     }
 
     public int ReadInt(int inCount)
@@ -92,5 +92,17 @@ public class InputMemoryBitStream
     public float ReadFloat()
     {
         return BitConverter.ToSingle(ReadBits(sizeof(float) << 3), 0);
+    }
+
+    public bool ReadBool()
+    {
+        return ReadBits(1)[0] == 1;
+    }
+
+    public Vector2 ReadVector2()
+    {
+        float x = ReadFloat();
+        float y = ReadFloat();
+        return new Vector2(x, y);
     }
 }
