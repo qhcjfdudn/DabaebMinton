@@ -53,11 +53,8 @@ public class OutputMemoryBitStream
         return capacity;
     }
 
-    public void WriteBits(byte[] inData, int inCount)
+    public void WriteBits(byte inData, int inCount)
     {
-        Debug.Log($"inData: {BitConverter.ToString(inData)}, inCount: {inCount}");
-        Debug.Log($"curHead: {_bitHead}, _capacity: {_capacity}");
-        
         int nextBitHead = _bitHead + inCount;
         if (nextBitHead >= _capacity)
         {
@@ -66,37 +63,27 @@ public class OutputMemoryBitStream
 
         int byteOffset = _bitHead >> 3;
         int bitOffset = _bitHead & 7;
+        int bitsFreeThisByte = 8 - bitOffset;
+
+        // 현재 처리 중 바이트에 inData 중 쓸 수 있는 만큼 우선 쓰기
         int currentMask = ~(0xff << bitOffset);
+        _streamBuffer[byteOffset] = (byte)((_streamBuffer[byteOffset] & currentMask) | (inData << bitOffset));
 
-        int inDataIdx = 0;
-
-        while (inCount > 8)
+        // inData의 쓰지 못한 상위 부분이 있다면 쓰기
+        if (inCount > bitsFreeThisByte)
         {
-            _streamBuffer[byteOffset] = (byte)((_streamBuffer[byteOffset] & currentMask) | (inData[inDataIdx] << bitOffset));
-
-            int writtenBits = 8 - bitOffset;
-            _streamBuffer[byteOffset + 1] = (byte)(inData[inDataIdx] >> writtenBits);
-
-            ++inDataIdx; ++byteOffset;
-            inCount -= 8;
-        }
-
-        if (bitOffset + inCount > 8)
-        {
-            _streamBuffer[byteOffset] = (byte)((_streamBuffer[byteOffset] & currentMask) | (inData[inDataIdx] << bitOffset));
-
-            int writtenBits = 8 - bitOffset;
-            inCount -= writtenBits;
-            byte mask = (byte)(~(0xff << inCount) << writtenBits);
-            _streamBuffer[byteOffset + 1] = (byte)((inData[inDataIdx] & mask) >> writtenBits);
-        }
-        else
-        {
-            byte inDataMask = (byte)~(0xff << inCount);
-            _streamBuffer[byteOffset] = (byte)((_streamBuffer[byteOffset] & currentMask) | ((inData[inDataIdx] & inDataMask) << bitOffset));
+            _streamBuffer[byteOffset + 1] = (byte)(inData >> bitsFreeThisByte);
         }
 
         _bitHead = nextBitHead;
+    }
+
+    public void WriteBits(byte[] inData, int inCount)
+    {
+        for (int idx = 0; inCount > 0; ++idx, inCount -= 8)
+        {
+            WriteBits(inData[idx], Math.Min(8, inCount));
+        }
     }
 
     public void WriteBits(int inData, int inCount)
