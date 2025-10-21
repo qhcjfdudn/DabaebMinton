@@ -85,14 +85,10 @@ public class BadmintonControllerComponent : MonoBehaviour
             p1Agent.SetOpponent(player2);
             p2Agent.SetOpponent(player1);
         }
-
-        if (player1 == null)
+        else if (PlayMode == EPlayMode.Online)
         {
-            player1 = CreatePlayer("Player1", new Vector2(-3f, 1.25f));
-        }
-        if (player2 == null)
-        {
-            player2 = CreatePlayer("Player2", new Vector2(3f, 1.25f));
+            // 온라인 플레이어는 네트워크 매니저가 생성 및 관리
+            // 여기서는 아무 것도 하지 않는다.
         }
 
         Controller.SetPlayer(player1, player2);
