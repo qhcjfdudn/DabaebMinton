@@ -9,6 +9,5 @@ public:
 
 	uint32_t GetClassId() const override { return 'PLYR'; }
 
-	void Write(OutputMemoryBitStream& inStream) const override;
 	size_t CountWriteBitSize(const uint8_t inState) const override;
 };

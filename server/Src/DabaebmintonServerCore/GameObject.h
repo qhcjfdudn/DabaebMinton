@@ -34,8 +34,6 @@ public:
 
 	virtual uint8_t GetAllStateMask() const { return static_cast<uint8_t>(ReplicationState::RS_All); }
 
-	virtual void Write(OutputMemoryBitStream& inStream) const;
-	
 	virtual uint8_t Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) const;
 	virtual size_t CountWriteBitSize(const uint8_t inDirtyState) const;
 

@@ -16,11 +16,6 @@ Player::Player(PxVec2 location) :
 	PxRigidBodyExt::updateMassAndInertia(*_rigidbody, 1.0f);
 }
 
-void Player::Write(OutputMemoryBitStream& inStream) const
-{
-	GameObject::Write(inStream);
-}
-
 size_t Player::CountWriteBitSize(const uint8_t inState) const
 {
 	return GameObject::CountWriteBitSize(inState);

@@ -13,7 +13,6 @@ public:
 
 	bool FixedUpdate() override;
 
-	void Write(OutputMemoryBitStream& inStream) const override;
 	size_t CountWriteBitSize(const uint8_t inState) const override;
 
 private:

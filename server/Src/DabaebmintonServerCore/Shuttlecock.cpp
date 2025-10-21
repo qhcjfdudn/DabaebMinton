@@ -29,11 +29,6 @@ bool Shuttlecock::FixedUpdate()
 	return true;
 }
 
-void Shuttlecock::Write(OutputMemoryBitStream& inStream) const
-{
-	GameObject::Write(inStream);
-}
-
 size_t Shuttlecock::CountWriteBitSize(const uint8_t inState) const
 {
 	return GameObject::CountWriteBitSize(inState);

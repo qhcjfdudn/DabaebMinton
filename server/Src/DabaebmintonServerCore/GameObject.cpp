@@ -48,12 +48,6 @@ void GameObject::SetCurrentTransform()
 	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
 }
 
-void GameObject::Write(OutputMemoryBitStream& inStream) const
-{
-	inStream.Write(_location);
-	inStream.Write(_velocity);
-}
-
 uint8_t GameObject::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) const
 {
 	uint8_t writtenState = 0;
