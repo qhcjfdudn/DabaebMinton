@@ -41,15 +41,17 @@ public class Shuttlecock : MonoBehaviour
 
     public void Read(InputMemoryBitStream inStream)
     {
-        float x = inStream.ReadFloat();
-        float y = inStream.ReadFloat();
+        bool hasLocation = inStream.ReadBool();
+        if (hasLocation)
+        {
+            _rigidbody.position = inStream.ReadVector2();
+        }
 
-        transform.position = new Vector2(x, y);
-
-        x = inStream.ReadFloat();
-        y = inStream.ReadFloat();
-
-        _rigidbody.linearVelocity = new Vector2(x, y);
+        bool hasVelocity = inStream.ReadBool();
+        if (hasVelocity)
+        {
+            _rigidbody.linearVelocity = inStream.ReadVector2();
+        }
     }
 
     private void SetSpriteRotation()

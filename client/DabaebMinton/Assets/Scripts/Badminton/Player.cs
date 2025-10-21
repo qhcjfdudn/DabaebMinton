@@ -105,6 +105,21 @@ public class Player : MonoBehaviour
 
     public SwingCharger GetSwingCharger() { return _swingCharger; }
 
+    public void Read(InputMemoryBitStream inStream)
+    {
+        bool hasLocation = inStream.ReadBool();
+        if (hasLocation)
+        {
+            _rigidbody.position = inStream.ReadVector2();
+        }
+
+        bool hasVelocity = inStream.ReadBool();
+        if (hasVelocity)
+        {
+            _rigidbody.linearVelocity = inStream.ReadVector2();
+        }
+    }
+
     private CharacterInitialData GetInitialData(ECharacterID characterID)
     {
         switch (characterID)
