@@ -1,4 +1,3 @@
-using System.Text;
 using System;
 using UnityEngine;
 
@@ -20,53 +19,49 @@ public class InputMemoryBitStream
         _bitHead = 0;
     }
 
+    public byte ReadByte(byte inCount)
+    {
+        byte outData = 0;
+
+        int byteOffset = _bitHead >> 3;
+        int bitOffset = _bitHead & 7;
+
+        int mask = ~(0xff << inCount);
+        outData = (byte)((_streamBuffer[byteOffset] >> bitOffset) & mask);
+
+        // 읽어야할 bit가 남았는지 확인
+        byte bitsRead = (byte)(8 - bitOffset);
+        if (bitsRead < inCount)
+        {
+            mask = ~(0xff << bitOffset);
+            outData |= (byte)((_streamBuffer[byteOffset + 1] & mask) << bitsRead);
+        }
+
+        _bitHead += inCount;
+
+        return outData;
+    }
+
     public byte[] ReadBits(int inCount)
     {
         Debug.Log($"ReadBits(inCount: {inCount})");
         Debug.Log($"curHead: {_bitHead}, _capacity: {_capacity}");
 
-        if (inCount <= 0)
-            return null;
+        int byteCount = (inCount + 7) >> 3;
+        byte[] ret = new byte[byteCount];
 
-        int nextBitHead = _bitHead + inCount;
-
-        int byteOffset = _bitHead >> 3;
-        int bitOffset = _bitHead & 7;
-
-        int byteSize = (inCount - 1) / 8 + 1;
-        byte[] ret = new byte[byteSize];
-        int destOffset = 0;
-
-        while (inCount > 8)
+        for (int i = 0; i < byteCount; ++i, inCount -= 8)
         {
-            ret[destOffset] |= (byte)(_streamBuffer[byteOffset] >> bitOffset);
-
-            int readBits = 8 - bitOffset;
-            byte mask = (byte)(0xff << bitOffset);
-            ret[destOffset] |= (byte)((_streamBuffer[byteOffset + 1] & ~mask) << readBits);
-
-            ++destOffset; ++byteOffset;
-            inCount -= 8;
+            int bitsToRead = Math.Min(8, inCount);
+            ret[i] = ReadByte((byte)bitsToRead);
         }
-
-        if (bitOffset + inCount > 8)
-        {
-            ret[destOffset] |= (byte)(_streamBuffer[byteOffset] >> bitOffset);
-
-            int readBits = 8 - bitOffset;
-            inCount -= readBits;
-            byte mask = (byte)~(0xff << inCount);
-            ret[destOffset] |= (byte)((_streamBuffer[byteOffset + 1] & mask) << readBits);
-        }
-        else
-        {
-            byte mask = (byte)(~(0xff << inCount) << bitOffset);
-            ret[destOffset] = (byte)((_streamBuffer[byteOffset] & mask) >> bitOffset);
-        }
-
-        _bitHead = nextBitHead;
 
         return ret;
+    }
+
+    public byte ReadByte()
+    {
+        return ReadByte((byte)(sizeof(byte) << 3));
     }
 
     public byte ReadByte(int inCount)
@@ -79,14 +74,7 @@ public class InputMemoryBitStream
 
     public int ReadInt()
     {
-        byte[] bytes = ReadBits(sizeof(int) << 3);
-
-        if (bytes.Length < 4)
-        {
-            throw new ArgumentOutOfRangeException("bytes", "ReadInt2 bytes is too small");
-        }
-
-        return BitConverter.ToInt32(bytes, 0);
+        return BitConverter.ToInt32(ReadBits(sizeof(int) << 3), 0);
     }
 
     public int ReadInt(int inCount)
@@ -94,26 +82,14 @@ public class InputMemoryBitStream
         if (inCount > (sizeof(int) << 3))
             throw new ArgumentOutOfRangeException("inCount", "ReadInt inCount is too large");
 
-        int ret = 0;
+        byte[] bytes = new byte[sizeof(int)];
+        Buffer.BlockCopy(ReadBits(inCount), 0, bytes, 0, sizeof(int));
 
-        byte[] bytes = ReadBits(inCount);
-        for (int i = 0; i < bytes.Length; ++i)
-        {
-            ret |= bytes[i] << (i * 8);
-        }
-
-        return ret;
+        return BitConverter.ToInt32(bytes);
     }
 
     public float ReadFloat()
     {
-        byte[] bytes = ReadBits(sizeof(float) << 3);
-
-        if (bytes.Length < 4)
-        {
-            throw new ArgumentOutOfRangeException("bytes", "ReadFloat bytes is too small");
-        }
-
-        return BitConverter.ToSingle(bytes, 0);
+        return BitConverter.ToSingle(ReadBits(sizeof(float) << 3), 0);
     }
 }
