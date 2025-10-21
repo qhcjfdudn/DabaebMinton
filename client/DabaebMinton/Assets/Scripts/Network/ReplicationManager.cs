@@ -60,7 +60,7 @@ public class ReplicationManager : MonoBehaviour
         uint networkId = rh.Nid;
         uint classId = (uint)inStream.ReadInt();
 
-        if (classId == NetworkUtils.GetClassId("PLYR"))
+        if (classId == NetworkUtils.ParseClassIdToUint("PLYR"))
         {
             byte dirtyState = inStream.ReadByte(8);
 

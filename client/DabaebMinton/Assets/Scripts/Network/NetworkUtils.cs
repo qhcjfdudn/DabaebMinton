@@ -19,4 +19,12 @@ public static class NetworkUtils
     {
         return GetRequiredBits((int)(object)value);
     }
+
+    public static uint ParseClassIdToUint(string s)
+    {
+        if (s.Length != 4)
+            throw new ArgumentException("Must be exactly 4 chars");
+
+        return ((uint)s[0] << 24) | ((uint)s[1] << 16) | ((uint)s[2] << 8) | s[3];
+    }
 }
