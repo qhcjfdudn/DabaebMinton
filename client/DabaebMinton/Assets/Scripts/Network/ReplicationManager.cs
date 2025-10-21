@@ -26,30 +26,32 @@ public class ReplicationManager : MonoBehaviour
     public void ProcessReplicationAction(InputMemoryBitStream inStream)
     {
         // 모든 패킷이 [NetworkId, ReplicationAction] 으로 시작
-        // 생성: ClassId, dirty State(All Mask)
-        // 수정: dirty State
+        // 생성: ClassId, dirty State가 포함된 데이터
+        // 수정: dirty State가 포함된 데이터
         // 삭제: 없음.
 
-
         // inStream이 빌 때까지 반복 처리 필요
-        ReplicationHeader rh = new ReplicationHeader();
-        rh.Read(inStream);
-
-        Debug.Log($"rh.Ra: {rh.Ra}, rh.Nid: {rh.Nid}");
-
-        switch (rh.Ra)
+        while (inStream.GetRemainingBitCount() > (sizeof(uint) << 3))
         {
-            case ReplicationAction.RA_Create:
-                ReplicationCreate(rh, inStream);
-                break;
+            ReplicationHeader rh = new ReplicationHeader();
+            rh.Read(inStream);
 
-            case ReplicationAction.RA_Update:
-                ReplicationUpdate(rh, inStream);
-                break;
+            Debug.Log($"rh.Ra: {rh.Ra}, rh.Nid: {rh.Nid}");
 
-            case ReplicationAction.RA_Delete:
-                ReplicationDelete();
-                break;
+            switch (rh.Ra)
+            {
+                case ReplicationAction.RA_Create:
+                    ReplicationCreate(rh, inStream);
+                    break;
+
+                case ReplicationAction.RA_Update:
+                    ReplicationUpdate(rh, inStream);
+                    break;
+
+                case ReplicationAction.RA_Delete:
+                    ReplicationDelete();
+                    break;
+            }
         }
     }
 
