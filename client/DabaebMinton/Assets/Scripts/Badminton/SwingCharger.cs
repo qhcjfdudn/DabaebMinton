@@ -24,6 +24,8 @@ public class SwingCharger : MonoBehaviour
     private ESwingChargerState _currentState;
     private int selectedSwingStateBits;
 
+    private Player _player;
+
     public void StartCharging(ESwingChargerState state)
     {
         selectedSwingStateBits |= (int)state;
@@ -84,8 +86,22 @@ public class SwingCharger : MonoBehaviour
         return (MAX_CHARGE_VALUE - MIN_CHARGE_VALUE) * chargingRatio + MIN_CHARGE_VALUE;
     }
 
+    private void Awake()
+    {
+        _player = GetComponentInParent<Player>();
+    }
+
     private void Start()
     {
+        if (_player.CharacterID == ECharacterID.Daramgee)
+        {
+            transform.localPosition = new Vector2(-0.35f, 0);
+        }
+        else if (_player.CharacterID == ECharacterID.Baebsae)
+        {
+            transform.localPosition = new Vector2(0.35f, 0);
+        }
+
         ChargeGauge = MIN_CHARGE_VALUE;
         _currentState = ESwingChargerState.Idle;
         selectedSwingStateBits = 0;

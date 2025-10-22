@@ -2,24 +2,25 @@ using UnityEngine;
 
 public class BadmintonHitBox : MonoBehaviour
 {
-    // ÀÌ °ªÀ¸·Î objectÀÇ ¿µ¿ªÀ» °áÁ¤ÇÑ´Ù.
-    // ±× ÈÄ shuttlecockÀÌ ÀÌ ¿µ¿ª¿¡ µé¾î¿À°í ³ª°¡¸é flag¸¦ ÄÑ°í ²ö´Ù.
+    // ì´ ê°’ìœ¼ë¡œ objectì˜ ì˜ì—­ì„ ê²°ì •í•œë‹¤.
+    // ê·¸ í›„ shuttlecockì´ ì´ ì˜ì—­ì— ë“¤ì–´ì˜¤ê³  ë‚˜ê°€ë©´ flagë¥¼ ì¼œê³  ëˆë‹¤.
     private float _localPosXFromPlayer = 0.33f, _localPosYFromPlayer = 0.24f;
     private float width = 1.12f, height = 1.43f;
 
+    private Player _player;
     private AccuracyPoint _accuracyPoint;
 
     public bool IncludesShuttlecock { get; private set; }
 
     private void Awake()
     {
+        _player = transform.parent.GetComponent<Player>();
         _accuracyPoint = GetComponentInChildren<AccuracyPoint>();
     }
 
     private void Start()
     {
-        // Player ÀÌ¸§À¸·Î HitBox ¿µ¿ªÀ» °áÁ¤ÇÏ´Â °Ô ¸¶À½¿¡ ¾È µéÁö¸¸ ´çÀå ´õ ³ªÀº ¾ÆÀÌµğ¾î°¡ ¶°¿À¸£Áö ¾Ê´Â´Ù.
-        if (transform.parent.name == "Player1")
+        if (_player.isLeftSide())
         {
             transform.localPosition = new Vector2(_localPosXFromPlayer, _localPosYFromPlayer);
             _accuracyPoint.transform.localPosition = new Vector2(0.25f, 0);

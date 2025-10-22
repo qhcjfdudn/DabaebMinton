@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 245000481300484787}
   - component: {fileID: 3854994804489048855}
   - component: {fileID: 6978910339965027894}
-  - component: {fileID: 6150473006149532614}
   m_Layer: 8
   m_Name: Shuttlecock
   m_TagString: Shuttlecock
@@ -170,16 +169,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6fd4dc5786ba9d4e959dc232154d854, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _netAction: {fileID: 6150473006149532614}
---- !u!114 &6150473006149532614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8584782643816032584}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9268ea4e801358c49baf7b1ddb1594a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  _badmintonControllerComponent: {fileID: 0}

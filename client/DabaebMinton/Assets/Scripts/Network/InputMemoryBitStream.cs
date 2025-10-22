@@ -80,12 +80,12 @@ public class InputMemoryBitStream
         return BitConverter.ToInt32(ReadBits(sizeof(int) << 3));
     }
 
-    public int ReadInt(int inCount)
+    public int ReadInt(int inBitCount)
     {
-        if (inCount > (sizeof(int) << 3))
+        if (inBitCount > (sizeof(int) << 3))
             throw new ArgumentOutOfRangeException("inCount", "ReadInt inCount is too large");
 
-        byte[] src = ReadBits(inCount);
+        byte[] src = ReadBits(inBitCount);
         byte[] bytes = new byte[sizeof(int)];
         Buffer.BlockCopy(src, 0, bytes, 0, src.Length);
 

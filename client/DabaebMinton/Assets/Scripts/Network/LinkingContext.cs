@@ -19,32 +19,28 @@ public class LinkingContext
     public void AddGameObject(uint networkId, GameObject gameObject)
     {
         _networkIdToGameObjectMap.Add(networkId, gameObject);
-        _gameObjectToNetworkIdMap.Add(gameObject, networkId);
     }
 
-    public uint GetNetworkId(GameObject gameObject)
-    {
-
-
-        return 0;
-    }
     public GameObject GetGameObject(uint networkId)
     {
-        if (_networkIdToGameObjectMap.TryGetValue(networkId, out GameObject gameObject) == false)
+        if (_networkIdToGameObjectMap.TryGetValue(networkId, out GameObject go) == false)
         {
             return null;
             
         }
 
-        return gameObject;
+        return go;
+    }
+
+    public void RemoveGameObject(uint networkId)
+    {
+        _networkIdToGameObjectMap.Remove(networkId);
     }
 
     private Dictionary<uint, GameObject> _networkIdToGameObjectMap;
-    private Dictionary<GameObject, uint> _gameObjectToNetworkIdMap;
 
     private LinkingContext()
     {
         _networkIdToGameObjectMap = new Dictionary<uint, GameObject>();
-        _gameObjectToNetworkIdMap = new Dictionary<GameObject, uint>();
     }
 }

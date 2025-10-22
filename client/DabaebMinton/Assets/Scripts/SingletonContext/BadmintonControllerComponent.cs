@@ -104,7 +104,7 @@ public class BadmintonControllerComponent : MonoBehaviour
         return transform.parent.GetComponentInChildren<BadmintonNet>();
     }
 
-    private Shuttlecock CreateShuttlecock()
+    public Shuttlecock CreateShuttlecock()
     {
         Shuttlecock shuttlecock = transform.parent.GetComponentInChildren<Shuttlecock>();
 
@@ -117,9 +117,29 @@ public class BadmintonControllerComponent : MonoBehaviour
         return shuttlecock;
     }
 
-    private Player CreatePlayer(string name, Vector2 initPos)
+    public Player CreatePlayer(string name, Vector2 initPos)
     {
         Player player = InstantiatePlayer($"Prefabs/{name}", name, initPos);
+        return player;
+    }
+
+    public Player CreatePlayer()
+    {
+        Player player = InstantiatePlayer("Prefabs/Player", "Player", new Vector2(0, 0));
+
+        if (Controller._player1 == null)
+        {
+            Controller._player1 = player;
+        }
+        else if (Controller._player2 == null)
+        {
+            Controller._player2 = player;
+        }
+        else
+        {
+            Debug.LogError("[BadmintonControllerComponent] Both players are already assigned.");
+        }
+
         return player;
     }
 

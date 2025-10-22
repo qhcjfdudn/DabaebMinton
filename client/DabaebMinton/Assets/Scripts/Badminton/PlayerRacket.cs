@@ -3,11 +3,11 @@ using UnityEngine;
 public class PlayerRacket : MonoBehaviour
 {
     [Header("Badminton Racket Settings")]
-    [Tooltip("BadmintonRacket ScriptableObjectÀÇ List¸¦ ±¸ÇöÇÕ´Ï´Ù.")]
+    [Tooltip("BadmintonRacket ScriptableObjectì˜ Listë¥¼ êµ¬í˜„í•©ë‹ˆë‹¤.")]
     public RacketDatabase _racketDatabase;
 
-    [Tooltip("ÇöÀç ¼±ÅÃµÈ BadmintonRacketÀÔ´Ï´Ù. \n" +
-        "RacketÀÇ ÀÌ¸§À» Á¤È®È÷ ÀÔ·ÂÇÏÁö ¾ÊÀ¸¸é Default RacketÀÌ ¼±ÅÃµË´Ï´Ù.")]
+    [Tooltip("í˜„ì¬ ì„ íƒëœ BadmintonRacketì…ë‹ˆë‹¤. \n" +
+        "Racketì˜ ì´ë¦„ì„ ì •í™•íˆ ì…ë ¥í•˜ì§€ ì•Šìœ¼ë©´ Default Racketì´ ì„ íƒë©ë‹ˆë‹¤.")]
     public string _selectedRacketName;
 
     public SpriteRenderer _racketSpriteRenderer;
@@ -21,8 +21,8 @@ public class PlayerRacket : MonoBehaviour
 
     private void ApplyRacketStats()
     {
-        Debug.Log($"[{_currentRacket.racketName}] Àû¿ëµÊ - ¹«°Ô: {_currentRacket.weight}, ¹İ¹ß·Â: {_currentRacket.repulsionPower}");
-        // Ä³¸¯ÅÍ ¼º´É¿¡ ¹İ¿µÇÏ´Â ÄÚµå ÀÛ¼º
+        Debug.Log($"[{_currentRacket.racketName}] ì ìš©ë¨ - ë¬´ê²Œ: {_currentRacket.weight}, ë°˜ë°œë ¥: {_currentRacket.repulsionPower}");
+        // ìºë¦­í„° ì„±ëŠ¥ì— ë°˜ì˜í•˜ëŠ” ì½”ë“œ ì‘ì„±
 
         _racketSpriteRenderer.sprite = _currentRacket.sprite;
     }

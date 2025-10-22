@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum ReplicationAction
@@ -55,20 +56,47 @@ public class ReplicationManager : MonoBehaviour
         }
     }
 
-    public void ReplicationCreate(ReplicationHeader rh, InputMemoryBitStream inStream)
+    public GameObject ReplicationCreate(ReplicationHeader rh, InputMemoryBitStream inStream)
     {
         Debug.Log("RA_Create 도달 완료!");
         
         uint networkId = rh.Nid;
         uint classId = (uint)inStream.ReadInt();
 
-        if (classId == NetworkUtils.ParseClassIdToUint("PLYR"))
-        {
-            byte dirtyState = inStream.ReadByte(8);
+        // if 구문으로 만들지만, GameObject 생성을 위한 Factory로 변경하면 좋을 것.
 
-            Debug.Log("ReplicationCreate: PLYR 생성 요청 도달!");
-            Debug.Log($"dirtyState: {dirtyState}");
+        GameObject go = null;
+        Action<InputMemoryBitStream> readAction = null;
+
+        if (classId == NetworkUtils.ParseClassIdToUint("STCK"))
+        {
+            Shuttlecock shuttlecock = _badmintonControllerComponent.CreateShuttlecock();
+
+            go = shuttlecock.gameObject;
+            readAction = shuttlecock.Read;
         }
+        else if (classId == NetworkUtils.ParseClassIdToUint("PLYR"))
+        {
+            Player player = _badmintonControllerComponent.CreatePlayer();
+
+            go = player.gameObject;
+            readAction = player.Read;
+        }
+
+        if (go == null)
+        {
+            Debug.LogError($"[ReplicationCreate] Unknown classId {classId} in ReplicationCreate");
+            return null;
+        }
+
+        var networkComponent = go.AddComponent<NetworkComponent>();
+        networkComponent.NetworkId = networkId;
+        networkComponent._readAction = readAction;
+        networkComponent.Read(inStream);
+
+        _linkingContext.AddGameObject(networkId, go);
+
+        return go;
     }
 
     public void ReplicationUpdate(ReplicationHeader rh, InputMemoryBitStream inStream)
@@ -89,7 +117,7 @@ public class ReplicationManager : MonoBehaviour
         }
         
         // gameObject의 Read 호출
-        NetAction netAction = gameObject.GetComponent<NetAction>();
+        NetworkComponent netAction = gameObject.GetComponent<NetworkComponent>();
         netAction.Read(inStream);
     }
     public void ReplicationDelete()
@@ -114,5 +142,9 @@ public class ReplicationManager : MonoBehaviour
 
         _instance = this;
         DontDestroyOnLoad(gameObject);
+
+        _badmintonControllerComponent = FindFirstObjectByType<BadmintonControllerComponent>().GetComponent<BadmintonControllerComponent>();
     }
+
+    private BadmintonControllerComponent _badmintonControllerComponent;
 }

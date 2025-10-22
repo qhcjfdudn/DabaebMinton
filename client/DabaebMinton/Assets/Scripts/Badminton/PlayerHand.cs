@@ -6,6 +6,8 @@ public class PlayerHand : MonoBehaviour
 
     public SpriteRenderer _racketSpriteRenderer;
 
+    private Player _player;
+
     public void OnStangindLeft(int frameIdx)
     {
         _handMovement.OnStandingLeft(frameIdx);
@@ -28,11 +30,21 @@ public class PlayerHand : MonoBehaviour
 
     private void Awake()
     {
+        _player = transform.parent.GetComponent<Player>();
         _handMovement = PlayerHandMovementFactory.Get(this, GetComponentInParent<Player>().CharacterID);
     }
 
     private void Start()
     {
+        if (_player.isLeftSide())
+        {
+            transform.SetLocalPositionAndRotation(new Vector3(0.239f, -0.146f, 0f), Quaternion.Euler(0f, 0f, 290f));
+        }
+        else
+        {
+            transform.SetLocalPositionAndRotation(new Vector3(-0.238f, -0.16f, 0f), Quaternion.Euler(0f, 0f, -20f));
+        }
+
         PlayerRacket racket = GetComponentInChildren<PlayerRacket>();
         if (racket == null)
         {

@@ -30,12 +30,7 @@ public class Player : MonoBehaviour
 
     private PlayerState _state;
 
-    public void InitializeStat(CharacterInitialData characterInitialData)
-    {
-        MoveVelocity = characterInitialData.moveVelocity;
-        JumpVelocity = characterInitialData.jumpVelocity;
-        Power = characterInitialData.power;
-    }
+    private BadmintonController _badmintonController;
 
     public void OnAnimationFrameUpdate(string eventData)
     {
@@ -105,10 +100,15 @@ public class Player : MonoBehaviour
 
     public SwingCharger GetSwingCharger() { return _swingCharger; }
 
+    public bool isLeftSide()
+    {
+        return _badmintonController._player1 == this;
+    }
+
     public void Read(InputMemoryBitStream inStream)
     {
-        bool hasLocation = inStream.ReadBool();
-        if (hasLocation)
+        bool hasPosition = inStream.ReadBool();
+        if (hasPosition)
         {
             _rigidbody.position = inStream.ReadVector2();
         }
@@ -118,19 +118,12 @@ public class Player : MonoBehaviour
         {
             _rigidbody.linearVelocity = inStream.ReadVector2();
         }
-    }
 
-    private CharacterInitialData GetInitialData(ECharacterID characterID)
-    {
-        switch (characterID)
+        bool hasCharacterId = inStream.ReadBool();
+        if (hasCharacterId)
         {
-            case ECharacterID.Daramgee:
-                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/DaramgeeInitialData");
-            case ECharacterID.Baebsae:
-                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/BaebsaeInitialData");
+            CharacterID = (ECharacterID)inStream.ReadInt((int)ECharacterID.Max);
         }
-
-        return null;
     }
 
     private enum EAnimationMoveState
@@ -180,6 +173,45 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void Initialize()
+    {
+        InitializeStat(GetInitialData());
+        InitializeAnimator();
+    }
+
+    private void InitializeStat(CharacterInitialData characterInitialData)
+    {
+        MoveVelocity = characterInitialData.moveVelocity;
+        JumpVelocity = characterInitialData.jumpVelocity;
+        Power = characterInitialData.power;
+    }
+
+    private CharacterInitialData GetInitialData()
+    {
+        switch (CharacterID)
+        {
+            case ECharacterID.Daramgee:
+                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/DaramgeeInitialData");
+            case ECharacterID.Baebsae:
+                return Resources.Load<CharacterInitialData>("ScriptableObjects/CharacterInitialData/BaebsaeInitialData");
+        }
+
+        return null;
+    }
+
+    private void InitializeAnimator()
+    {
+        switch (CharacterID)
+        {
+            case ECharacterID.Daramgee:
+                _animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animations/Player1/DaramAnimation");
+                break;
+            case ECharacterID.Baebsae:
+                _animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animations/Baebsae/BaebsaeAnimation");
+                break;
+        }
+    }
+
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
@@ -193,7 +225,12 @@ public class Player : MonoBehaviour
         
         _state = new StandingState();
 
-        InitializeStat(GetInitialData(CharacterID));
+        _badmintonController = transform.parent.GetComponentInChildren<BadmintonControllerComponent>().Controller;
+    }
+
+    private void Start()
+    {
+        Initialize();
     }
 
     // Update is called once per frame
@@ -213,5 +250,5 @@ public class Player : MonoBehaviour
 
 public enum ECharacterID
 {
-    None, Daramgee, Baebsae
+    None, Daramgee, Baebsae, Max
 }

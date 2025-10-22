@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Player.h"
+
 namespace GameConfig {
 	static const int MAX_PLAYERS = 2;
 
@@ -11,5 +13,8 @@ namespace GameConfig {
 
 	static const PxVec2 defaultPlayersPosition[MAX_PLAYERS] = {
 		PxVec2{ -6, 5 }, PxVec2{ 6, 5 }
+	};
+	static const ECharacterID defaultPlayerCharacterIds[MAX_PLAYERS] = {
+		ECharacterID::Daramgee, ECharacterID::Baebsae
 	};
 }

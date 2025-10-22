@@ -5,7 +5,6 @@ using UnityEngine;
 public class Shuttlecock : MonoBehaviour
 {
     public BadmintonControllerComponent _badmintonControllerComponent;
-    public NetAction _netAction;
 
     private ShuttlecockMovementStrategy _movementStrategy;
     public ShuttlecockMovementStrategy MovementStrategy {
@@ -69,9 +68,6 @@ public class Shuttlecock : MonoBehaviour
     private void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
-
-        _netAction = GetComponent<NetAction>();
-        _netAction._readAction = Read;
 
         var value = ShuttlecockMovementStrategyFactory.EShuttlecockMovementType.Normal;
         MovementStrategy = ShuttlecockMovementStrategyFactory.CreateShuttlecockMovementStrategy(this, value);

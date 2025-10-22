@@ -69,7 +69,7 @@ void Level::InitLevel(PlayerId_t (&playerIds)[MAX_PLAYERS])
 	// set player capsules position
 	for (int idx = 0; idx < MAX_PLAYERS; ++idx)
 	{
-		auto player = make_shared<Player>(defaultPlayersPosition[idx]);
+		auto player = make_shared<Player>(defaultPlayerCharacterIds[idx], defaultPlayersPosition[idx]);
 		player->SetOwnerId(playerIds[idx]);
 		_pxScene->addActor(*player->GetRigidbody());
 		_gameObjects.push_back(player);

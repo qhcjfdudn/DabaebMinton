@@ -9,7 +9,7 @@ public class BadmintonController
 
     protected Vector2 _nextShuttlecockServePosition;
     
-    protected Player _player1, _player2;
+    public Player _player1, _player2;
     protected Player _lastTouchedPlayer;
     protected Player _scoredPlayer;
 
