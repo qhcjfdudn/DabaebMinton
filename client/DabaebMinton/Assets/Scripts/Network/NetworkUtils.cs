@@ -20,7 +20,7 @@ public static class NetworkUtils
         return GetRequiredBits((int)(object)value);
     }
 
-    public static uint ParseClassIdToUint(string s)
+    public static uint Parse4byteStringToUint(string s)
     {
         if (s.Length != 4)
             throw new ArgumentException("Must be exactly 4 chars");

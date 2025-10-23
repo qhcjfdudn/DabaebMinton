@@ -68,14 +68,14 @@ public class ReplicationManager : MonoBehaviour
         GameObject go = null;
         Action<InputMemoryBitStream> readAction = null;
 
-        if (classId == NetworkUtils.ParseClassIdToUint("STCK"))
+        if (classId == NetworkUtils.Parse4byteStringToUint("STCK"))
         {
             Shuttlecock shuttlecock = _badmintonControllerComponent.CreateShuttlecock();
 
             go = shuttlecock.gameObject;
             readAction = shuttlecock.Read;
         }
-        else if (classId == NetworkUtils.ParseClassIdToUint("PLYR"))
+        else if (classId == NetworkUtils.Parse4byteStringToUint("PLYR"))
         {
             Player player = _badmintonControllerComponent.CreatePlayer();
 
