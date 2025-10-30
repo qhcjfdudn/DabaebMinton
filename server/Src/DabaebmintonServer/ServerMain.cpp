@@ -15,8 +15,6 @@
 #include "OutgoingPacketProcessProducer.h"
 #include "OutgoingPacketProcessConsumer.h"
 
-#include "DeveloperCommandFunctor.h"
-
 #include <spdlog/spdlog.h>
 
 void signalHandler(int signum)
@@ -99,15 +97,9 @@ int main()
 	for (int i = 0; i < 4; ++i)
 		gameReplicationUpdateConsumers.emplace_back(replicationUpdateConsumer);
 
-	// 서버 검증을 위한 커맨드 처리용 Thread
-	DeveloperCommandFunctor developerCommandFunctor;
-	thread developerInputThread(developerCommandFunctor);
-
 	///////////////////////////////
 	// Server 종료 signal 이후 로직
 	///////////////////////////////
-
-	developerInputThread.join();
 
 	HttpServer::GetInstance().Stop();
 	
