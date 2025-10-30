@@ -101,12 +101,12 @@ int main()
 	// Server 종료 signal 이후 로직
 	///////////////////////////////
 
-	HttpServer::GetInstance().Stop();
-	
 	outgoingPacketProcessProducer.join();
 
 	for (thread& gameReplicationUpdateConsumer : gameReplicationUpdateConsumers)
 		gameReplicationUpdateConsumer.join();
+
+	HttpServer::GetInstance().Stop();
 
 	// Game이 사용하는 resource 반납
 	GameManager::GetInstance().RemoveAllGames();
