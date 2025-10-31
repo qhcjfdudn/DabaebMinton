@@ -92,6 +92,11 @@ public class InputMemoryBitStream
         return BitConverter.ToInt32(bytes);
     }
 
+    public uint ReadUInt()
+    {
+        return BitConverter.ToUInt32(ReadBits(sizeof(int) << 3));
+    }
+
     public float ReadFloat()
     {
         return BitConverter.ToSingle(ReadBits(sizeof(float) << 3), 0);

@@ -53,6 +53,11 @@ public class OutputMemoryBitStream
         return capacity;
     }
 
+    public void Append(OutputMemoryBitStream stream)
+    {
+        WriteBits(stream.StreamBuffer, stream.Count);
+    }
+
     public void WriteBits(byte inData, int inCount)
     {
         int nextBitHead = _bitHead + inCount;
@@ -93,14 +98,19 @@ public class OutputMemoryBitStream
 
     public void Write(int inData)
     {
-        WriteBits(BitConverter.GetBytes(inData), 32);
+        WriteBits(BitConverter.GetBytes(inData), sizeof(int) << 3);
+    }
+
+    public void Write(float inData)
+    {
+        WriteBits(BitConverter.GetBytes(inData), sizeof(float) << 3);
     }
 
     public void Write(string inData)
     {
         byte[] encodedInData = Encoding.UTF8.GetBytes(inData);
 
-        WriteBits(encodedInData, encodedInData.Length * 8);
+        WriteBits(encodedInData, encodedInData.Length << 3);
     }
 
     public void Write(bool inData)
