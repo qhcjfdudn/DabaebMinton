@@ -9,9 +9,9 @@
 
 void ReplicationManagerTransmissionData::AddTransmission(NetworkId_t inNetworkId, ReplicationAction inAction, uint8_t inState)
 {
-	for( const auto& transmission: mTransmissions )
+	for (const auto& transmission : mTransmissions)
 	{
-		assert( inNetworkId != transmission.GetNetworkId() );
+		assert(inNetworkId != transmission.GetNetworkId());
 	}
 
 	mTransmissions.emplace_back(inNetworkId, inAction, inState);
