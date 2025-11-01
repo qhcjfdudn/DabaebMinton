@@ -3,6 +3,8 @@ using static ShuttlecockMovementStrategyFactory;
 
 public class BadmintonController
 {
+    public BadmintonControllerComponent badmintonControllerComponent { get; set; }
+
     protected Shuttlecock _shuttlecock;
     protected BadmintonNet _badmintonNet;
     protected float _shortServiceLine;
@@ -301,6 +303,11 @@ public class BadmintonController
         _lastTouchedPlayer = null;
         _gamePlayState = EGamePlayState.Playing;
     }
+    
+    public virtual void SetGamePlayStateReady()
+    {
+        _gamePlayState = EGamePlayState.Ready;
+    }
 
     private Vector2 GetSwingForce(Player player, float baseAngle, float minAngle, float maxAngle) // 좌우 방향을 한 방향으로 계산 가능하도록 forwardDir 통해
                                                                                                   // 좌표와 방향 수정한 뒤 비행 각도 계산.
@@ -348,6 +355,7 @@ public class BadmintonController
 public enum EGamePlayState
 {
     None,
+    Ready,
     Playing,
     Paused,
     End

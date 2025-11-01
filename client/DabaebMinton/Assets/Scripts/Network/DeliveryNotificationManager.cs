@@ -4,6 +4,13 @@ using PacketSequenceNumber = System.UInt16;
 
 public class DeliveryNotificationManager
 {
+    private LinkedList<AckRange> _pendingAcks = new LinkedList<AckRange>();
+    
+    public bool hasAcks()
+    {
+        return _pendingAcks.Count > 0;
+    }
+
     public void AddPendingAck(PacketSequenceNumber inSequenceNumber)
     {
         if (_pendingAcks.Count == 0 || _pendingAcks.Last.Value.ExtendIfShould(inSequenceNumber) == false)
@@ -23,6 +30,4 @@ public class DeliveryNotificationManager
             _pendingAcks.RemoveFirst();
         }
     }
-
-    private LinkedList<AckRange> _pendingAcks = new LinkedList<AckRange>();
 }

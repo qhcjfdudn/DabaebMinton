@@ -87,7 +87,7 @@ public class BadmintonControllerComponent : MonoBehaviour
         }
         else if (PlayMode == EPlayMode.Online)
         {
-            // 온라인 플레이어는 네트워크 매니저가 생성 및 관리
+            // 온라인 플레이어는 네트워크 매니저가 ProcessPacket을 통해 생성.
             // 여기서는 아무 것도 하지 않는다.
         }
 
@@ -95,6 +95,8 @@ public class BadmintonControllerComponent : MonoBehaviour
 
         int difficulty = PlayerPrefs.GetInt("difficulty");
         Controller.SetShuttlecockMovementStrategy((EShuttlecockSpeed)difficulty);
+
+        NetworkManager.Instance.onHelloFromServer += SetGamePlayStateReady;
 
         Controller.Initialize();
     }
@@ -239,16 +241,26 @@ public class BadmintonControllerComponent : MonoBehaviour
         return BadmintonControllerFactory.GetDefaultBadmintonController();
     }
 
+    public void SetGamePlayStateReady()
+    {
+        Controller.SetGamePlayStateReady();
+        _inputManager.SetActionMapBy(PlayMode); // 검증 이후 GamePlayState가 Plying에 들어갈 때 변경되도록 수정 필요
+        
+        if (PlayMode == EPlayMode.Online)
+        {
+            FindFirstObjectByType<OnlinePlayModeInputManager>().SetOnlinePlayableBadmintonController((OnlinePlayableBadmintonController)Controller);
+        }
+    }
+
     private void Awake()
     {
         InitSetting();
         Controller = GetController();
+        Controller.badmintonControllerComponent = this;
     }
 
     private void Start()
     {
-        _inputManager.SetActionMapBy(PlayMode);
-
         Initialize();
     }
 

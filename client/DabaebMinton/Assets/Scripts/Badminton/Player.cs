@@ -104,28 +104,6 @@ public class Player : MonoBehaviour
     {
         return _badmintonController._player1 == this;
     }
-
-    public void Read(InputMemoryBitStream inStream)
-    {
-        bool hasPosition = inStream.ReadBool();
-        if (hasPosition)
-        {
-            _rigidbody.position = inStream.ReadVector2();
-        }
-
-        bool hasVelocity = inStream.ReadBool();
-        if (hasVelocity)
-        {
-            _rigidbody.linearVelocity = inStream.ReadVector2();
-        }
-
-        bool hasCharacterId = inStream.ReadBool();
-        if (hasCharacterId)
-        {
-            CharacterID = (ECharacterID)inStream.ReadInt((int)ECharacterID.Max);
-        }
-    }
-
     private enum EAnimationMoveState
     {
         Standing, Move
@@ -209,6 +187,33 @@ public class Player : MonoBehaviour
             case ECharacterID.Baebsae:
                 _animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("Animations/Baebsae/BaebsaeAnimation");
                 break;
+        }
+    }
+
+    public void Read(InputMemoryBitStream inStream)
+    {
+        bool hasPosition = inStream.ReadBool();
+        if (hasPosition)
+        {
+            _rigidbody.position = inStream.ReadVector2();
+        }
+
+        bool hasVelocity = inStream.ReadBool();
+        if (hasVelocity)
+        {
+            _rigidbody.linearVelocity = inStream.ReadVector2();
+        }
+
+        bool hasCharacterId = inStream.ReadBool();
+        if (hasCharacterId)
+        {
+            CharacterID = (ECharacterID)inStream.ReadInt((int)ECharacterID.Max);
+        }
+
+        bool hasOwnerPlayerId = inStream.ReadBool();
+        if (hasOwnerPlayerId)
+        {
+            GetComponent<NetworkComponent>().OwnerPlayerId = inStream.ReadUInt();
         }
     }
 

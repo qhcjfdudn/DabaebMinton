@@ -1,6 +1,7 @@
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 using static NetworkUtils;
@@ -44,9 +45,13 @@ public class NetworkManager : MonoBehaviour
     public string OnlinePlayServerIp { get; set; } = "";
     public UInt16 OnlinePlayServerPort { get; set; } = 0;
     public UInt64 OnlinePlaySessionId { get; set; } = 0;
+    public UInt32 OnlinePlayPlayerId { get; set; } = 0;
 
     private ReplicationManager _replicationManager;
-    private DeliveryNotificationManager _delivertyNotificationManager;
+    private DeliveryNotificationManager _deliveryNotificationManager;
+    public RPCManager _rpcManager;
+
+    public Action onHelloFromServer;
 
     private NetworkManager() { }
 
@@ -62,23 +67,6 @@ public class NetworkManager : MonoBehaviour
             Debug.Log("서버에 연결되었습니다.");
 
             StartListening(); // 데이터 수신 대기
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError("서버 연결 실패: " + ex.Message);
-        }
-    }
-
-    public void ConnectToOnlinePlayServer()
-    {
-        try
-        {
-            _udpClient = new UdpClient();
-            _udpClient.Connect(OnlinePlayServerIp, OnlinePlayServerPort); // 서버에 연결
-
-            // 수신 대기 시작
-            RecvFromOnlinePlayServer();
-
         }
         catch (Exception ex)
         {
@@ -131,6 +119,23 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    public void ConnectToOnlinePlayServer()
+    {
+        try
+        {
+            _udpClient = new UdpClient();
+            _udpClient.Connect(OnlinePlayServerIp, OnlinePlayServerPort); // 서버에 연결
+
+            // 수신 대기 시작
+            RecvFromOnlinePlayServer();
+
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError("서버 연결 실패: " + ex.Message);
+        }
+    }
+
     private async void RecvFromOnlinePlayServer()
     {
         try
@@ -162,11 +167,12 @@ public class NetworkManager : MonoBehaviour
         PacketSequenceNumber packetSequenceNumber = BitConverter.ToUInt16(inStream.ReadBits(16));
         Debug.Log($"PacketSequenceNumber: {packetSequenceNumber}");
 
-        _delivertyNotificationManager.AddPendingAck(packetSequenceNumber);
+        _deliveryNotificationManager.AddPendingAck(packetSequenceNumber);
 
         switch (packetType)
         {
             case PacketType.PT_Hello:
+                ProcessHello(inStream);
                 break;
             case PacketType.PT_ReplicationData:
                 _replicationManager.ProcessReplicationAction(inStream);
@@ -175,6 +181,16 @@ public class NetworkManager : MonoBehaviour
                 break;
             default: break;
         }
+    }
+
+    private void ProcessHello(InputMemoryBitStream inStream)
+    {
+        Debug.Log("Hello 패킷 수신 완료.");
+        _replicationManager.ProcessReplicationAction(inStream);
+
+        // Hello Packet이 만약 여러 개라면 모두 처리하지 않은 상태에서 Invoke는 좋지 않다.
+        // 모든 Hello가 처리된 것을 감시하다가 이걸 호출하는 형태의 감시자가 있어야 한다.
+        onHelloFromServer.Invoke();
     }
 
     private async void SendToOnlinePlayServer()
@@ -217,6 +233,15 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
+    public async void SendPacketsEveryPacketPeriodUdp()
+    {
+        while (true)
+        {
+            await Task.Delay(100); // 100ms 간격으로 패킷 전송
+            SendPacketsEveryPacketPeriod();
+        }
+    }
+
     public void SendPacketsToServer()
     {
         if (null == _client || false == _client.Connected)
@@ -243,7 +268,7 @@ public class NetworkManager : MonoBehaviour
     {
         _outBuffer.Clear();
 
-        // Session
+        // Session ID
         _outBuffer.Write(OnlinePlaySessionId);
 
         // Acks
@@ -251,6 +276,35 @@ public class NetworkManager : MonoBehaviour
 
         // Packet Type
         _outBuffer.WriteBits((int)PacketType.PT_Hello, GetRequiredBits(PacketType.PT_Max));
+
+        SendToOnlinePlayServer();
+    }
+
+    public void SendPacketsEveryPacketPeriod()
+    {
+        if (_deliveryNotificationManager.hasAcks() == false &&
+            _rpcManager.hasRpcToSend() == false)
+        {
+            return;
+        }
+
+        if (_deliveryNotificationManager.hasAcks())
+        {
+            Debug.Log("Sending Acks to server.");
+        }
+
+        _outBuffer.Clear();
+
+        _outBuffer.Write(OnlinePlaySessionId);
+        _deliveryNotificationManager.WriteAckData(_outBuffer);
+
+        if (_rpcManager.hasRpcToSend())
+        {
+            _outBuffer.WriteBits((int)PacketType.PT_RPC, GetRequiredBits(PacketType.PT_Max));
+            _outBuffer.Append(_rpcManager.GetStream());
+
+            _rpcManager.Clear();
+        }
 
         SendToOnlinePlayServer();
     }
@@ -291,7 +345,13 @@ public class NetworkManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         _replicationManager = ReplicationManager.Instance;
-        _delivertyNotificationManager = new DeliveryNotificationManager();
+        _deliveryNotificationManager = new DeliveryNotificationManager();
+        _rpcManager = new RPCManager();
+    }
+
+    private void Start()
+    {
+        SendPacketsEveryPacketPeriodUdp();
     }
 
     // 연결 종료
