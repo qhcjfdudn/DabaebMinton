@@ -4,9 +4,11 @@
 #include "PhysicsEngine.h"
 #include "OutputMemoryBitStream.h"
 
-Player::Player(ECharacterID characterId, PxVec2 position) :
+Player::Player(ECharacterID characterId, PlayerId_t ownerId, PxVec2 position) :
+	_characterId(characterId),
+	_ownerId(ownerId),
 	GameObject(position, PxVec2{ 0.0f, 0.0f }),
-	_characterId(characterId)
+	_moveValue{ 0.0f }
 {
 	auto& physicsEngine = PhysicsEngine::GetInstance();
 
@@ -27,12 +29,12 @@ uint8_t Player::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) con
 {
 	uint8_t writtenState = 0;
 
-	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Location))
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Position))
 	{
 		inStream.Write(true);
 		inStream.Write(_location);
 
-		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Location);
+		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Position);
 	}
 	else
 	{
@@ -63,5 +65,25 @@ uint8_t Player::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) con
 		inStream.Write(false);
 	}
 
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_OwnerId))
+	{
+		inStream.Write(true);
+		inStream.Write(_ownerId);
+		writtenState |= static_cast<uint8_t>(ReplicationState::RS_OwnerId);
+	}
+	else
+	{
+		inStream.Write(false);
+	}
+
 	return writtenState;
+}
+
+bool Player::FixedUpdate()
+{
+	_rigidbody->setLinearVelocity(PxVec3{ _moveValue, 0.0f, 0.0f });
+
+	MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Position));
+
+	return GameObject::FixedUpdate();
 }

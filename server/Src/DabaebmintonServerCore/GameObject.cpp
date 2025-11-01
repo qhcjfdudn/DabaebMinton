@@ -16,7 +16,7 @@ GameObject::~GameObject()
 
 void GameObject::SetVelocity(PxVec2 velocity)
 {
-	_velocity = velocity;
+	_rigidbody->setLinearVelocity(PxVec3{ velocity.x, velocity.y, 0.0f });
 }
 
 PxActor* GameObject::GetRigidbody() const
@@ -38,9 +38,6 @@ bool GameObject::FixedUpdate()
 
 void GameObject::SetCurrentTransform()
 {
-	// simulate 중에는 getGlobalPose()를 사용할 수 없다는 에러 메시지 발견
-	// 물리 엔진에 접근해 값을 알아오고자 할 때는 lockRead()를 걸어야 한다.
-
 	PxVec3 curLocation{ _rigidbody->getGlobalPose().p };
 	PxVec3 curVelocity{ _rigidbody->getLinearVelocity() };
 
@@ -52,12 +49,12 @@ uint8_t GameObject::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState)
 {
 	uint8_t writtenState = 0;
 
-	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Location))
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Position))
 	{
 		inStream.Write(true);
 		inStream.Write(_location);
 		
-		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Location);
+		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Position);
 	}
 	else
 	{
@@ -83,7 +80,7 @@ size_t GameObject::CountWriteBitSize(const uint8_t inDirtyState) const
 	size_t totalBits = 0;
 
 	totalBits += 1;
-	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Location))
+	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Position))
 	{
 		totalBits += BitSizeCounter::Count(_location);
 	}

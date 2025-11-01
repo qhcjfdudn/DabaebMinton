@@ -36,11 +36,22 @@ Game::Game(ClientProxy* (&players)[GameConfig::MAX_PLAYERS]) :
 		{
 			players[idx]->GetReplicationManager().ReplicateCreate(networkId, gameObject->GetAllStateMask());
 		}
+
+		gameObject->SetDirtyHandler(
+			[this](NetworkId_t id, uint8_t dirtyState)
+			{
+				spdlog::debug("[Game::Game] MarkDirtyState called. id: {}, dirtyState: {}", id, static_cast<int>(dirtyState));
+
+				for (int playerIdx = 0; playerIdx < MAX_PLAYERS; ++playerIdx)
+				{
+					_player[playerIdx]->GetReplicationManager().SetStateDirty(id, dirtyState);
+				}
+			});
 	}
 
 	SetNextReplicationTimeFromNow();
 
-	SetNextStepPhysicsTime(steady_clock::now() + 1min);
+	SetNextStepPhysicsTime(steady_clock::now() + 3s);
 }
 
 Game::~Game()
@@ -92,8 +103,8 @@ void Game::SetNextStepPhysicsTime(const steady_clock::time_point& time)
 
 bool Game::StepPhysicsIfPossible()
 {
-	if (_gamePlayState != GamePlayState::Playing)
-		return false;
+	//if (_gamePlayState != GamePlayState::Playing)
+	//	return false;
 
 	const auto now = steady_clock::now();
 	if (HasElapsedStepPhysicsInterval(now) == false)
@@ -113,6 +124,8 @@ bool Game::HasElapsedStepPhysicsInterval(const steady_clock::time_point& time) c
 
 void Game::StepPhysics(const steady_clock::time_point& curTime)
 {
+	_level.FixedUpdate();
+
 	PxReal elapsed = duration_cast<duration<float>>(curTime - _lastRealStepPhysicsTime).count();
 	PhysicsEngine::GetInstance().StepPhysics(_level.GetScene(), elapsed);
 
@@ -157,10 +170,11 @@ void Game::SetClientReady(const PlayerId_t playerId)
 	}
 }
 
-void Game::MovePlayer(GameObject* playerCharacter)
+void Game::MovePlayer(Player* character, PxVec2 direction)
 {
-	// 이 player를 RPC를 요청한 유저가 소유권이 있을까? 하는 정보는
-	// NetworkManager에서 처리했고, 실제로 MovePlayer가 동작하는 과정을 구현
+	// movable 한지 검증할 수 있다면 좋겠지만 생략
 
-	spdlog::debug("[Game::MovePlayer] called. player: {}", playerCharacter->GetClassId());
+	spdlog::debug("[Game::MovePlayer] called. player: {}", character->GetNetworkId());
+
+	character->_moveValue = direction.x;
 }

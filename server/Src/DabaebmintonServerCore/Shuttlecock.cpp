@@ -20,15 +20,6 @@ float Shuttlecock::GetRadius() const
 	return _radius;
 }
 
-bool Shuttlecock::FixedUpdate()
-{
-	SetCurrentTransform();
-	cout << "Shuttlecock FixedUpdate" << endl;
-	cout << "Position: " << _location.x << ", " << _location.y << endl;
-
-	return true;
-}
-
 size_t Shuttlecock::CountWriteBitSize(const uint8_t inState) const
 {
 	return GameObject::CountWriteBitSize(inState);

@@ -41,7 +41,7 @@ public:
 	
 	// RPC
 	void SetClientReady(const PlayerId_t playerId);
-	void MovePlayer(GameObject* playerCharacter);
+	void MovePlayer(Player* character, PxVec2 direction);
 
 	atomic<bool> IsPendingReplicationUpdate{ false };
 

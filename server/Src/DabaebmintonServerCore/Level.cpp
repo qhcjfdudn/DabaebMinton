@@ -69,8 +69,7 @@ void Level::InitLevel(PlayerId_t (&playerIds)[MAX_PLAYERS])
 	// set player capsules position
 	for (int idx = 0; idx < MAX_PLAYERS; ++idx)
 	{
-		auto player = make_shared<Player>(defaultPlayerCharacterIds[idx], defaultPlayersPosition[idx]);
-		player->SetOwnerId(playerIds[idx]);
+		auto player = make_shared<Player>(defaultPlayerCharacterIds[idx], playerIds[idx], defaultPlayersPosition[idx]);
 		_pxScene->addActor(*player->GetRigidbody());
 		_gameObjects.push_back(player);
 	}
@@ -148,15 +147,15 @@ void Level::SetLastFixedUpdateTimeToNow()
 void Level::FixedUpdate()
 {
 	const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
-	spdlog::info("[Level::FixedUpdate] called.");
 
 	// 아래 코드가 안정성을 보장하는지 검증 필요
 	// ex) _gameObjects의 복사 중 _gameObjects의 요소의 추가/변경/삭제가 발생한다면?
 	auto gameObjectsCopied = _gameObjects;
+	
+	_pxScene->lockWrite();
 	for (auto& gameObject : gameObjectsCopied)
 	{
-		_pxScene->lockRead();
 		bool isChanged = gameObject->FixedUpdate();
-		_pxScene->unlockRead();
 	}
+	_pxScene->unlockWrite();
 }

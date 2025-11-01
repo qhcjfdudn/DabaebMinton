@@ -49,17 +49,28 @@ void UnwrapSetClientReady(const ClientProxy& clientProxy, InputMemoryBitStream& 
 
 void UnwrapMovePlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inStream)
 {
-	auto& gameManager = GameManager::GetInstance();
-	auto game = gameManager.FindGame(&clientProxy);
-	
 	NetworkId_t networkId = 0;
+	PxVec2 direction = {};
 	inStream.Read(networkId);
+	inStream.Read(direction.x);
+	inStream.Read(direction.y);
+	
+	spdlog::debug("[UnwrapMovePlayer] x: {}, y: {}", direction.x, direction.y);
 
-	auto& networkManager = NetworkManagerServer::GetInstance();
-	GameObject* playerCharacter = networkManager.GetGameObject(networkId);
+	GameObject* playerCharacter = NetworkManagerServer::GetInstance().GetGameObject(networkId);
 
-	// 이동 데이터를 정의한다.
-	// 이동 데이터를 읽는다.
+	if (playerCharacter == nullptr)
+	{
+		spdlog::warn("[UnwrapMovePlayer] playerCharacter is nullptr. networkId: {}", networkId);
+		return;
+	}
 
-	game->MovePlayer(playerCharacter /* , 이동 데이터 전달 */);
+	if (playerCharacter->GetClassId() != 'PLYR')
+	{
+		spdlog::warn("[UnwrapMovePlayer] playerCharacter is not Player class. networkId: {}", networkId);
+		return;
+	}
+
+	auto game = GameManager::GetInstance().FindGame(&clientProxy);
+	game->MovePlayer(static_cast<Player*>(playerCharacter), direction);
 }
