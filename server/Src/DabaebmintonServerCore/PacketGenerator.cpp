@@ -65,13 +65,9 @@ OutputMemoryBitStream& PacketGenerator::GetNextPacket()
 	stream.Write(_inFlightPacket->GetSequenceNumber());
 	// deliveryNotificationManager에 pendingAck가 있다면 여기에 써줄 것
 
-	
-	if (_packetType == PacketType::PT_ReplicationData)
-	{
-		int key = static_cast<int>(PacketType::PT_ReplicationData);
-		auto replTransData = make_shared<ReplicationManagerTransmissionData>(_replicationManager);
-		_inFlightPacket->SetTransmissionData(key, replTransData);
-	}
+	int key = static_cast<int>(_packetType);
+	auto replTransData = make_shared<ReplicationManagerTransmissionData>(_replicationManager);
+	_inFlightPacket->SetTransmissionData(key, replTransData);
 
 	return stream;
 }

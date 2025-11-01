@@ -724,7 +724,7 @@ void NetworkManagerServer::SendWelcomePacket(ClientProxy* clientProxy)
 	DeliveryNotificationManager& deliNotiManager = clientProxy->GetDeliveryNotificationManager();
 	ReplicationManager& replManager = clientProxy->GetReplicationManager();
 
-	PacketGenerator welcomePacketGenerator{ &deliNotiManager, &replManager, PacketType::PT_ReplicationData };
+	PacketGenerator welcomePacketGenerator{ &deliNotiManager, &replManager, PacketType::PT_Hello };
 
 	replManager.Write(welcomePacketGenerator);
 
