@@ -47,9 +47,6 @@ public class InputMemoryBitStream
 
     public byte[] ReadBits(int inCount)
     {
-        Debug.Log($"ReadBits(inCount: {inCount})");
-        Debug.Log($"curHead: {_bitHead}, _capacity: {_capacity}");
-
         int byteCount = (inCount + 7) >> 3;
         byte[] ret = new byte[byteCount];
 
