@@ -11,21 +11,29 @@
 
 void ReplicationManager::ReplicateCreate(int inNetworkId, uint8_t inInitialDirtyState)
 {
+	_networkIdToReplicationCommandMutex.lock();
 	mNetworkIdToReplicationCommand[inNetworkId] = ReplicationCommand{ inInitialDirtyState };
+	_networkIdToReplicationCommandMutex.unlock();
 }
 
 void ReplicationManager::ReplicateDestroy(int inNetworkId)
 {
+	_networkIdToReplicationCommandMutex.lock();
 	mNetworkIdToReplicationCommand[inNetworkId].SetDestroy();
+	_networkIdToReplicationCommandMutex.unlock();
 }
 
 void ReplicationManager::RemoveFromReplication(int inNetworkId)
 {
+	_networkIdToReplicationCommandMutex.lock();
 	mNetworkIdToReplicationCommand.erase(inNetworkId);
+	_networkIdToReplicationCommandMutex.unlock();
 }
 
 void ReplicationManager::Write(PacketGenerator& packetGenerator)
 {
+	_networkIdToReplicationCommandMutex.lock();
+
 	for (auto& [networkId, replicationCommand] : mNetworkIdToReplicationCommand)
 	{
 		if (replicationCommand.HasDirtyState())
@@ -64,16 +72,21 @@ void ReplicationManager::Write(PacketGenerator& packetGenerator)
 			replicationCommand.ClearDirtyState(writtenState);
 		}
 	}
+	_networkIdToReplicationCommandMutex.unlock();
 }
 
 void ReplicationManager::SetStateDirty(int inNetworkId, uint8_t inDirtyState)
 {
+	_networkIdToReplicationCommandMutex.lock();
 	mNetworkIdToReplicationCommand[inNetworkId].AddDirtyState(inDirtyState);
+	_networkIdToReplicationCommandMutex.unlock();
 }
 
 void ReplicationManager::HandleCreateAckd(int inNetworkId)
 {
+	_networkIdToReplicationCommandMutex.lock();
 	mNetworkIdToReplicationCommand[inNetworkId].HandleCreateAckd();
+	_networkIdToReplicationCommandMutex.unlock();
 }
 
 size_t ReplicationManager::CountWriteBitSize(NetworkId_t networkId) const

@@ -24,4 +24,5 @@ private:
 	uint8_t WriteDestroyAction(OutputMemoryBitStream& inOutputStream, int inNetworkId, uint8_t inDirtyState);
 
 	unordered_map<NetworkId_t, ReplicationCommand>	mNetworkIdToReplicationCommand;
+	shared_mutex _networkIdToReplicationCommandMutex{};
 };
