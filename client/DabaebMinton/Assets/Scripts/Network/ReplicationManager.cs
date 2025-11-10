@@ -101,19 +101,18 @@ public class ReplicationManager : MonoBehaviour
 
     public void ReplicationUpdate(ReplicationHeader rh, InputMemoryBitStream inStream)
     {
-        Debug.Log("RA_Update 도달 완료!");
-        
         uint networkId = rh.Nid;
 
-        // LinkingContext 필요. networkId에 해당하는 데이터 찾기
-
         GameObject gameObject = _linkingContext.GetGameObject(networkId);
+
         if (null == gameObject)
         {
-            // 새로운 gameObject를 생성해서 전달해야 하는데, 
-            // classID를 기준으로 만드는 Factory 함수? 가 있어야 한다.
-            gameObject = Instantiate(Resources.Load<GameObject>("Prefabs/Shuttlecock"));
-            _linkingContext.AddGameObject(networkId, gameObject);
+            // 정상적이라면 Object가 생성된 이후에만 ReplicationUpdate 발생.
+            // game 비정상 종료 시 linkingContext에 gameObject가 없는 상태로 ReplicationUpdate 넘어올 수 있다.
+            // null 발생 가능. 비정상 종료 시에는 이후의 패킷이 모두 불필요하다고 보고
+            // 아무 동작도 하지 않도록 처리.
+
+            return;
         }
         
         // gameObject의 Read 호출
