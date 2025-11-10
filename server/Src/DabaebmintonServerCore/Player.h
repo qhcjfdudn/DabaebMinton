@@ -39,4 +39,6 @@ public:
 private:
 	ECharacterID _characterId;
 	PlayerId_t _ownerId;
+
+	PxVec3 _oldPosition{};
 };
