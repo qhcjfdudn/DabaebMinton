@@ -67,12 +67,14 @@ public class OnlinePlayableBadmintonController : BadmintonController
     {
         base.SetGamePlayStateReady();
 
-        uint playerId = NetworkManager.Instance.OnlinePlayPlayerId;
+        uint playerId = _networkManager.OnlinePlayPlayerId;
 
         if (_player1.GetComponent<NetworkComponent>().OwnerPlayerId == playerId)
             _playerCharacterNetworkId = _player1.GetComponent<NetworkComponent>().NetworkId;
         else if (_player2.GetComponent<NetworkComponent>().OwnerPlayerId == playerId)
             _playerCharacterNetworkId = _player2.GetComponent<NetworkComponent>().NetworkId;
+
+        SetClientReadyRpc();
     }
 
     // RPCs
@@ -87,5 +89,10 @@ public class OnlinePlayableBadmintonController : BadmintonController
 
         outStream.Write(value.x);
         outStream.Write(value.y);
+    }
+
+    public void SetClientReadyRpc()
+    {
+        _rpcManager.GetStream().Write(NetworkUtils.Parse4byteStringToUint("CLRD"));
     }
 }

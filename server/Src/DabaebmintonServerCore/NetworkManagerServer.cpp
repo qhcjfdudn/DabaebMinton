@@ -389,7 +389,7 @@ int NetworkManagerServer::SendTo(ClientProxy* client)
 	client->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 
 	// Replication State
-	SendReplicationStatePacketToClient(client);
+	SendReplicationStatePacketToClientIfValid(client);
 
 	// RPCs
 	SendRpcPacketToClient(client);
@@ -436,10 +436,16 @@ int NetworkManagerServer::RecvFrom()
 	return retCode;
 }
 
-void NetworkManagerServer::SendReplicationStatePacketToClient(ClientProxy* client)
+void NetworkManagerServer::SendReplicationStatePacketToClientIfValid(ClientProxy* client)
 {
-	DeliveryNotificationManager& deliNotiManager = client->GetDeliveryNotificationManager();
 	ReplicationManager& replManager = client->GetReplicationManager();
+	
+	if (replManager.ShouldReplicate == false)
+	{
+		return;
+	}
+	
+	DeliveryNotificationManager& deliNotiManager = client->GetDeliveryNotificationManager();
 
 	PacketGenerator packetGenerator{ &deliNotiManager, &replManager, PacketType::PT_ReplicationData };
 

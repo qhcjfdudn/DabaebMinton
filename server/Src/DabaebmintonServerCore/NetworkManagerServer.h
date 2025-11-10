@@ -33,7 +33,7 @@ public:
 	int SendTo(ClientProxy* client);
 	int RecvFrom();
 	
-	void SendReplicationStatePacketToClient(ClientProxy* client);
+	void SendReplicationStatePacketToClientIfValid(ClientProxy* client);
 	void SendRpcPacketToClient(ClientProxy* client);
 
 	void ProcessQueuedPackets();

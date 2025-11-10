@@ -21,9 +21,6 @@ void OutgoingPacketProcessProducer::operator() ()
 			{
 				game->SetNextReplicationTimeFromNow();
 				
-				if (game->GetGamePlayState() != GamePlayState::Playing)
-					continue;
-				
 				game->IsPendingReplicationUpdate.store(true, std::memory_order_release);
 				
 				gameManager._pendingOutgoingPacketProcessMutex.lock();

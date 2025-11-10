@@ -103,9 +103,6 @@ void Game::SetNextStepPhysicsTime(const steady_clock::time_point& time)
 
 bool Game::StepPhysicsIfPossible()
 {
-	//if (_gamePlayState != GamePlayState::Playing)
-	//	return false;
-
 	const auto now = steady_clock::now();
 	if (HasElapsedStepPhysicsInterval(now) == false)
 	{
@@ -160,6 +157,9 @@ void Game::SetClientReady(const PlayerId_t playerId)
 	}
 
 	_isPlayerReadyToGoNextState[playerIdx] = true;
+	
+	ClientProxy* playerProxy = _player[playerIdx];
+	playerProxy->GetReplicationManager().ShouldReplicate = true;
 
 	if (++_numPlayersReadyCount == MAX_PLAYERS)
 	{

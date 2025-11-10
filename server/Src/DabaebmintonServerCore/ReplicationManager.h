@@ -16,6 +16,8 @@ public:
 
 	void Write(PacketGenerator& packetGenerator);
 
+	bool ShouldReplicate = false;
+
 private:
 	size_t CountWriteBitSize(NetworkId_t networkId) const;
 
