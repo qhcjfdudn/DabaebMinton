@@ -5,26 +5,40 @@ public class InputManager : MonoBehaviour
 {
     PlayerInput _playerInput;
 
-    private void Awake()
-    {
-        _playerInput = GetComponent<PlayerInput>();
-    }
-
     public void SetActionMapBy(EPlayMode playMode)
     {
         switch (playMode)
         {
             case EPlayMode.Local:
-                _playerInput.SwitchCurrentActionMap("LocalPlayMode");
-                Debug.Log("InputManagerController - Local Play Mode");
+                SwitchCurrentActionMap("LocalPlayMode");
+                Debug.Log("[InputManager] - Local Play Mode");
                 break;
             case EPlayMode.Online:
-                _playerInput.SwitchCurrentActionMap("OnlinePlayMode");
-                Debug.Log("InputManagerController - Online Play Mode");
+                SwitchCurrentActionMap("OnlinePlayMode");
+                Debug.Log("[InputManager] - Online Play Mode");
                 break;
             default:
-                Debug.LogError("InputManagerController - Invalid Play Mode");
+                Debug.LogError("[InputManager] - Invalid Play Mode");
                 break;
+        }
+    }
+
+    private void Awake()
+    {
+        _playerInput = GetComponent<PlayerInput>();
+    }
+
+    private void SwitchCurrentActionMap(string actionMapName)
+    {
+        DisableAllActionMaps();
+        _playerInput.actions.FindActionMap(actionMapName).Enable();
+    }
+
+    private void DisableAllActionMaps()
+    {
+        foreach (var actionMap in _playerInput.actions.actionMaps)
+        {
+            actionMap.Disable();
         }
     }
 }

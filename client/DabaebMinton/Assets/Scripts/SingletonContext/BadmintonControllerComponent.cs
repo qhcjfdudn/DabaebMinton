@@ -244,12 +244,8 @@ public class BadmintonControllerComponent : MonoBehaviour
     public void SetGamePlayStateReady()
     {
         Controller.SetGamePlayStateReady();
-        _inputManager.SetActionMapBy(PlayMode); // 검증 이후 GamePlayState가 Plying에 들어갈 때 변경되도록 수정 필요
-        
-        if (PlayMode == EPlayMode.Online)
-        {
-            FindFirstObjectByType<OnlinePlayModeInputManager>().SetOnlinePlayableBadmintonController((OnlinePlayableBadmintonController)Controller);
-        }
+
+        FindFirstObjectByType<OnlinePlayModeInputManager>().SetOnlinePlayableBadmintonController((OnlinePlayableBadmintonController)Controller);
     }
 
     private void Awake()
@@ -262,6 +258,8 @@ public class BadmintonControllerComponent : MonoBehaviour
     private void Start()
     {
         Initialize();
+
+        _inputManager.SetActionMapBy(PlayMode);
     }
 
     private void FixedUpdate()
