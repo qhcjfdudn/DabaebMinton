@@ -3,6 +3,7 @@
 
 #include "PhysicsEngine.h"
 #include "OutputMemoryBitStream.h"
+#include "CharacterInitialData.h"
 
 Player::Player(ECharacterID characterId, PlayerId_t ownerId, PxVec2 position) :
 	_characterId(characterId),
@@ -81,9 +82,21 @@ uint8_t Player::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) con
 
 bool Player::FixedUpdate()
 {
-	_rigidbody->setLinearVelocity(PxVec3{ _moveValue, 0.0f, 0.0f });
+	float characterMoveVelocity = 0.0f;
+	switch (_characterId)
+	{
+	case ECharacterID::Daramgee:
+		characterMoveVelocity = DaramgeeInitialData::moveVelocity;
+		break;
+	case ECharacterID::Baebsae:
+		characterMoveVelocity = BaebsaeInitialData::moveVelocity;
+		break;
+	}
+
+	float y = _rigidbody->getLinearVelocity().y;
 
 	MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Position));
+	_rigidbody->setLinearVelocity(PxVec3{ _moveValue * characterMoveVelocity, y, 0.0f });
 
 	return GameObject::FixedUpdate();
 }

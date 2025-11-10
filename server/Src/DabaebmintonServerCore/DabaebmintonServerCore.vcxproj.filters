@@ -21,6 +21,9 @@
     <Filter Include="ServerEngine">
       <UniqueIdentifier>{1d92e9a7-09d2-4aa5-8f77-2acc3779a7bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\CharacterInitialData">
+      <UniqueIdentifier>{4e5ab9d2-3f9d-403a-97d8-a5e94fd3522a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shuttlecock.cpp">
@@ -276,6 +279,9 @@
     </ClInclude>
     <ClInclude Include="GameConfig.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="CharacterInitialData.h">
+      <Filter>Game\CharacterInitialData</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
