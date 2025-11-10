@@ -94,15 +94,17 @@ bool Player::FixedUpdate()
 	}
 
 	float y = _rigidbody->getLinearVelocity().y;
-
 	_rigidbody->setLinearVelocity(PxVec3{ _moveValue * characterMoveVelocity, y, 0.0f });
 
-	PxVec3 currentPosition = _rigidbody->getGlobalPose().p;
-	if (currentPosition != _oldPosition)
+	PxVec3 curPos = _rigidbody->getGlobalPose().p;
+	PxVec2 curPos2D{ curPos.x, curPos.y };
+
+	if ((curPos2D - _position).magnitude() > 1e-4f)
 	{
 		MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Position));
-		_oldPosition = currentPosition;
+
+		return GameObject::FixedUpdate();
 	}
 
-	return GameObject::FixedUpdate();
+	return true;
 }
