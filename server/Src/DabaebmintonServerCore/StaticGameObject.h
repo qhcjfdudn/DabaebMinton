@@ -17,7 +17,7 @@ public:
 	PxActor* GetRigidbody() const;
 
 protected:
-	PxVec2 _location;
+	PxVec2 _position;
 	PxVec2 _velocity;
 
 	PxRigidStatic* _rigidbody = nullptr;

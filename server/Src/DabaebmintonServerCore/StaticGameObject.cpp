@@ -4,7 +4,7 @@
 #include "OutputMemoryBitStream.h"
 
 StaticGameObject::StaticGameObject(PxVec2 location) :
-	_location(location) {}
+	_position(location) {}
 
 StaticGameObject::~StaticGameObject()
 {
@@ -24,7 +24,7 @@ unsigned int StaticGameObject::GetClassId()
 
 void StaticGameObject::Write(OutputMemoryBitStream& inStream)
 {
-	inStream.Write(_location);
+	inStream.Write(_position);
 }
 
 PxActor* StaticGameObject::GetRigidbody() const

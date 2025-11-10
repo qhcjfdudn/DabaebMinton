@@ -38,7 +38,7 @@ public:
 	void SetDirtyHandler(DirtyEvent dirtyEvent) { MarkDirtyState = std::move(dirtyEvent); }
 
 protected:
-	PxVec2 _location;
+	PxVec2 _position;
 	PxVec2 _velocity;
 
 	PxRigidDynamic* _rigidbody = nullptr;

@@ -18,7 +18,7 @@ unsigned int BadmintonNet::GetClassId()
 void BadmintonNet::Write(OutputMemoryBitStream& inStream)
 {
 	StaticGameObject::Write(inStream);
-	inStream.Write(_location);
+	inStream.Write(_position);
 	inStream.Write(_halfX);
 	inStream.Write(_halfY);
 }

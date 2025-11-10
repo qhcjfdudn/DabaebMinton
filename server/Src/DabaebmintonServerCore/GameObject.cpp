@@ -5,7 +5,7 @@
 #include "BitSizeCounter.h"
 
 GameObject::GameObject(PxVec2 location, PxVec2 velocity) :
-	_location(location), _velocity(velocity) {
+	_position(location), _velocity(velocity) {
 }
 
 GameObject::~GameObject()
@@ -38,10 +38,10 @@ bool GameObject::FixedUpdate()
 
 void GameObject::SetCurrentTransform()
 {
-	PxVec3 curLocation{ _rigidbody->getGlobalPose().p };
+	PxVec3 curPosition{ _rigidbody->getGlobalPose().p };
 	PxVec3 curVelocity{ _rigidbody->getLinearVelocity() };
 
-	_location = PxVec2{ curLocation.x, curLocation.y };
+	_position = PxVec2{ curPosition.x, curPosition.y };
 	_velocity = PxVec2{ curVelocity.x, curVelocity.y };
 }
 
@@ -52,7 +52,7 @@ uint8_t GameObject::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState)
 	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Position))
 	{
 		inStream.Write(true);
-		inStream.Write(_location);
+		inStream.Write(_position);
 		
 		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Position);
 	}
@@ -82,7 +82,7 @@ size_t GameObject::CountWriteBitSize(const uint8_t inDirtyState) const
 	totalBits += 1;
 	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Position))
 	{
-		totalBits += BitSizeCounter::Count(_location);
+		totalBits += BitSizeCounter::Count(_position);
 	}
 
 	totalBits += 1;

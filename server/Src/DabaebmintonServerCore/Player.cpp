@@ -33,7 +33,7 @@ uint8_t Player::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) con
 	if (inDirtyState & static_cast<uint8_t>(ReplicationState::RS_Position))
 	{
 		inStream.Write(true);
-		inStream.Write(_location);
+		inStream.Write(_position);
 
 		writtenState |= static_cast<uint8_t>(ReplicationState::RS_Position);
 	}
