@@ -515,6 +515,8 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inStream, const S
 	case PacketType::PT_RPC:
 		ProcessRPCs(inStream, client.get());
 		break;
+	default:
+		break;
 	}
 }
 

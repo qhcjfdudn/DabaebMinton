@@ -2,6 +2,7 @@
 
 enum class PacketType
 {
+	PT_None,
 	PT_Hello,
 	PT_ReplicationData,
 	PT_RPC,

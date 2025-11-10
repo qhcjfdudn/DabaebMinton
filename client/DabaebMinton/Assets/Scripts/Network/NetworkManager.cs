@@ -9,6 +9,7 @@ using static NetworkUtils;
 using PacketSequenceNumber = System.UInt16;
 public enum PacketType
 {
+    PT_None,
     PT_Hello,
     PT_ReplicationData,
     PT_RPC,
@@ -266,6 +267,8 @@ public class NetworkManager : MonoBehaviour
 
     public void SendHello()
     {
+        Debug.Log("[NetworkManager] SendHello called.");
+
         _outBuffer.Clear();
 
         // Session ID
@@ -304,6 +307,10 @@ public class NetworkManager : MonoBehaviour
             _outBuffer.Append(_rpcManager.GetStream());
 
             _rpcManager.Clear();
+        }
+        else
+        {
+            _outBuffer.WriteBits((int)PacketType.PT_None, GetRequiredBits(PacketType.PT_Max));
         }
 
         SendToOnlinePlayServer();
