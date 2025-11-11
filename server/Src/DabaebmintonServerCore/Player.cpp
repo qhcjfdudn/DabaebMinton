@@ -83,27 +83,49 @@ uint8_t Player::Write(OutputMemoryBitStream& inStream, uint8_t inDirtyState) con
 bool Player::FixedUpdate()
 {
 	float characterMoveVelocity = 0.0f;
+	float characterJumpVelocity = 0.0f;
 	switch (_characterId)
 	{
 	case ECharacterID::Daramgee:
 		characterMoveVelocity = DaramgeeInitialData::moveVelocity;
+		characterJumpVelocity = DaramgeeInitialData::jumpVelocity;
 		break;
 	case ECharacterID::Baebsae:
 		characterMoveVelocity = BaebsaeInitialData::moveVelocity;
+		characterJumpVelocity = BaebsaeInitialData::jumpVelocity;
 		break;
 	}
 
-	float y = _rigidbody->getLinearVelocity().y;
-	_rigidbody->setLinearVelocity(PxVec3{ _moveValue * characterMoveVelocity, y, 0.0f });
+	float nextVelocityX = _moveValue * characterMoveVelocity;
+	float nextVelocityY = _rigidbody->getLinearVelocity().y;
+
+	_rigidbody->setLinearVelocity(PxVec3{ nextVelocityX, nextVelocityY, 0 });
 
 	PxVec3 curPos = _rigidbody->getGlobalPose().p;
 	PxVec2 curPos2D{ curPos.x, curPos.y };
 
+	// 가로 이동
 	if ((curPos2D - _position).magnitude() > 1e-4f)
 	{
 		MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Position));
 
 		return GameObject::FixedUpdate();
+	}
+
+	// 점프 처리
+	if (_isJumpPressed /* && _jumpCount == 0 */)
+	{
+		if (nextVelocityY < 0.f)
+		{
+			_rigidbody->setLinearVelocity(PxVec3{ nextVelocityX, 0, 0 });
+		}
+
+		_rigidbody->addForce(PxVec3{ 0, characterJumpVelocity, 0 });
+
+		_isJumpPressed = false;
+		++_jumpCount;
+
+		//MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Velocity));
 	}
 
 	return true;

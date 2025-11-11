@@ -26,4 +26,13 @@ public class OnlinePlayModeInputManager : MonoBehaviour
             _onlinePlayableBadmintonController.MovePlayerRpc(Vector2.zero);
         }
     }
+
+    public void OnPlayerJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            _onlinePlayableBadmintonController.JumpPlayerRpc();
+            return;
+        }
+    }
 }

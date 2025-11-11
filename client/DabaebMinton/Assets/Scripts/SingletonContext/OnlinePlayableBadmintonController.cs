@@ -78,6 +78,10 @@ public class OnlinePlayableBadmintonController : BadmintonController
     }
 
     // RPCs
+    public void SetClientReadyRpc()
+    {
+        _rpcManager.GetStream().Write(NetworkUtils.Parse4byteStringToUint("CLRD"));
+    }
 
     public void MovePlayerRpc(Vector2 value)
     {
@@ -91,8 +95,10 @@ public class OnlinePlayableBadmintonController : BadmintonController
         outStream.Write(value.y);
     }
 
-    public void SetClientReadyRpc()
+    public void JumpPlayerRpc()
     {
-        _rpcManager.GetStream().Write(NetworkUtils.Parse4byteStringToUint("CLRD"));
+        OutputMemoryBitStream outStream = _rpcManager.GetStream();
+        outStream.Write(NetworkUtils.Parse4byteStringToUint("JMPL"));
+        outStream.Write(_playerCharacterNetworkId);
     }
 }

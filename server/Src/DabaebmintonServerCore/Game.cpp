@@ -178,3 +178,8 @@ void Game::MovePlayer(Player* character, PxVec2 direction)
 
 	character->_moveValue = direction.x;
 }
+
+void Game::JumpPlayer(Player* character)
+{
+	character->_isJumpPressed = true;
+}

@@ -35,6 +35,8 @@ public:
 	bool FixedUpdate() override;
 
 	float _moveValue;
+	bool _isJumpPressed{ false };
+	int _jumpCount{ 0 };
 
 private:
 	ECharacterID _characterId;

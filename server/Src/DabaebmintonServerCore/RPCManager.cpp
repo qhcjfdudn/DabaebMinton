@@ -12,6 +12,7 @@ RPCManager::RPCManager()
 	// Unwrap rpc 나열
 	RegisterUnwrapRpc('CLRD', UnwrapSetClientReady);
 	RegisterUnwrapRpc('MVPL', UnwrapMovePlayer);
+	RegisterUnwrapRpc('JMPL', UnwrapJumpPlayer);
 }
 
 void RPCManager::RegisterUnwrapRpc(RPCNameType name, RPCFuncType func)
@@ -73,4 +74,26 @@ void UnwrapMovePlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inSt
 
 	auto game = GameManager::GetInstance().FindGame(&clientProxy);
 	game->MovePlayer(static_cast<Player*>(playerCharacter), direction);
+}
+
+void UnwrapJumpPlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inStream)
+{
+	NetworkId_t networkId = 0;
+	inStream.Read(networkId);
+	
+	GameObject* playerCharacter = NetworkManagerServer::GetInstance().GetGameObject(networkId);
+	
+	if (playerCharacter == nullptr)
+	{
+		spdlog::warn("[UnwrapJumpPlayer] playerCharacter is nullptr. networkId: {}", networkId);
+		return;
+	}
+	if (playerCharacter->GetClassId() != 'PLYR')
+	{
+		spdlog::warn("[UnwrapJumpPlayer] playerCharacter is not Player class. networkId: {}", networkId);
+		return;
+	}
+
+	auto game = GameManager::GetInstance().FindGame(&clientProxy);
+	game->JumpPlayer(static_cast<Player*>(playerCharacter));
 }

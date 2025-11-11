@@ -42,6 +42,7 @@ public:
 	// RPC
 	void SetClientReady(const PlayerId_t playerId);
 	void MovePlayer(Player* character, PxVec2 direction);
+	void JumpPlayer(Player* character);
 
 	atomic<bool> IsPendingReplicationUpdate{ false };
 

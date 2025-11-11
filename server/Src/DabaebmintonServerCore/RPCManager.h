@@ -24,3 +24,4 @@ void UnwrapSetClientReady(const ClientProxy& clientProxy, InputMemoryBitStream& 
 
 // 캐릭터 조작 관련 RPC 함수
 void UnwrapMovePlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inStream);
+void UnwrapJumpPlayer(const ClientProxy& clientProxy, InputMemoryBitStream& inStream);
