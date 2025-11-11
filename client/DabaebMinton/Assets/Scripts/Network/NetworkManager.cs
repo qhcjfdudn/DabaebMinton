@@ -291,14 +291,15 @@ public class NetworkManager : MonoBehaviour
             return;
         }
 
-        if (_deliveryNotificationManager.hasAcks())
-        {
-            Debug.Log("Sending Acks to server.");
-        }
-
         _outBuffer.Clear();
 
         _outBuffer.Write(OnlinePlaySessionId);
+
+        if (_deliveryNotificationManager.hasAcks())
+        {
+            Debug.Log("[NetworkManager] Sending Acks to server.");
+        }
+
         _deliveryNotificationManager.WriteAckData(_outBuffer);
 
         if (_rpcManager.hasRpcToSend())

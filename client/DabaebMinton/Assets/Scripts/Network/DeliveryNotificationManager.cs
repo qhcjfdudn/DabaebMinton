@@ -21,7 +21,7 @@ public class DeliveryNotificationManager
 
     public void WriteAckData(OutputMemoryBitStream outStream)
     {
-        bool hasAcks = (_pendingAcks.Count > 0);
+        bool hasAcks = _pendingAcks.Count > 0;
 
         outStream.Write(hasAcks);
         if (hasAcks)

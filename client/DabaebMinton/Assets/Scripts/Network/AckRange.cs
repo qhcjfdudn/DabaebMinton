@@ -1,6 +1,4 @@
 using System;
-using Unity.VisualScripting;
-using UnityEngine;
 using PacketSequenceNumber = System.UInt16;
 
 public class AckRange
@@ -33,5 +31,6 @@ public class AckRange
         }
     }
 
-    private PacketSequenceNumber _start, _count;
+    private PacketSequenceNumber _start;
+    private uint _count;
 }
