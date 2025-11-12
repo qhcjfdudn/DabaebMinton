@@ -131,23 +131,8 @@ void Level::RemoveAllStaticGameObjects()
 	}
 }
 
-bool Level::HasElapsedFixedUpdateInterval()
-{
-	system_clock::time_point currentTime = system_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - _lastFixedUpdateTime;
-
-	return elapsedTime.count() >= Constant::FIXED_UPDATE_TIMESTEP;
-}
-
-void Level::SetLastFixedUpdateTimeToNow()
-{
-	_lastFixedUpdateTime = system_clock::now();
-}
-
 void Level::FixedUpdate()
 {
-	const local_time<system_clock::duration> now = zoned_time{ current_zone(), system_clock::now() }.get_local_time();
-
 	// 아래 코드가 안정성을 보장하는지 검증 필요
 	// ex) _gameObjects의 복사 중 _gameObjects의 요소의 추가/변경/삭제가 발생한다면?
 	auto gameObjectsCopied = _gameObjects;

@@ -70,8 +70,6 @@ Game::~Game()
 
 void Game::StartGame()
 {
-	_level.SetLastFixedUpdateTimeToNow();
-
 	SetNextStepPhysicsTime(steady_clock::now());
 	
 	_gamePlayState = GamePlayState::Playing;

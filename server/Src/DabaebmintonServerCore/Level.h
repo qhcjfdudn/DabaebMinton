@@ -26,8 +26,6 @@ public:
 
 	void RemoveAllStaticGameObjects();
 
-	bool HasElapsedFixedUpdateInterval();
-	void SetLastFixedUpdateTimeToNow();
 	void FixedUpdate();
 
 private:
