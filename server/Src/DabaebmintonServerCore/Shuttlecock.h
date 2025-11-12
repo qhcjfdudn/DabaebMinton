@@ -11,7 +11,7 @@ public:
 	
 	float GetRadius() const;
 
-	size_t CountWriteBitSize(const uint8_t inState) const override;
+	bool FixedUpdate() override;
 
 private:
 	float _radius = 0.3f;

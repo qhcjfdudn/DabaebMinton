@@ -17,7 +17,18 @@ float Shuttlecock::GetRadius() const
 	return _radius;
 }
 
-size_t Shuttlecock::CountWriteBitSize(const uint8_t inState) const
+bool Shuttlecock::FixedUpdate()
 {
-	return GameObject::CountWriteBitSize(inState);
+	PxVec3 curPos{ _rigidbody->getGlobalPose().p };
+	PxVec2 curPos2D{ curPos.x, curPos.y };
+
+	if ((curPos2D - _position).magnitude() > 1e-4f)
+	{
+		GameObject::FixedUpdate();
+		
+		MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Position));
+		MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Velocity));
+	}
+
+	return true;
 }
