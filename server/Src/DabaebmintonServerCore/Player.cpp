@@ -101,18 +101,15 @@ bool Player::FixedUpdate()
 	{
 		MarkDirtyState(_networkId, static_cast<uint8_t>(ReplicationState::RS_Position));
 
-		return GameObject::FixedUpdate();
+		GameObject::FixedUpdate();
 	}
 
 	// 점프 처리
 	if (_isJumpPressed /* && _jumpCount == 0 */)
 	{
-		if (nextVelocityY < 0.f)
-		{
-			_rigidbody->setLinearVelocity(PxVec3{ nextVelocityX, 0, 0 });
-		}
-
-		_rigidbody->addForce(PxVec3{ 0, characterJumpVelocity, 0 });
+		const float jumpCorrection = 1.07f;
+		_rigidbody->setLinearVelocity(PxVec3{ nextVelocityX, 0, 0 });
+		_rigidbody->addForce(PxVec3{ 0, characterJumpVelocity * 0.02f * jumpCorrection, 0 }, PxForceMode::eIMPULSE);
 
 		_isJumpPressed = false;
 		++_jumpCount;
