@@ -36,6 +36,7 @@ public:
 		const PxVec3& velocity = PxVec3(0));
 
 	PxRigidDynamic* CreateDefaultPlayerCharacter(const PxVec2& position, const PxVec2& size = { .5f, 1.5f });
+	PxRigidDynamic* CreateDefaultShuttlecock(const PxReal& radius, const PxVec2& position, const PxVec2& velocity = PxVec2(0));
 
 	void StepPhysics(PxScene* scene, PxReal elapsedTime);
 
@@ -59,4 +60,6 @@ private:
 	PhysicsEngineRunningState _engineRunningState{ PhysicsEngineRunningState::Initiating };
 
 	PxReal stackZ = 10.0f;
+
+	std::unordered_map<uint32_t, PxMaterial*> _materialMap;
 };

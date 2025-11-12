@@ -32,6 +32,12 @@ void PhysicsEngine::CleanupPhysics()
 {
 	PX_RELEASE(pxDispatcher);
 	PX_RELEASE(pxDefaultMaterial);
+
+	for (auto& [key, material] : _materialMap)
+	{
+		PX_RELEASE(material);
+	}
+
 	PX_RELEASE(pxPhysics);
 	if (pxPvd)
 	{
@@ -206,6 +212,43 @@ PxRigidDynamic* PhysicsEngine::CreateDefaultPlayerCharacter(const PxVec2& positi
 	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, true);
 
 	return rb;
+}
+
+PxRigidDynamic* PhysicsEngine::CreateDefaultShuttlecock(const PxReal& radius, const PxVec2& position, const PxVec2& velocity)
+{
+	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ position.x, position.y, 0 });
+
+	if (body == nullptr)
+	{
+		spdlog::error("[PhysicsEngine::CreateSphere2D] Shuttlecock(): CreateSphere2D error.");
+		return nullptr;
+	}
+
+	// material
+	if (_materialMap.find('STCK') == _materialMap.end())
+	{
+		PxMaterial* shuttlecockMaterial = pxPhysics->createMaterial(.1f, .1f, .1f);
+		shuttlecockMaterial->setFrictionCombineMode(PxCombineMode::eAVERAGE);
+		shuttlecockMaterial->setRestitutionCombineMode(PxCombineMode::eMAX);
+
+		_materialMap.emplace('STCK', shuttlecockMaterial);
+	}
+
+	PxShape* shape = pxPhysics->createShape(PxSphereGeometry(radius), *_materialMap.at('STCK'));
+	body->attachShape(*shape);
+	shape->release();
+
+	body->setMass(1.5f);
+	body->setMassSpaceInertiaTensor(PxVec3(0));
+
+	body->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
+
+	body->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
+	body->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+
+	body->setLinearVelocity(PxVec3{ velocity.x, velocity.y, 0 });
+
+	return body;
 }
 
 void PhysicsEngine::StepPhysics(PxScene* scene, PxReal elapsedTime)

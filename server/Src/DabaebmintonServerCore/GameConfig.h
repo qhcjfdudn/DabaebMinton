@@ -9,7 +9,7 @@ namespace GameConfig {
 	static const PxVec2 defaultBadmintonNetPosition{ 0, 1.25f };
 	
 	static const PxVec2 defaultBadmintonShuttlecockPosition{ -2, 6.15f };
-	static const PxVec2 defaultBadmintonShuttlecockVelocity{ 2, 1 };
+	static const PxVec2 defaultBadmintonShuttlecockVelocity{ 4, 3 };
 
 	static const PxVec2 defaultPlayersPosition[MAX_PLAYERS] = {
 		PxVec2{ -6, 5 }, PxVec2{ 6, 5 }

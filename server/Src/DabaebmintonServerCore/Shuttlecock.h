@@ -5,7 +5,7 @@
 class Shuttlecock : public GameObject
 {
 public:
-	Shuttlecock(PxVec2 location, PxVec2 velocity);
+	Shuttlecock(PxVec2 position, PxVec2 velocity);
 
 	uint32_t GetClassId() const override { return 'STCK'; }
 	
