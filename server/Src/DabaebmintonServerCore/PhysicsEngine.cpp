@@ -19,6 +19,10 @@ void PhysicsEngine::InitPhysics()
 	pxPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *pxFoundation, PxTolerancesScale(), true, pxPvd);
 	pxDispatcher = PxDefaultCpuDispatcherCreate(2);
 
+	pxDefaultMaterial = pxPhysics->createMaterial(.4f, .4f, 0);
+	pxDefaultMaterial->setFrictionCombineMode(PxCombineMode::eAVERAGE);
+	pxDefaultMaterial->setRestitutionCombineMode(PxCombineMode::eMAX);
+
 	_engineRunningState = PhysicsEngineRunningState::Running;
 
 	spdlog::info("[PhysicsEngine::InitPhysics] InitPhysics done.");
@@ -26,9 +30,8 @@ void PhysicsEngine::InitPhysics()
 
 void PhysicsEngine::CleanupPhysics()
 {
-	// 관리하는 모든 객체를 여기서 반납해버려도 될까?
-
 	PX_RELEASE(pxDispatcher);
+	PX_RELEASE(pxDefaultMaterial);
 	PX_RELEASE(pxPhysics);
 	if (pxPvd)
 	{
@@ -88,16 +91,14 @@ void PhysicsEngine::ReleaseEveryScene()
 
 PxRigidStatic* PhysicsEngine::CreatePlain(float nx, float ny, float nz, float distance)
 {
-	pxMaterial = pxPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-
-	return PxCreatePlane(*pxPhysics, PxPlane(nx, ny, nz, distance), *pxMaterial);
+	return PxCreatePlane(*pxPhysics, PxPlane(nx, ny, nz, distance), *pxDefaultMaterial);
 }
 
 PxRigidDynamic * PhysicsEngine::CreateBox(const PxTransform& tp, float halfExtentX, float halfExtentY, float halfExtentZ)
 {
 	PxRigidDynamic* body = pxPhysics->createRigidDynamic(tp);
 
-	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, halfExtentZ), *pxMaterial);
+	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, halfExtentZ), *pxDefaultMaterial);
 	body->attachShape(*shape);
 	shape->release();
 
@@ -110,7 +111,7 @@ PxRigidDynamic * PhysicsEngine::CreateBox2D(const PxVec2& location, float halfEx
 {
 	PxRigidDynamic* body = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
 
-	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxMaterial);
+	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxDefaultMaterial);
 	body->attachShape(*shape);
 	shape->release();
 
@@ -123,7 +124,7 @@ PxRigidStatic* PhysicsEngine::CreateBox2DStatic(const PxVec2& location, float ha
 {
 	PxRigidStatic* body = pxPhysics->createRigidStatic(PxTransform{ location.x, location.y, 0 });
 
-	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxMaterial);
+	PxShape* shape = pxPhysics->createShape(PxBoxGeometry(halfExtentX, halfExtentY, 0.1f), *pxDefaultMaterial);
 	body->attachShape(*shape);
 	shape->release();
 
@@ -144,7 +145,7 @@ PxRigidDynamic * PhysicsEngine::CreateSphere2D(const PxVec2& location, const PxV
 	body->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
 	body->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
 
-	PxShape* shape = pxPhysics->createShape(PxSphereGeometry(halfExtentRadius), *pxMaterial);
+	PxShape* shape = pxPhysics->createShape(PxSphereGeometry(halfExtentRadius), *pxDefaultMaterial);
 	body->attachShape(*shape);
 	shape->release();
 
@@ -156,7 +157,7 @@ PxRigidDynamic* PhysicsEngine::CreateCapsule2D(const PxVec2& location, float rad
 	PxRigidDynamic* rb = pxPhysics->createRigidDynamic(PxTransform{ location.x, location.y, 0 });
 	PxTransform relativePose(PxQuat(PxHalfPi, PxVec3(0, 0, 1)));
 	PxShape* aCapsuleShape = PxRigidActorExt::createExclusiveShape(*rb,
-		PxCapsuleGeometry(radius, halfHeight), *pxMaterial);
+		PxCapsuleGeometry(radius, halfHeight), *pxDefaultMaterial);
 	aCapsuleShape->setLocalPose(relativePose);
 
 	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
@@ -168,11 +169,43 @@ PxRigidDynamic* PhysicsEngine::CreateCapsule2D(const PxVec2& location, float rad
 
 PxRigidDynamic * PhysicsEngine::createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity)
 {
-	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxMaterial, 10.0f);
+	PxRigidDynamic* dynamic = PxCreateDynamic(*pxPhysics, t, geometry, *pxDefaultMaterial, 10.0f);
 	dynamic->setAngularDamping(0.5f);
 	dynamic->setLinearVelocity(velocity);
 
 	return dynamic;
+}
+
+PxRigidDynamic* PhysicsEngine::CreateDefaultPlayerCharacter(const PxVec2& position, const PxVec2& size)
+{
+	// 1. Rigidbody
+	PxRigidDynamic* rb = pxPhysics->createRigidDynamic(PxTransform{ position.x, position.y, 0 });
+
+	// 2. capsule 모양
+	PxReal radius = size.x / 2; // radius를 통해 반구 양쪽에 하나씩 붙인다.
+	PxReal halfHeight = (size.y - size.x) / 2;	// halfHeight를 2배 해서 height로 몸통 크기를 정한다.
+												// halfHeight는 engine 연산을 편하게 하기 위한 트릭이다.
+	// 3. 캡슐의 재질
+	PxMaterial* playerMaterial = pxDefaultMaterial;
+
+	// 캡슐 생성
+	PxShape* aCapsuleShape = PxRigidActorExt::createExclusiveShape(*rb,
+		PxCapsuleGeometry(radius, halfHeight), *playerMaterial);
+	
+	// 캡슐의 방향. PxHalfPi를 넣어야 캡슐이 일어선 상태가 된다.
+	PxTransform relativePose(PxQuat(PxHalfPi, PxVec3(0, 0, 1)));
+	aCapsuleShape->setLocalPose(relativePose);
+
+	// PlayerCharacter를 만들기 위한 Mass, 관성 모멘트. 관성 모멘트는 0을 확인했다.
+	rb->setMass(1.0f);
+	rb->setMassSpaceInertiaTensor({ 0, 0, 0 });
+
+	// 회전 잠금
+	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, true);
+	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, true);
+	rb->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, true);
+
+	return rb;
 }
 
 void PhysicsEngine::StepPhysics(PxScene* scene, PxReal elapsedTime)

@@ -35,6 +35,8 @@ public:
 		const PxGeometry& geometry,
 		const PxVec3& velocity = PxVec3(0));
 
+	PxRigidDynamic* CreateDefaultPlayerCharacter(const PxVec2& position, const PxVec2& size = { .5f, 1.5f });
+
 	void StepPhysics(PxScene* scene, PxReal elapsedTime);
 
 	PhysicsEngineRunningState GetEngineRunningState();
@@ -51,11 +53,10 @@ private:
 	PxFoundation* pxFoundation = nullptr;
 	PxPhysics* pxPhysics = nullptr;
 	PxDefaultCpuDispatcher* pxDispatcher = nullptr;
-	PxMaterial* pxMaterial = nullptr;
+	PxMaterial* pxDefaultMaterial = nullptr;
 	PxPvd* pxPvd = nullptr;
 
 	PhysicsEngineRunningState _engineRunningState{ PhysicsEngineRunningState::Initiating };
 
 	PxReal stackZ = 10.0f;
 };
-

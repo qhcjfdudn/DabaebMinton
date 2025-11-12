@@ -8,17 +8,9 @@
 Player::Player(ECharacterID characterId, PlayerId_t ownerId, PxVec2 position) :
 	_characterId(characterId),
 	_ownerId(ownerId),
-	GameObject(position, PxVec2{ 0.0f, 0.0f }),
-	_moveValue{ 0.0f }
+	GameObject(position, PxVec2{ 0.0f, 0.0f })
 {
-	auto& physicsEngine = PhysicsEngine::GetInstance();
-
-	_rigidbody = physicsEngine.CreateCapsule2D(
-		position,
-		0.25f /* x size의 절반 */,
-		0.5f /* height의 절반 */);
-
-	PxRigidBodyExt::updateMassAndInertia(*_rigidbody, 1.0f);
+	_rigidbody = PhysicsEngine::GetInstance().CreateDefaultPlayerCharacter(position);
 }
 
 size_t Player::CountWriteBitSize(const uint8_t inState) const

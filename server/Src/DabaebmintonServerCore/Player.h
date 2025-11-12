@@ -34,7 +34,7 @@ public:
 
 	bool FixedUpdate() override;
 
-	float _moveValue;
+	float _moveValue{ 0.0f };
 	bool _isJumpPressed{ false };
 	int _jumpCount{ 0 };
 
