@@ -119,13 +119,13 @@ bool Game::HasElapsedStepPhysicsInterval(const steady_clock::time_point& time) c
 
 void Game::StepPhysics(const steady_clock::time_point& curTime)
 {
-	_level.FixedUpdate();
-
 	PxReal elapsed = duration_cast<duration<float>>(curTime - _lastRealStepPhysicsTime).count();
 	PhysicsEngine::GetInstance().StepPhysics(_level.GetScene(), elapsed);
 
 	_lastRealStepPhysicsTime = curTime;
 	fetchNextStepPhysicsTime();
+
+	_level.FixedUpdate();
 }
 
 void Game::fetchNextStepPhysicsTime()
