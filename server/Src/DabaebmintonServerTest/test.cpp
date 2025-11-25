@@ -110,8 +110,3 @@ TEST(MemoryBitStream, SerializeTest)
 
 	EXPECT_TRUE(inputStream.isEndOfStream());
 }
-
-TEST(Replication, SetReplicationActionCreate)
-{
-	
-}
