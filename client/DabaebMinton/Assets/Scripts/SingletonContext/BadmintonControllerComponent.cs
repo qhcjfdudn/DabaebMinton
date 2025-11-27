@@ -1,4 +1,3 @@
-using Unity.MLAgents;
 using UnityEngine;
 
 public class BadmintonControllerComponent : MonoBehaviour
@@ -11,27 +10,6 @@ public class BadmintonControllerComponent : MonoBehaviour
 
     private int _playerCount;
     private int _positionOf1P;
-
-    public void TogglePlayMode()
-    {
-        switch (PlayMode)
-        {
-            case EPlayMode.None:
-                PlayMode = EPlayMode.Local;
-                break;
-            case EPlayMode.Local:
-                PlayMode = EPlayMode.Online;
-                break;
-            case EPlayMode.Online:
-                PlayMode = EPlayMode.Local;
-                break;
-            default:
-                PlayMode = EPlayMode.Local;
-                break;
-        }
-
-        _inputManager.SetActionMapBy(PlayMode);
-    }
 
     private void Initialize()
     {

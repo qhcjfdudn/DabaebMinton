@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System;
 using System.Text;
 
 public class UIController : MonoBehaviour
@@ -63,13 +62,5 @@ public class UIController : MonoBehaviour
         _usernameInputField.text = null;
 
         _usernameTextField.text = username;
-    }
-
-    public void OnClickToggleNetworkModeButton()
-    {
-        BadmintonControllerComponent badmintonControllerComponent =
-            FindFirstObjectByType<BadmintonControllerComponent>()
-            .GetComponent<BadmintonControllerComponent>();
-        badmintonControllerComponent.TogglePlayMode();
     }
 }
